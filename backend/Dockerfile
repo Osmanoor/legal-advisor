@@ -1,5 +1,5 @@
-# Use Python 3.9 slim image
-FROM python:3.9-slim
+# Use Python 3.12 slim image
+FROM python:3.12-slim
 
 # Set working directory
 WORKDIR /app
@@ -13,21 +13,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the entire application
 COPY . .
 
-# Create a config directory for Streamlit
-RUN mkdir -p .streamlit
-
-# Create Streamlit config file
-RUN echo "\
-[server]\n\
-port = 8080\n\
-address = '0.0.0.0'\n\
-headless = true\n\
-enableCORS = false\n\
-enableXsrfProtection = false\n\
-" > .streamlit/config.toml
-
-# Expose port 8080
+# Expose port 8080 (Cloud Run expects port 8080)
 EXPOSE 8080
 
-# Run the Streamlit app
-ENTRYPOINT ["streamlit", "run", "app/streamlit_app.py", "--server.port=8080", "--server.address=0.0.0.0"]
+# Set environment variable for Flask
+ENV FLASK_APP=app.py
+ENV PORT=8080
+
+# Run the Flask app
+CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 app:app

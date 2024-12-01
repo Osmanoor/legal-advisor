@@ -14,8 +14,8 @@ from src.config import load_config
 from src.rag_system import ArabicRAGSystem
 
 
-os.environ["OPENAI_API_KEY"] = "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"
-os.environ["GOOGLE_API_KEY"] = "AIzaSyCS1BffW1boMTsHsg5tW_LJRIErIWxJ0EI"
+os.environ["OPENAI_API_KEY"] = ""
+os.environ["GOOGLE_API_KEY"] = ""
 
 # Configuration
 CONTACTS_FILE = 'data/contacts.csv'

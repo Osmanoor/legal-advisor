@@ -74,7 +74,7 @@ const ChatPage: React.FC = () => {
       <header className="bg-slate-800/50 border-b border-slate-700">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
-            {language === 'ar' ? 'المستشار القانوني' : 'Legal Advisor'}
+            {language === 'ar' ? "مجتمع المشتريات الحكومية" : "Government Procurement Community"}
           </h1>
           <button
             onClick={() => setLanguage(prev => prev === 'ar' ? 'en' : 'ar')}

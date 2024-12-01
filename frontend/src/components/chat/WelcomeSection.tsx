@@ -11,7 +11,7 @@ const WelcomeSection: React.FC<Props> = ({ language, onSuggestionClick }) => {
 
   const content = {
     ar: {
-      title: 'المستشار القانوني الذكي في خدمتك',
+      title: 'مساعد مجتمع المشتريات الحكومية الذكي في خدمتك',
       description: 'اطرح أسئلتك حول نظام المنافسات والمشتريات الحكومية',
       placeholder: 'اكتب سؤالك هنا...',
       sendButton: 'إرسال',
@@ -23,7 +23,7 @@ const WelcomeSection: React.FC<Props> = ({ language, onSuggestionClick }) => {
       ]
     },
     en: {
-      title: 'AI Legal Assistant at Your Service',
+      title: 'Government Procurement Community AI Assistant at Your Service',
       description: 'Ask your questions about Government Procurement Law',
       placeholder: 'Type your question here...',
       sendButton: 'Send',
@@ -49,7 +49,7 @@ const WelcomeSection: React.FC<Props> = ({ language, onSuggestionClick }) => {
         <img src='images/legal-bot-removebg.png' className="text-white" />
       </div>
       
-      <h1 className="text-3xl font-bold text-center mb-3 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+      <h1 className="text-3xl font-bold text-center pb-5 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
         {content[language].title}
       </h1>
       <p className="text-slate-300 mb-8 text-center">{content[language].description}</p>

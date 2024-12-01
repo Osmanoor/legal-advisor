@@ -64,15 +64,15 @@ const LandingPage: React.FC = () => {
 
   const content: Content = {
     ar: {
-      title: "المستشار القانوني",
+      title: "مجتمع المشتريات الحكومية",
       subtitle: "نظام المنافسات والمشتريات الحكومية",
-      description: "منصة متكاملة للبحث والاستشارات في نظام المنافسات والمشتريات الحكومية",
+      description: "منصة متكاملة تخص مجتمع المشتريات الحكومية من موظفي وموردين وهي منصة غير رسمية ولا تتبع الى أي جهة حكومية جهد بسيط من زملاء لكم ونرجو ان نقدم من خلالها الفائدة المرجوة علما بانها تحتمل الصواب والخطأ ولا تكفي عن العودة للنظام واللائحة والتعاميم ذات العلاقة",
       searchPlaceholder: "ابحث عن مواد النظام...",
       features: [
         { icon: Search, title: "بحث متقدم", description: "بحث سهل وسريع في مواد النظام بالكلمات المفتاحية", isAvailable: false },
-        { icon: MessageSquare, title: "المستشار الذكي", description: "إجابات دقيقة لاستفساراتك القانونية", isAvailable: true },
-        { icon: Book, title: "مكتبة قانونية", description: "مجموعة شاملة من الوثائق القانونية", isAvailable: false },
-        { icon: Store, title: "متجر إلكتروني", description: "تسوق المنتجات القانونية مباشرة", isAvailable: false }
+        { icon: MessageSquare, title: "المستشار الذكي", description: "إجابات دقيقة لاستفساراتك في المشتريات الحكومية", isAvailable: true },
+        { icon: Book, title: "مكتبة المشتريات", description: "مجموعة شاملة من وثائق المشتريات الحكومية", isAvailable: false },
+        { icon: Store, title: "متجر إلكتروني", description: "يتم خدمتكم بالربط والوساطة بينكم ومقدمي الخدمات المدفوعة للمشتريات مثال على ذلك الكتب والدورات وغيرها من منتجات تخص المشتريات الحكومية بدون اي مقابل", isAvailable: false }
       ],
       faq: [
         {
@@ -80,16 +80,16 @@ const LandingPage: React.FC = () => {
           a: "يمكنك استخدام شريط البحث الرئيسي أو تصفح الأقسام والفصول مباشرة"
         },
         {
-          q: "هل الاستشارات القانونية مجانية؟",
+          q: "هل الاستشارات مجانية؟",
           a: "نعم، الاستشارات الأساسية مجانية ومدعومة بالذكاء الاصطناعي"
         },
         {
           q: "كيف يمكنني تحميل النظام كاملاً؟",
-          a: "يمكنك تحميل النظام كاملاً من قسم المكتبة القانونية بصيغة PDF"
+          a: "يمكنك تحميل النظام كاملاً من قسم مكتبة المشتريات بصيغة PDF"
         }
       ],
       stats: [
-        { number: "١٠٠٠+", numericValue: 1000, label: "مادة قانونية" },
+        { number: "١٠٠٠+", numericValue: 1000, label: "مادة في النظام" },
         { number: "٥٠٠٠+", numericValue: 5000, label: "مستخدم نشط" },
         { number: "٩٩", numericValue: 99, label: "دقة الإجابات" }
       ],
@@ -106,15 +106,15 @@ const LandingPage: React.FC = () => {
       learnMore: "اكتشف المزيد"
     },
     en: {
-      title: "The Legal Advisor",
-      subtitle: "Government Procurement & Competition Law",
-      description: "Comprehensive platform for searching and consulting the Government Procurement Law",
+      title: "Government Procurement Community",
+      subtitle: "Government Procurement & Competition System",
+      description: "An integrated platform for the government procurement community including employees and suppliers. This is an unofficial platform, not affiliated with any government entity - a simple effort by your colleagues aiming to provide value, acknowledging that it may contain errors and does not substitute referring to official regulations and related circulars.",
       searchPlaceholder: "Search regulations...",
       features: [
         { icon: Search, title: "Advanced Search", description: "Fast and easy search through regulations", isAvailable: false },
-        { icon: MessageSquare, title: "Smart Advisor", description: "AI-powered accurate answers", isAvailable: true },
-        { icon: Book, title: "Legal Library", description: "Comprehensive document collection", isAvailable: false },
-        { icon: Store, title: "Online Store", description: "Shop legal products directly", isAvailable: false }
+        { icon: MessageSquare, title: "Smart Advisor", description: "Accurate answers for your procurement inquiries", isAvailable: true },
+        { icon: Book, title: "Procurement Library", description: "Comprehensive procurement document collection", isAvailable: false },
+        { icon: Store, title: "Online Store", description: "We connect you with paid procurement service providers such as books, courses, and other procurement-related products at no additional cost", isAvailable: false }
       ],
       faq: [
         {
@@ -122,16 +122,16 @@ const LandingPage: React.FC = () => {
           a: "You can use the main search bar or browse through sections and chapters directly"
         },
         {
-          q: "Are legal consultations free?",
+          q: "Are consultations free?",
           a: "Yes, basic consultations are free and powered by AI"
         },
         {
           q: "How can I download the complete regulation?",
-          a: "You can download the complete regulation from the legal library section in PDF format"
+          a: "You can download the complete regulation from the procurement library section in PDF format"
         }
       ],
       stats: [
-        { number: "1000+", numericValue: 1000, label: "Legal Articles" },
+        { number: "1000+", numericValue: 1000, label: "System Articles" },
         { number: "5000+", numericValue: 5000, label: "Active Users" },
         { number: "99", numericValue: 99, label: "Answer Accuracy" }
       ],
@@ -354,7 +354,7 @@ const LandingPage: React.FC = () => {
       </div>
 
       {/* Stats Section */}
-      <div className="bg-gray-50 py-24">
+      {/* <div className="bg-gray-50 py-24">
         <div className="max-w-7xl mx-auto px-6">
           <div ref={statsRef} className="grid md:grid-cols-3 gap-8">
             {animatedStats.map((stat, index) => (
@@ -365,7 +365,7 @@ const LandingPage: React.FC = () => {
             ))}
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* FAQ Section */}
       <div className="max-w-7xl mx-auto px-6 py-24">

@@ -29,9 +29,15 @@ app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
 # Global variables
-rag_system = None
-config = None
+configs = {}
+rag_systems = {}
 chat_histories = {}  # Store chat histories per session
+
+def get_rag_system(language):
+    if language not in rag_systems:
+        configs[language] = load_config(language)
+        rag_systems[language] = ArabicRAGSystem(configs[language])
+    return rag_systems[language]
 
 @dataclass
 class ChatResponse:
@@ -40,22 +46,6 @@ class ChatResponse:
     sources: list
     error: Optional[str] = None
 
-def init_rag_system():
-    """Initialize RAG system if not already initialized"""
-    global rag_system
-    global config
-    if rag_system is None:
-        try:
-            config = load_config()
-            rag_system = ArabicRAGSystem(config)
-        except Exception as e:
-            print(f"Error initializing RAG system: {str(e)}")
-            raise
-
-@app.before_request
-def before_first_request():
-    """Initialize the RAG system before the first request"""
-    init_rag_system()
 
 def require_auth(f):
     @wraps(f)
@@ -74,16 +64,15 @@ def check_auth(username, password):
 @app.route('/api/chat', methods=['POST'])
 def chat():
     """Handle chat requests"""
-    global rag_system
-    global config
     try:
         data = request.get_json()
         message = data.get('message')
         session_id = data.get('sessionId', 'default')  # Use a session ID to maintain separate chat histories
         language = data.get('language', 'ar')
-        if config.lang != language:
-            config = load_config(language)
-            rag_system = ArabicRAGSystem(config)
+
+        # Get the appropriate rag_system for the given language
+        rag_system = get_rag_system(language)
+
         if not message:
             return jsonify({"error": "No message provided"}), 400
 
@@ -107,7 +96,6 @@ def chat():
                 "content": doc.page_content,
                 "metadata": doc.metadata
             }
-
             formatted_sources.append(source)
 
         chat_response = ChatResponse(
@@ -118,6 +106,7 @@ def chat():
         return jsonify(asdict(chat_response))
 
     except Exception as e:
+        print(f"Error: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 @app.route('/api/chat/history', methods=['GET'])

@@ -35,4 +35,4 @@ class ArabicRAGSystem:
 
     def query(self, question: str, chat_history: Optional[list] = None) -> Dict[str, Any]:
         """Process a query and return the response."""
-        return self.qa_handler.query(question, chat_history)
+        return self.qa_handler.query(question)

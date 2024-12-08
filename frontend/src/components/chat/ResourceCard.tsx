@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, FileText, Book, Bookmark } from 'lucide-react';
 import { Resource } from '../../types/chat';
 
 interface Props {
@@ -24,6 +24,37 @@ const ResourceCard: React.FC<Props> = ({ resource, language }) => {
       summary: 'Summary'
     }
   };
+
+  // Get badge color and icon based on article type
+  const getBadgeConfig = (type: string) => {
+    const configs = {
+      primary: { 
+        color: 'bg-blue-500/20 text-blue-400 border-blue-500/30', 
+        icon: FileText,
+        hoverColor: 'hover:bg-blue-500/30'
+      },
+      secondary: { 
+        color: 'bg-purple-500/20 text-purple-400 border-purple-500/30', 
+        icon: Book,
+        hoverColor: 'hover:bg-purple-500/30'
+      },
+      supplementary: { 
+        color: 'bg-green-500/20 text-green-400 border-green-500/30', 
+        icon: Bookmark,
+        hoverColor: 'hover:bg-green-500/30'
+      },
+      default: { 
+        color: 'bg-slate-500/20 text-slate-400 border-slate-500/30', 
+        icon: FileText,
+        hoverColor: 'hover:bg-slate-500/30'
+      }
+    };
+    
+    return configs[type as keyof typeof configs] || configs.default;
+  };
+
+  const badgeConfig = getBadgeConfig(resource.metadata.article_type);
+  const BadgeIcon = badgeConfig.icon;
 
   // Format numbers in Arabic style for Arabic language
   const formatNumber = (num: number): string => {
@@ -56,6 +87,17 @@ const ResourceCard: React.FC<Props> = ({ resource, language }) => {
             <span className="text-sm font-medium text-slate-300 unicode-bidi-override">
               {`${labels[language].article} ${formatNumber(resource.metadata.article_number)}`}
             </span>
+            <div 
+              className={`
+                px-2 py-1 rounded-md text-xs font-medium border 
+                flex items-center gap-1 transition-colors
+                ${badgeConfig.color} ${badgeConfig.hoverColor}
+                ${language === 'ar' ? 'mr-auto' : 'ml-auto'}
+              `}
+            >
+              <BadgeIcon size={14} />
+              <span className="capitalize">{resource.metadata.article_type}</span>
+            </div>
           </div>
           <div className="flex flex-col gap-1 mt-1 text-sm text-slate-400">
             <span className="unicode-bidi-override">{formattedChapter}</span>
@@ -94,7 +136,6 @@ const ResourceCard: React.FC<Props> = ({ resource, language }) => {
           </p>
         </div>
       )}
-
     </div>
   );
 };

@@ -1,6 +1,11 @@
 import os
 from dataclasses import dataclass
 from typing import Literal
+from dotenv import load_dotenv
+from pathlib import Path
+
+dotenv_path = Path('..','.env')
+load_dotenv(dotenv_path)
 
 @dataclass
 class RAGConfig:

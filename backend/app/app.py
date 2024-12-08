@@ -98,6 +98,8 @@ def chat():
 
         formatted_sources = []
         for doc in response["source_documents"]:
+            print(doc.metadata)
+            print("\n")
             source = {
                 "content": doc.page_content,
                 "metadata": doc.metadata

@@ -2,6 +2,7 @@ export interface Resource {
   content: string;
   metadata: {
     article_number: number;
+    article_type: string;
     chapter_name: string;
     chapter_number: number;
     section_name: string;

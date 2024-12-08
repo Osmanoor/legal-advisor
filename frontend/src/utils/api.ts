@@ -1,3 +1,4 @@
+import { Console } from 'console';
 import { ChatMessage, Resource } from '../types/chat';
 
 // API response types
@@ -7,6 +8,7 @@ interface ChatResponse {
     content: string;
     metadata: {
       article_number: number;
+      article_type: string;
       chapter_name: string;
       chapter_number: number;
       section_name: string;
@@ -66,7 +68,7 @@ export const chatService = {
       });
   
       const data = await checkResponse(response);
-      
+      console.log("JSON Data:", data)
       // No need to transform the response as it already matches our interface
       return data;
     } catch (error) {

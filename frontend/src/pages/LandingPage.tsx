@@ -42,9 +42,9 @@ interface Content {
     stats: Stat[];
     cta: string;
     learnMore: string;
-    comingSoon: string;  
-    formSuccess: string; 
-    formError: string;   
+    comingSoon: string;
+    formSuccess: string;
+    formError: string;
   };
 }
 
@@ -69,10 +69,10 @@ const LandingPage: React.FC = () => {
       description: "منصة متكاملة تخص مجتمع المشتريات الحكومية من موظفي وموردين وهي منصة غير رسمية ولا تتبع الى أي جهة حكومية جهد بسيط من زملاء لكم ونرجو ان نقدم من خلالها الفائدة المرجوة علما بانها تحتمل الصواب والخطأ ولا تكفي عن العودة للنظام واللائحة والتعاميم ذات العلاقة",
       searchPlaceholder: "ابحث عن مواد النظام...",
       features: [
-        { icon: Search, title: "بحث متقدم", description: "بحث سهل وسريع في مواد النظام بالكلمات المفتاحية", isAvailable: false },
+        { icon: Search, title: "بحث متقدم", description: "بحث سهل وسريع في مواد النظام بالكلمات", isAvailable: false },
         { icon: MessageSquare, title: "المستشار الذكي", description: "إجابات دقيقة لاستفساراتك في المشتريات الحكومية", isAvailable: true },
         { icon: Book, title: "مكتبة المشتريات", description: "مجموعة شاملة من وثائق المشتريات الحكومية", isAvailable: false },
-        { icon: Store, title: "متجر إلكتروني", description: "يتم خدمتكم بالربط والوساطة بينكم ومقدمي الخدمات المدفوعة للمشتريات مثال على ذلك الكتب والدورات وغيرها من منتجات تخص المشتريات الحكومية بدون اي مقابل", isAvailable: false }
+        // { icon: Store, title: "متجر إلكتروني", description: "يتم خدمتكم بالربط والوساطة بينكم ومقدمي الخدمات المدفوعة للمشتريات مثال على ذلك الكتب والدورات وغيرها من منتجات تخص المشتريات الحكومية بدون اي مقابل", isAvailable: false }
       ],
       faq: [
         {
@@ -346,9 +346,11 @@ const LandingPage: React.FC = () => {
 
       {/* Features Grid */}
       <div className="max-w-7xl mx-auto px-6 py-24">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="flex flex-wrap justify-between gap-8">
           {content[language].features.map((feature, index) => (
-            <FeatureCard feature={feature}></FeatureCard>
+            <div className="flex-1 min-w-[250px]">
+              <FeatureCard feature={feature} />
+            </div>
           ))}
         </div>
       </div>
@@ -450,7 +452,7 @@ const LandingPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="space-y-4">
-              <h3 className="font-bold text-lg">Legal Advisor</h3>
+              <h3 className="font-bold text-lg">Government Procurement Community</h3>
               <p className="text-gray-400">© 2024 All rights reserved</p>
             </div>
           </div>

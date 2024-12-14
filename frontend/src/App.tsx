@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import ChatPage from './pages/ChatPage';
 import ContactAdmin from './pages/ContactAdmin';
+import SearchPage from './pages/SearchPage';
 
 const App = () => {
   return (
@@ -9,6 +10,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/chat" element={<ChatPage />} />
+        <Route path="/search" element={<SearchPage />} />
         <Route path="/admin" element={<ContactAdmin />} />
       </Routes>
     </BrowserRouter>

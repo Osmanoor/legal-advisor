@@ -69,7 +69,7 @@ const LandingPage: React.FC = () => {
       description: "منصة متكاملة تخص مجتمع المشتريات الحكومية من موظفي وموردين وهي منصة غير رسمية ولا تتبع الى أي جهة حكومية جهد بسيط من زملاء لكم ونرجو ان نقدم من خلالها الفائدة المرجوة علما بانها تحتمل الصواب والخطأ ولا تكفي عن العودة للنظام واللائحة والتعاميم ذات العلاقة",
       searchPlaceholder: "ابحث عن مواد النظام...",
       features: [
-        { icon: Search, title: "بحث متقدم", description: "بحث سهل وسريع في مواد النظام بالكلمات", isAvailable: false },
+        { icon: Search, title: "بحث متقدم", description: "بحث سهل وسريع في مواد النظام بالكلمات", isAvailable: true },
         { icon: MessageSquare, title: "المستشار الذكي", description: "إجابات دقيقة لاستفساراتك في المشتريات الحكومية", isAvailable: true },
         { icon: Book, title: "مكتبة المشتريات", description: "مجموعة شاملة من وثائق المشتريات الحكومية", isAvailable: false },
         // { icon: Store, title: "متجر إلكتروني", description: "يتم خدمتكم بالربط والوساطة بينكم ومقدمي الخدمات المدفوعة للمشتريات مثال على ذلك الكتب والدورات وغيرها من منتجات تخص المشتريات الحكومية بدون اي مقابل", isAvailable: false }
@@ -111,7 +111,7 @@ const LandingPage: React.FC = () => {
       description: "An integrated platform for the government procurement community including employees and suppliers. This is an unofficial platform, not affiliated with any government entity - a simple effort by your colleagues aiming to provide value, acknowledging that it may contain errors and does not substitute referring to official regulations and related circulars.",
       searchPlaceholder: "Search regulations...",
       features: [
-        { icon: Search, title: "Advanced Search", description: "Fast and easy search through regulations", isAvailable: false },
+        { icon: Search, title: "Advanced Search", description: "Fast and easy search through regulations", isAvailable: true },
         { icon: MessageSquare, title: "Smart Advisor", description: "Accurate answers for your procurement inquiries", isAvailable: true },
         { icon: Book, title: "Procurement Library", description: "Comprehensive procurement document collection", isAvailable: false },
         { icon: Store, title: "Online Store", description: "We connect you with paid procurement service providers such as books, courses, and other procurement-related products at no additional cost", isAvailable: false }
@@ -248,6 +248,9 @@ const LandingPage: React.FC = () => {
     const handleClick = () => {
       if (feature.isAvailable && feature.icon === MessageSquare) {
         navigate('/chat');
+      }
+      if (feature.isAvailable && feature.icon === Search) {
+        navigate('/search');
       }
     };
 

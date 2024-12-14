@@ -128,6 +128,58 @@ def clear_chat_history():
         chat_histories[session_id] = []
     return jsonify({"status": "success"})
 
+def validate_search_type(search_type: Optional[str]) -> bool:
+    """Validate the search type parameter."""
+    if search_type is None:
+        return True
+    return search_type in ['System', 'Regulation', 'Both']
+
+@app.route('/api/search', methods=['GET'])
+def search():
+    """
+    Handle search requests with query parameters.
+    
+    Query Parameters:
+    - query (required): Search keywords
+    - type (optional): Resource type filter ('System', 'Regulation', 'Both')
+    
+    Returns:
+    - JSON response with search results or error message
+    """
+    # Get query parameters
+    search_query = request.args.get('query', '').strip()
+    search_type = request.args.get('type')
+
+    # Validate input
+    if not search_query:
+        return jsonify({
+            'error': 'Search query is required'
+        }), 400
+
+    if not validate_search_type(search_type):
+        return jsonify({
+            'error': 'Invalid search type. Must be one of: System, Regulation, Both'
+        }), 400
+
+    try:
+        # Call your existing search function
+        # Assuming your function is named 'perform_search' and takes these parameters
+        search_results = perform_search(
+            query=search_query,
+            resource_type=search_type
+        )
+
+        # Return the results
+        return jsonify({
+            'data': search_results
+        }), 200
+
+    except Exception as e:
+        # Log the error here if you have logging set up
+        return jsonify({
+            'error': 'An error occurred while processing your search'
+        }), 500
+
 @app.route('/api/contact', methods=['POST'])
 def submit_contact():
     try:
@@ -172,6 +224,7 @@ def get_contacts():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))

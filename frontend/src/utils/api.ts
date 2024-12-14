@@ -1,5 +1,7 @@
 import { Console } from 'console';
 import { ChatMessage, Resource } from '../types/chat';
+import { SearchParams, SearchResponse } from '../types/search';
+
 
 // API response types
 interface ChatResponse {
@@ -53,6 +55,20 @@ const checkResponse = async (response: Response) => {
 };
 
 // Main API service
+export const searchResources = async ({ query, type }: SearchParams): Promise<SearchResponse> => {
+  const params = new URLSearchParams({ query });
+  if (type && type !== 'Both') {
+    params.append('type', type);
+  }
+
+  const response = await fetch(`${API_CONFIG.BASE_URL}/search?${params.toString()}`);
+  if (!response.ok) {
+    throw new Error('Search request failed');
+  }
+
+  return response.json();
+};
+
 export const chatService = {
   // Send a message and get response
   async sendMessage(message: string, language: 'ar' | 'en'): Promise<ChatResponse> {

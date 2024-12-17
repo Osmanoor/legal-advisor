@@ -38,7 +38,7 @@ class SearchEngine:
         Returns:
             bool: True if matches, False otherwise
         """
-        if filter_type == "both":
+        if filter_type == "Both":
             return True
             
         # Handle Arabic type filter
@@ -52,7 +52,7 @@ class SearchEngine:
             
         return item_type == filter_type
     
-    def search(self, query_text, doc_type="both"):
+    def search(self, query_text, doc_type="Both"):
         """
         Search for text in content fields across all loaded JSON files with type filtering
         
@@ -84,7 +84,7 @@ class SearchEngine:
 # Create a singleton instance
 search_engine = SearchEngine()
 
-def search_content(query_text, doc_type="both"):
+def search_content(query_text, doc_type="Both"):
     """
     Search for content across all JSON files with type filtering
     
@@ -103,7 +103,7 @@ if __name__ == "__main__":
     test_queries = [
         ("tender documents", "System"),
         ("المنافسة", "اللائحة"),
-        ("contract", "both")
+        ("contract", "Both")
     ]
     
     for query, doc_type in test_queries:

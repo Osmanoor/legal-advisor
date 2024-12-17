@@ -1,25 +1,39 @@
 import React from 'react';
 import { ResourceType, Resource } from '../../types/search';
+import { Language, translations } from '../../utils/translations';
+
+export const LanguageSwitch: React.FC<{
+  currentLanguage: Language;
+  onLanguageChange: (lang: Language) => void;
+}> = ({ currentLanguage, onLanguageChange }) => (
+  <button
+    onClick={() => onLanguageChange(currentLanguage === 'en' ? 'ar' : 'en')}
+    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-700/50 hover:bg-slate-600/50 transition-colors"
+  >
+    {translations[currentLanguage][currentLanguage === 'en' ? 'switchToArabic' : 'switchToEnglish']}
+  </button>
+);
 
 export const SearchBar: React.FC<{
   query: string;
   onQueryChange: (query: string) => void;
   onSearch: () => void;
-}> = ({ query, onQueryChange, onSearch }) => (
-  <div className="flex gap-2">
+  language: Language;
+}> = ({ query, onQueryChange, onSearch, language }) => (
+  <div className="flex gap-2" dir={language === 'ar' ? 'rtl' : 'ltr'}>
     <input
       type="text"
       value={query}
       onChange={(e) => onQueryChange(e.target.value)}
-      placeholder="Enter search keywords..."
-      className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+      placeholder={translations[language].searchPlaceholder}
+      className="flex-1 px-4 py-2 border rounded-lg bg-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
       onKeyDown={(e) => e.key === 'Enter' && onSearch()}
     />
     <button
       onClick={onSearch}
       className="px-6 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
     >
-      Search
+      {translations[language].searchButton}
     </button>
   </div>
 );
@@ -27,9 +41,10 @@ export const SearchBar: React.FC<{
 export const TypeFilter: React.FC<{
   selectedType?: ResourceType;
   onTypeChange: (type?: ResourceType) => void;
-}> = ({ selectedType, onTypeChange }) => (
-  <div className="flex gap-4 items-center">
-    <span className="font-medium">Filter by type:</span>
+  language: Language;
+}> = ({ selectedType, onTypeChange, language }) => (
+  <div className="flex gap-4 items-center" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+    <span className="font-medium">{translations[language].filterByType}</span>
     <div className="flex gap-4">
       {(['Both', 'System', 'Regulation'] as const).map((type) => (
         <label key={type} className="flex items-center gap-2 cursor-pointer">
@@ -40,7 +55,7 @@ export const TypeFilter: React.FC<{
             onChange={() => onTypeChange(type)}
             className="w-4 h-4 text-blue-600"
           />
-          <span>{type}</span>
+          <span>{translations[language].typeOptions[type]}</span>
         </label>
       ))}
     </div>
@@ -68,12 +83,13 @@ const HighlightedText: React.FC<{
 export const ResourceCard: React.FC<{
   resource: Resource;
   searchQuery: string;
-}> = ({ resource, searchQuery }) => (
-  <div className="p-6 border rounded-lg shadow-sm hover:shadow-md transition-shadow">
+  language: Language;
+}> = ({ resource, searchQuery, language }) => (
+  <div className="p-6 border rounded-lg shadow-sm transition-shadow bg-slate-700/50" dir={language === 'ar' ? 'rtl' : 'ltr'}>
     <div className="flex justify-between items-start mb-4">
       <div>
         <h3 className="text-xl font-semibold">#{resource.number}</h3>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-gray-400">
           {resource.chapter.name} - {resource.section.name}
         </p>
       </div>
@@ -84,25 +100,25 @@ export const ResourceCard: React.FC<{
     
     <div className="space-y-4">
       <div>
-        <h4 className="font-medium mb-2">Content:</h4>
-        <p className="text-gray-700 whitespace-pre-wrap">
+        <h4 className="font-medium mb-2">{translations[language].content}</h4>
+        <p className="text-gray-300 whitespace-pre-wrap">
           <HighlightedText text={resource.content} query={searchQuery} />
         </p>
       </div>
       
       <div>
-        <h4 className="font-medium mb-2">Summary:</h4>
-        <p className="text-gray-700">
+        <h4 className="font-medium mb-2">{translations[language].summary}</h4>
+        <p className="text-gray-300">
           <HighlightedText text={resource.summary} query={searchQuery} />
         </p>
       </div>
       
       {resource.keywords.length > 0 && (
         <div>
-          <h4 className="font-medium mb-2">Keywords:</h4>
+          <h4 className="font-medium mb-2">{translations[language].keywords}</h4>
           <div className="flex flex-wrap gap-2">
             {resource.keywords.map((keyword) => (
-              <span key={keyword} className="px-2 py-1 text-sm bg-gray-100 rounded">
+              <span key={keyword} className="px-2 py-1 text-sm bg-gray-600 rounded">
                 {keyword}
               </span>
             ))}
@@ -112,10 +128,10 @@ export const ResourceCard: React.FC<{
       
       {resource.references.length > 0 && (
         <div>
-          <h4 className="font-medium mb-2">References:</h4>
+          <h4 className="font-medium mb-2">{translations[language].references}</h4>
           <div className="flex flex-wrap gap-2">
             {resource.references.map((ref) => (
-              <span key={ref} className="px-2 py-1 text-sm bg-gray-100 rounded">
+              <span key={ref} className="px-2 py-1 text-sm bg-gray-600 rounded">
                 #{ref}
               </span>
             ))}

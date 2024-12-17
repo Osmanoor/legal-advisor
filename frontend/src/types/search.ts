@@ -18,7 +18,7 @@ export interface Resource {
   summary: string;
   section: Section;
   chapter: Chapter;
-  type: Exclude<ResourceType, 'Both'>;
+  type: string;
 }
 
 export interface SearchParams {

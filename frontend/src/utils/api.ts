@@ -33,7 +33,7 @@ interface LanguageResponse {
 
 // API configuration
 const API_CONFIG = {
-  BASE_URL: '/api',
+  BASE_URL: 'http://127.0.0.1:8080/api',
   HEADERS: {
     'Content-Type': 'application/json',
   },

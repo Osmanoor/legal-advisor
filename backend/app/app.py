@@ -11,6 +11,7 @@ from functools import wraps
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from src.config import load_config
 from src.rag_system import ArabicRAGSystem
+from data.search_engine import SearchEngine
 
 app = Flask('__name__', static_folder='static', static_url_path='')
 CORS(app)
@@ -28,6 +29,7 @@ configs = {}
 rag_systems = {}
 chat_histories = {}
 
+search_engine = SearchEngine()
 @dataclass
 class ChatResponse:
     """Structure for chat response"""
@@ -149,24 +151,27 @@ def search():
     # Get query parameters
     search_query = request.args.get('query', '').strip()
     search_type = request.args.get('type')
-
+    print(f"search:{search_query} type:{search_type}")
     # Validate input
     if not search_query:
         return jsonify({
             'error': 'Search query is required'
         }), 400
 
+    if search_type is None:
+        search_type = "Both"
+        
     if not validate_search_type(search_type):
         return jsonify({
             'error': 'Invalid search type. Must be one of: System, Regulation, Both'
         }), 400
-
+    
     try:
         # Call your existing search function
         # Assuming your function is named 'perform_search' and takes these parameters
-        search_results = perform_search(
-            query=search_query,
-            resource_type=search_type
+        search_results = search_engine.search(
+            query_text=search_query,
+            doc_type=search_type
         )
 
         # Return the results

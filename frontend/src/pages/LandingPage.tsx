@@ -71,7 +71,7 @@ const LandingPage: React.FC = () => {
       features: [
         { icon: Search, title: "بحث متقدم", description: "بحث سهل وسريع في مواد النظام بالكلمات", isAvailable: true },
         { icon: MessageSquare, title: "المستشار الذكي", description: "إجابات دقيقة لاستفساراتك في المشتريات الحكومية", isAvailable: true },
-        { icon: Book, title: "مكتبة المشتريات", description: "مجموعة شاملة من وثائق المشتريات الحكومية", isAvailable: false },
+        { icon: Book, title: "مكتبة المشتريات", description: "مجموعة شاملة من وثائق المشتريات الحكومية", isAvailable: true },
         // { icon: Store, title: "متجر إلكتروني", description: "يتم خدمتكم بالربط والوساطة بينكم ومقدمي الخدمات المدفوعة للمشتريات مثال على ذلك الكتب والدورات وغيرها من منتجات تخص المشتريات الحكومية بدون اي مقابل", isAvailable: false }
       ],
       faq: [
@@ -113,7 +113,7 @@ const LandingPage: React.FC = () => {
       features: [
         { icon: Search, title: "Advanced Search", description: "Fast and easy search through regulations", isAvailable: true },
         { icon: MessageSquare, title: "Smart Advisor", description: "Accurate answers for your procurement inquiries", isAvailable: true },
-        { icon: Book, title: "Procurement Library", description: "Comprehensive procurement document collection", isAvailable: false },
+        { icon: Book, title: "Procurement Library", description: "Comprehensive procurement document collection", isAvailable: true },
         { icon: Store, title: "Online Store", description: "We connect you with paid procurement service providers such as books, courses, and other procurement-related products at no additional cost", isAvailable: false }
       ],
       faq: [
@@ -251,6 +251,9 @@ const LandingPage: React.FC = () => {
       }
       if (feature.isAvailable && feature.icon === Search) {
         navigate('/search');
+      }
+      if (feature.isAvailable && feature.icon === Book) {
+        navigate('/library');
       }
     };
 

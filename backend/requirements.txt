@@ -10,3 +10,6 @@ langchain_community
 langchain_openai
 Flask
 Flask-Cors
+oauth2client
+google-api-python-client
+certifi

@@ -18,7 +18,14 @@ export const translations = {
     keywords: 'Keywords:',
     references: 'References:',
     switchToArabic: 'عربي',
-    switchToEnglish: 'English'
+    switchToEnglish: 'English',
+    libraryTitle: 'Library',
+    downloadButton: 'Download',
+    downloadSuccess: 'File downloaded successfully',
+    downloadError: 'Failed to download file',
+    openButton: 'Open',
+    downloading: 'Downloading...',
+    deepSearchLabel: 'Deep search',
   },
   ar: {
     pageTitle: 'البحث في الموارد',
@@ -37,7 +44,14 @@ export const translations = {
     keywords: 'الكلمات المفتاحية:',
     references: 'المراجع:',
     switchToArabic: 'عربي',
-    switchToEnglish: 'English'
+    switchToEnglish: 'English',
+    libraryTitle: 'المكتبة',
+    downloadButton: 'تنزيل',
+    downloadSuccess: 'تم تنزيل الملف بنجاح',
+    downloadError: 'فشل تنزيل الملف',
+    openButton: 'فتح',
+    downloading: 'جاري التحميل...',
+    deepSearchLabel: 'بحث عميق',
   }
 } as const;
 

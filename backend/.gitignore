@@ -1,0 +1,15 @@
+# Ignore Python environment and package files in backend
+/backend/__pycache__/
+/backend/env/
+/backend/venv/
+/backend/*.pyc
+/backend/*.pyo
+/backend/*.pyd
+/backend/.mypy_cache/
+/backend/.pytest_cache/
+
+# Ignore Node.js dependencies in frontend
+/frontend/node_modules/
+/frontend/npm-debug.log*
+/frontend/yarn-debug.log*
+/frontend/yarn-error.log*

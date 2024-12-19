@@ -8,8 +8,8 @@ export const translations = {
     filterByType: 'Filter by type:',
     typeOptions: {
       Both: 'Both',
-      System: 'System',
-      Regulation: 'Regulation'
+      System: 'Government Tenders and Procurement System',
+      Regulation: 'Implementing Regulations of the Government Tenders and Procurement System'
     },
     noResults: 'No results found for your search.',
     error: 'Failed to fetch search results. Please try again.',
@@ -34,8 +34,8 @@ export const translations = {
     filterByType: 'تصفية حسب النوع:',
     typeOptions: {
       Both: 'الكل',
-      System: 'نظام',
-      Regulation: 'لائحة'
+      System: 'نظام المنافسات والمشتريات الحكومية',
+      Regulation: 'اللائحة التنفيذية لنظام المنافسات والمشتريات الحكومية'
     },
     noResults: 'لم يتم العثور على نتائج لبحثك.',
     error: 'فشل في جلب نتائج البحث. حاول مرة أخرى.',

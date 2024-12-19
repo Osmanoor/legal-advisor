@@ -26,9 +26,9 @@ const LibraryPage: React.FC = () => {
   const [downloadingFiles, setDownloadingFiles] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string>('');
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([
-    { id: "1MbGmql3amv-RJfrQs-LlcTMhXBJf-c3P", name: "Root" }
+    { id: "1BMIRxbgn7CdNCETbULCntFDJ-gEBYPWA", name: "Root" }
   ]);
-  const BASE_URL = 'http://127.0.0.1:5000';
+  const BASE_URL = '/api';
 
   const isFolder = (item: FileOrFolder) => 
     item.mimeType === 'application/vnd.google-apps.folder';

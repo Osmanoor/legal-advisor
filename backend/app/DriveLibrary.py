@@ -1,12 +1,7 @@
-from flask import Flask, jsonify, request, send_file
-from flask_cors import CORS
 from googleapiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
 from googleapiclient.http import MediaIoBaseDownload
 import io
-
-app = Flask(__name__)
-CORS(app)
 
 class DriveLibrary:
     """Google Drive Library for Flask Backend"""
@@ -19,7 +14,7 @@ class DriveLibrary:
         """Authenticate with Google Drive using a service account"""
         scopes = ['https://www.googleapis.com/auth/drive']
         credentials = ServiceAccountCredentials.from_json_keyfile_name(
-            'backend\\service_account_credentials.json', scopes
+            'service_account_credentials.json', scopes
         )
         return build('drive', 'v3', credentials=credentials)
 
@@ -148,93 +143,3 @@ class DriveLibrary:
         except Exception as e:
             print(f"Error generating download URL: {str(e)}")
             return {'error': str(e)}
-
-# Initialize Drive Library with your Google Drive folder ID
-drive_library = DriveLibrary(folder_id="1MbGmql3amv-RJfrQs-LlcTMhXBJf-c3P")
-
-@app.route('/list-folder-contents', methods=['GET'])
-def list_folder_contents():
-    folder_id = request.args.get('folder_id', None)
-    sort_by = request.args.get('sort_by', 'name')
-    sort_order = request.args.get('sort_order', 'asc')
-    result = drive_library.list_folder_contents(folder_id, sort_by, sort_order)
-    print(result)
-    return jsonify(result)
-
-@app.route('/search-files', methods=['GET'])
-def search_files():
-    query = request.args.get('query', '')
-    folder_id = request.args.get('folder_id', None)
-    recursive = request.args.get('recursive', 'true').lower() == 'true'
-    file_type = request.args.get('file_type', None)
-    min_size = request.args.get('min_size', None)
-    max_size = request.args.get('max_size', None)
-
-    result = drive_library.search_files(
-        query=query,
-        folder_id=folder_id,
-        recursive=recursive,
-        file_type=file_type,
-        min_size=int(min_size) if min_size else None,
-        max_size=int(max_size) if max_size else None
-    )
-    print(result)
-    return jsonify(result)
-
-@app.route('/get-download-url', methods=['POST'])
-def get_download_url():
-    try:
-        data = request.json
-        file_id = data.get('file_id')
-
-        if not file_id:
-            return jsonify({'error': 'file_id is required'}), 400
-
-        result = drive_library.download_file(file_id)
-        
-        if 'error' in result:
-            return jsonify(result), 500
-
-        return jsonify(result)
-
-    except Exception as e:
-        print(f"Error in download URL endpoint: {str(e)}")
-        return jsonify({'error': str(e)}), 500
-    
-@app.route('/download-file', methods=['POST'])
-def download_file():
-    try:
-        data = request.json
-        file_id = data.get('file_id')
-
-        if not file_id:
-            return jsonify({'error': 'file_id is required'}), 400
-
-        file_io, file_name, mime_type = drive_library.download_file(file_id)
-        
-        if file_io is None:
-            # If mime_type is a dict, it contains our error message
-            if isinstance(mime_type, dict) and 'error' in mime_type:
-                return jsonify(mime_type), 500
-            return jsonify({'error': 'Failed to download file'}), 500
-
-        # Add headers to prevent caching
-        response = send_file(
-            file_io,
-            mimetype=mime_type,
-            as_attachment=True,
-            download_name=file_name
-        )
-        
-        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-        response.headers['Pragma'] = 'no-cache'
-        response.headers['Expires'] = '0'
-        
-        return response
-
-    except Exception as e:
-        print(f"Error in download endpoint: {str(e)}")
-        return jsonify({'error': 'Server error during download'}), 500
-
-if __name__ == '__main__':
-    app.run(debug=True)

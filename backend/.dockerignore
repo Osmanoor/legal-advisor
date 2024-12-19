@@ -1,7 +1,8 @@
 .git
 .gitignore
 .env
-__pycache__
+.env.*
+__pycache__/
 *.pyc
 *.pyo
 *.pyd
@@ -20,6 +21,8 @@ coverage.xml
 *.cover
 *.log
 .pytest_cache/
-.env.local
-.env.*.local
-chroma_db/
+*.sqlite3
+chroma_db/*/
+chroma_db_ar/*/
+chroma_db_en/*/
+tests/

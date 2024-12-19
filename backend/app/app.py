@@ -7,12 +7,13 @@ from dataclasses import dataclass, asdict
 from datetime import datetime
 import csv
 from functools import wraps
-from DriveLibrary import DriveLibrary
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from src.config import load_config
 from src.rag_system import ArabicRAGSystem
 from data.search_engine import SearchEngine
+from app.DriveLibrary import DriveLibrary
+
 
 app = Flask('__name__', static_folder='static', static_url_path='')
 CORS(app)

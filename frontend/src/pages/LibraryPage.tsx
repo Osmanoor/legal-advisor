@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Languages, Folder, File, ChevronRight, ArrowLeft, Loader } from 'lucide-react';
 import { Language, translations } from '../utils/translations';
+import { useLanguage } from '../LanguageContext';
+
 
 interface FileOrFolder {
   mimeType: string;
@@ -18,7 +20,7 @@ interface BreadcrumbItem {
 }
 
 const LibraryPage: React.FC = () => {
-  const [language, setLanguage] = useState<Language>('en');
+  const {language, setLanguage} = useLanguage();
   const [items, setItems] = useState<FileOrFolder[]>([]);
   const [query, setQuery] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -26,9 +28,9 @@ const LibraryPage: React.FC = () => {
   const [downloadingFiles, setDownloadingFiles] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string>('');
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([
-    { id: "1BMIRxbgn7CdNCETbULCntFDJ-gEBYPWA", name: "Root" }
+    { id: "1BMIRxbgn7CdNCETbULCntFDJ-gEBYPWA", name: translations[language].root }
   ]);
-  const BASE_URL = '/api';
+  const BASE_URL = 'api';
 
   const isFolder = (item: FileOrFolder) => 
     item.mimeType === 'application/vnd.google-apps.folder';
@@ -147,7 +149,7 @@ const LibraryPage: React.FC = () => {
             {language === 'ar' ? "مجتمع المشتريات الحكومية" : "Government Procurement Community"}
           </Link>
           <button
-            onClick={() => setLanguage(prev => prev === 'ar' ? 'en' : 'ar')}
+            onClick={() => setLanguage(language === 'ar' ? 'en' : 'ar')}
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-700/50 hover:bg-slate-600/50 transition-colors"
           >
             <Languages size={20} />
@@ -161,19 +163,21 @@ const LibraryPage: React.FC = () => {
           <h1 className="text-3xl font-bold">{translations[language].libraryTitle}</h1>
           
           {/* Breadcrumb Navigation */}
-          <div className="flex items-center gap-2 text-gray-400 overflow-x-auto">
-            {breadcrumbs.map((crumb, index) => (
-              <React.Fragment key={crumb.id}>
-                {index > 0 && <ChevronRight size={16} />}
-                <button
-                  onClick={() => handleBreadcrumbClick(index)}
-                  className="hover:text-white transition-colors whitespace-nowrap"
-                >
-                  {crumb.name}
-                </button>
-              </React.Fragment>
-            ))}
-          </div>
+          {breadcrumbs.length > 1 && (
+            <div className="flex items-center gap-2 text-gray-400 overflow-x-auto">
+              {breadcrumbs.map((crumb, index) => (
+                <React.Fragment key={crumb.id}>
+                  {index > 0 && <ChevronRight size={16} />}
+                  <button
+                    onClick={() => handleBreadcrumbClick(index)}
+                    className="hover:text-white transition-colors whitespace-nowrap"
+                  >
+                    {crumb.name}
+                  </button>
+                </React.Fragment>
+              ))}
+            </div>
+          )}
 
           <div className="flex flex-col gap-4">
             <div className="flex gap-2">
@@ -217,9 +221,9 @@ const LibraryPage: React.FC = () => {
             {error}
           </div>
         ) : items.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="flex flex-col gap-4">
             {items.map((item) => (
-              <div key={item.id} className="p-6 border rounded-lg shadow-sm transition-shadow hover:shadow-md bg-slate-700/50">
+              <div key={item.id} className="p-6 border rounded-lg shadow-sm transition-shadow hover:shadow-md bg-slate-700/50 flex flex-col">
                 <div className="flex items-start gap-4 h-full">
                   <div className="flex items-start gap-3 min-w-0 flex-1">
                     {isFolder(item) ? (
@@ -228,7 +232,7 @@ const LibraryPage: React.FC = () => {
                       <File className="flex-shrink-0 text-blue-400" size={24} />
                     )}
                     <div className="min-w-0 flex-1">
-                      <h3 className="text-lg font-semibold truncate" title={item.name}>
+                      <h3 className="text-lg font-semibold" title={item.name}>
                         {item.name}
                       </h3>
                       <p className="text-sm text-gray-400">

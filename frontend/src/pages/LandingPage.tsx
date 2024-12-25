@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, FormEvent } from 'react';
-import { Search, Book, MessageSquare, Download, Store, Languages, ChevronDown, ArrowRight, Phone, Mail, MapPin } from 'lucide-react';
+import { Search, Book, MessageSquare, Download, Store, Languages, ChevronDown, ArrowRight, Phone, Mail, MapPin, Linkedin, LinkedinIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import chatService from '../utils/api';
+import { useLanguage } from '../LanguageContext';
 
 // Add interfaces for better type safety
 interface Stat {
@@ -45,6 +45,19 @@ interface Content {
     comingSoon: string;
     formSuccess: string;
     formError: string;
+    contact: {
+      title: string;
+      phone: string;
+      email: string;
+      address: string;
+      form: {
+        name: string;
+        email: string;
+        message: string;
+        send: string;
+        sending: string;
+      };
+    };
   };
 }
 
@@ -52,7 +65,7 @@ type FormStatus = 'idle' | 'loading' | 'success' | 'error';
 type ErrorType = 'required' | 'email' | 'server' | 'network' | null;
 
 const LandingPage: React.FC = () => {
-  const [language, setLanguage] = useState<'ar' | 'en'>('ar');
+  const { language, setLanguage } = useLanguage();
   const [isVisible, setIsVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [animatedStats, setAnimatedStats] = useState<Stat[]>([]);
@@ -103,7 +116,20 @@ const LandingPage: React.FC = () => {
       formSuccess: "تم إرسال رسالتك بنجاح",
       formError: "حدث خطأ أثناء إرسال الرسالة",
       cta: "ابدأ الآن",
-      learnMore: "اكتشف المزيد"
+      learnMore: "اكتشف المزيد",
+      contact: {
+        title: "تواصل معنا",
+        phone: "هاتف",
+        email: "البريد الإلكتروني",
+        address: "الرياض، المملكة العربية السعودية",
+        form: {
+          name: "الاسم",
+          email: "البريد الإلكتروني",
+          message: "الرسالة",
+          send: "إرسال الرسالة",
+          sending: "جاري الإرسال..."
+        }
+      },
     },
     en: {
       title: "Government Procurement Community",
@@ -145,7 +171,20 @@ const LandingPage: React.FC = () => {
       formSuccess: "Message sent successfully",
       formError: "Error sending message",
       cta: "Get Started",
-      learnMore: "Learn More"
+      learnMore: "Learn More",
+      contact: {
+        title: "Contact Us",
+        phone: "Phone",
+        email: "Email",
+        address: "Riyadh, Saudi Arabia",
+        form: {
+          name: "Name",
+          email: "Email",
+          message: "Message",
+          send: "Send Message",
+          sending: "Sending..."
+        }
+      },
     }
   };
 
@@ -270,11 +309,15 @@ const LandingPage: React.FC = () => {
             </span>
           </div>
         )}
-        <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-4">
-          <feature.icon className="w-6 h-6 text-blue-600" />
+        <div className="flex items-center">
+          <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mr-4">
+            <feature.icon className="w-6 h-6 text-blue-600" />
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+            <p className="text-gray-600">{feature.description}</p>
+          </div>
         </div>
-        <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-        <p className="text-gray-600">{feature.description}</p>
       </div>
     );
   };
@@ -287,50 +330,50 @@ const LandingPage: React.FC = () => {
       {/* Floating Header */}
       <header className="fixed w-full bg-white/80 backdrop-blur-md z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Logo
-          </h1>
           <button
-            onClick={() => setLanguage(prev => prev === 'ar' ? 'en' : 'ar')}
+            onClick={() => setLanguage(language === 'ar' ? 'en' : 'ar')}
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 transition-all duration-300"
           >
             <Languages size={20} />
             {language === 'ar' ? 'English' : 'العربية'}
           </button>
+          {/* <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Logo
+          </h1> */}
         </div>
       </header>
 
       {/* Hero Section with Animation */}
       <div className={`${gradientBg} text-white pt-32 pb-20 transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <h1 className="text-5xl font-bold leading-tight">
-                {content[language].title}
-              </h1>
-              <p className="text-xl opacity-90">
-                {content[language].description}
-              </p>
-              <div className="flex gap-4">
-                <button onClick={() => navigate('/chat')} className={`px-8 py-4 bg-white text-blue-600 rounded-full font-semibold ${buttonHoverEffect}`}>
-                  {content[language].cta}
-                </button>
-                <button className={`px-8 py-4 border-2 border-white text-white rounded-full font-semibold ${buttonHoverEffect}`}>
-                  {content[language].learnMore}
-                </button>
-              </div>
-            </div>
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-3xl transform rotate-6"></div>
-              <img
-                src="images/legal-bot.jpg"
-                alt="Legal System Interface"
-                className="rounded-3xl shadow-2xl transform transition-transform duration-500 hover:scale-105"
-              />
-            </div>
-          </div>
+  <div className="max-w-7xl mx-auto px-6">
+    <div className="grid md:grid-cols-2 gap-12 items-center">
+      <div className="space-y-6">
+        <h1 className="text-5xl md:text-5xl sm:text-3xl hero-title font-bold leading-tight">
+          {content[language].title}
+        </h1>
+        <p className="text-xl opacity-90">
+          {content[language].description}
+        </p>
+        <div className="flex gap-4">
+          <button onClick={() => navigate('/chat')} className={`px-8 py-4 bg-white text-blue-600 rounded-full font-semibold ${buttonHoverEffect}`}>
+            {content[language].cta}
+          </button>
+          <button className={`px-8 py-4 border-2 border-white text-white rounded-full font-semibold ${buttonHoverEffect}`}>
+            {content[language].learnMore}
+          </button>
         </div>
       </div>
+      <div className="relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-3xl"></div>
+        <img
+          src="images/logo192.png"
+          alt="Legal System Interface"
+          className="rounded-3xl shadow-2xl transform transition-transform duration-500 hover:scale-105"
+        />
+      </div>
+    </div>
+  </div>
+</div>
 
       {/* Search Section */}
       <div className="max-w-3xl mx-auto px-6 -mt-8 relative z-10">
@@ -345,7 +388,11 @@ const LandingPage: React.FC = () => {
               className="w-full px-6 py-4 rounded-xl border-2 border-gray-100 focus:border-blue-500 focus:outline-none text-lg"
               dir={language === 'ar' ? 'rtl' : 'ltr'}
             />
-            <Search className="absolute top-1/2 transform -translate-y-1/2 right-4 text-gray-400" />
+            {language === 'ar' ? (
+              <Search className="absolute top-1/2 transform -translate-y-1/2 left-4 text-gray-400" />
+            ) : (
+              <Search className="absolute top-1/2 transform -translate-y-1/2 right-4 text-gray-400" />
+            )}
           </div>
         </div>
       </div>
@@ -390,68 +437,72 @@ const LandingPage: React.FC = () => {
 
       {/* Contact Section */}
       <div className={`${gradientBg} text-white py-24`}>
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-2 gap-12">
-            <div>
-              <h2 className="text-3xl font-bold mb-6">Contact Us</h2>
-              <div className="space-y-4">
-                <div className="flex items-center gap-4">
-                  <Phone className="w-6 h-6" />
-                  <span>+966 12 345 6789</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <Mail className="w-6 h-6" />
-                  <span>contact@legaladvisor.sa</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <MapPin className="w-6 h-6" />
-                  <span>Riyadh, Saudi Arabia</span>
-                </div>
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="grid md:grid-cols-2 gap-12">
+          <div className={`${language === 'ar' ? 'order-2' : 'order-1'}`}>
+            <h2 className="text-3xl font-bold mb-6">{content[language].contact.title}</h2>
+            <div className="space-y-4">
+              <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+                <Linkedin className="w-6 h-6" />
+                <a 
+                  href="https://www.linkedin.com/in/yousefalmazyad" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="hover:underline"
+                >
+                  Yousef Almazyad
+                </a>
               </div>
             </div>
-            <div className="bg-white/10 rounded-xl p-6 backdrop-blur-lg">
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <input
-                  type="text"
-                  placeholder="Name"
-                  value={contactForm.name}
-                  onChange={(e) => setContactForm(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full px-4 py-3 rounded-lg bg-white/20 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white"
-                />
-                <input
-                  type="email"
-                  placeholder="Email"
-                  value={contactForm.email}
-                  onChange={(e) => setContactForm(prev => ({ ...prev, email: e.target.value }))}
-                  className="w-full px-4 py-3 rounded-lg bg-white/20 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white"
-                />
-                <textarea
-                  placeholder="Message"
-                  rows={4}
-                  value={contactForm.message}
-                  onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))}
-                  className="w-full px-4 py-3 rounded-lg bg-white/20 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white"
-                ></textarea>
-                <button
-                  disabled={formStatus === 'loading'}
-                  className={`w-full px-8 py-4 bg-white text-blue-600 rounded-lg font-semibold ${buttonHoverEffect}
-                  ${formStatus === 'loading' ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  {formStatus === 'loading' ? 'Sending...' : 'Send Message'}
-                </button>
-                {formStatus === 'success' && (
-                  <div className="text-green-400 text-center">{content[language].formSuccess}</div>
-                )}
-                {formStatus === 'error' && (
-                  <div className="text-red-400 text-center">
-                    {errorType && content[language].formErrors[errorType]}
-                  </div>
-                )}
-              </form>
-            </div>
+          </div>
+          <div className={`bg-white/10 rounded-xl p-6 backdrop-blur-lg ${language === 'ar' ? 'order-1' : 'order-2'}`}>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <input
+                type="text"
+                placeholder={content[language].contact.form.name}
+                value={contactForm.name}
+                onChange={(e) => setContactForm(prev => ({ ...prev, name: e.target.value }))}
+                className="w-full px-4 py-3 rounded-lg bg-white/20 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white"
+                dir={language === 'ar' ? 'rtl' : 'ltr'}
+              />
+              <input
+                type="email"
+                placeholder={content[language].contact.form.email}
+                value={contactForm.email}
+                onChange={(e) => setContactForm(prev => ({ ...prev, email: e.target.value }))}
+                className="w-full px-4 py-3 rounded-lg bg-white/20 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white"
+                dir={language === 'ar' ? 'rtl' : 'ltr'}
+              />
+              <textarea
+                placeholder={content[language].contact.form.message}
+                rows={4}
+                value={contactForm.message}
+                onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))}
+                className="w-full px-4 py-3 rounded-lg bg-white/20 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white"
+                dir={language === 'ar' ? 'rtl' : 'ltr'}
+              ></textarea>
+              <button
+                disabled={formStatus === 'loading'}
+                className={`w-full px-8 py-4 bg-white text-blue-600 rounded-lg font-semibold ${buttonHoverEffect}
+                ${formStatus === 'loading' ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                {formStatus === 'loading' ? content[language].contact.form.sending : content[language].contact.form.send}
+              </button>
+              {formStatus === 'success' && (
+                <div className="text-green-400 text-center" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                  {content[language].formSuccess}
+                </div>
+              )}
+              {formStatus === 'error' && (
+                <div className="text-red-400 text-center" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                  {errorType && content[language].formErrors[errorType]}
+                </div>
+              )}
+            </form>
           </div>
         </div>
       </div>
+    </div>
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">

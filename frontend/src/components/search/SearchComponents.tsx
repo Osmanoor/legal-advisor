@@ -88,9 +88,14 @@ export const ResourceCard: React.FC<{
   <div className="p-6 border rounded-lg shadow-sm transition-shadow bg-slate-700/50" dir={language === 'ar' ? 'rtl' : 'ltr'}>
     <div className="flex justify-between items-start mb-4">
       <div>
-        <h3 className="text-xl font-semibold">#{resource.number}</h3>
+        <h3 className="text-xl font-semibold">
+          {translations[language].article} {resource.number}
+        </h3>
         <p className="text-sm text-gray-400">
-          {resource.chapter.name} - {resource.section.name}
+          {translations[language].chapter} {resource.chapter.number}: {resource.chapter.name}
+        </p>
+        <p className="text-sm text-gray-400">
+          {translations[language].section} {resource.section.number}: {resource.section.name}
         </p>
       </div>
       <span className="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800">

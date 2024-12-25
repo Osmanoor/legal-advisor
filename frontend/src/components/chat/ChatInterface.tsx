@@ -1,15 +1,18 @@
+// ChatInterface.tsx
 import React, { useState, useRef, useEffect } from 'react';
 import { Send } from 'lucide-react';
 import { ChatMessage } from '../../types/chat';
 import MessageBubble from './MessageBubble';
+import LoadingIndicator from './LoadingIndicator';
 
 interface Props {
   messages: ChatMessage[];
   onSendMessage: (message: string) => void;
   language: 'ar' | 'en';
+  loading: boolean;
 }
 
-const ChatInterface: React.FC<Props> = ({ messages, onSendMessage, language }) => {
+const ChatInterface: React.FC<Props> = ({ messages, onSendMessage, language, loading }) => {
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [formHeight, setFormHeight] = useState(0);
@@ -49,6 +52,7 @@ const ChatInterface: React.FC<Props> = ({ messages, onSendMessage, language }) =
               language={language}
             />
           ))}
+          {loading && <LoadingIndicator language={language} />}
           <div ref={messagesEndRef} />
         </div>
       </div>

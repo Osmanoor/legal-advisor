@@ -5,9 +5,10 @@ import { SearchBar, TypeFilter, ResourceCard, LanguageSwitch } from '../componen
 import { Language, translations } from '../utils/translations';
 import { Languages } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../LanguageContext';
 
 const SearchPage: React.FC = () => {
-  const [language, setLanguage] = useState<Language>('en');
+  const {language, setLanguage} = useLanguage();
   const [query, setQuery] = useState('');
   const [selectedType, setSelectedType] = useState<ResourceType>();
   const [results, setResults] = useState<Resource[]>([]);
@@ -44,7 +45,7 @@ const SearchPage: React.FC = () => {
             {language === 'ar' ? "مجتمع المشتريات الحكومية" : "Government Procurement Community"}
           </Link>
           <button
-            onClick={() => setLanguage(prev => prev === 'ar' ? 'en' : 'ar')}
+            onClick={() => setLanguage(language === 'ar' ? 'en' : 'ar')}
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-700/50 hover:bg-slate-600/50 transition-colors"
           >
             <Languages size={20} />

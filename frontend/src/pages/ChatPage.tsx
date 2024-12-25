@@ -1,3 +1,4 @@
+// ChatPage.tsx
 import React, { useState, useEffect } from 'react';
 import { Languages } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -5,10 +6,12 @@ import ChatInterface from '../components/chat/ChatInterface';
 import WelcomeSection from '../components/chat/WelcomeSection';
 import { ChatMessage } from '../types/chat';
 import { chatService } from '../utils/api';
+import { useLanguage } from '../LanguageContext';
 
 const ChatPage: React.FC = () => {
-  const [language, setLanguage] = useState<'ar' | 'en'>('ar');
+  const {language, setLanguage} = useLanguage();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [loading, setLoading] = useState(false);
 
   // Load initial language
   useEffect(() => {
@@ -39,13 +42,15 @@ const ChatPage: React.FC = () => {
   // Handle sending message
   const handleSendMessage = async (message: string) => {
     try {
+      setLoading(true);
+
       const userMessage: ChatMessage = {
         role: 'user',
         content: message,
         timestamp: new Date()
       };
       setMessages(prev => [...prev, userMessage]);
-  
+
       const response = await chatService.sendMessage(message, language);
       
       const assistantMessage: ChatMessage = {
@@ -57,6 +62,8 @@ const ChatPage: React.FC = () => {
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error sending message:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -81,7 +88,7 @@ const ChatPage: React.FC = () => {
             {language === 'ar' ? "مجتمع المشتريات الحكومية" : "Government Procurement Community"}
           </Link>
           <button
-            onClick={() => setLanguage(prev => prev === 'ar' ? 'en' : 'ar')}
+            onClick={() => setLanguage(language === 'ar' ? 'en' : 'ar')}
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-700/50 hover:bg-slate-600/50 transition-colors"
           >
             <Languages size={20} />
@@ -101,6 +108,7 @@ const ChatPage: React.FC = () => {
             messages={messages}
             onSendMessage={handleSendMessage}
             language={language}
+            loading={loading}
           />
         )}
       </main>

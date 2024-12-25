@@ -3,7 +3,7 @@ export type Language = 'en' | 'ar';
 export const translations = {
   en: {
     pageTitle: 'Search Resources',
-    searchPlaceholder: 'Enter search keywords...',
+    searchPlaceholder: 'Enter the name of the file you want to search for...',
     searchButton: 'Search',
     filterByType: 'Filter by type:',
     typeOptions: {
@@ -25,11 +25,16 @@ export const translations = {
     downloadError: 'Failed to download file',
     openButton: 'Open',
     downloading: 'Downloading...',
-    deepSearchLabel: 'Deep search',
+    deepSearchLabel: 'Deep search (will search through all subfolders recursively.)',
+    deepSearchTooltip: 'Deep search ',
+    root: 'مكتبة المشتريات',
+    article: 'Article',
+    chapter: 'Chapter',
+    section: 'Section',
   },
   ar: {
     pageTitle: 'البحث في الموارد',
-    searchPlaceholder: 'ادخل كلمات البحث...',
+    searchPlaceholder: 'ادخل اسم الملف الذي تريد البحث عنه...',
     searchButton: 'بحث',
     filterByType: 'تصفية حسب النوع:',
     typeOptions: {
@@ -51,7 +56,12 @@ export const translations = {
     downloadError: 'فشل تنزيل الملف',
     openButton: 'فتح',
     downloading: 'جاري التحميل...',
-    deepSearchLabel: 'بحث عميق',
+    deepSearchLabel: 'البحث العميق (سيبحث عن الملف في جميع المجلدات الفرعية بشكل تكراري.)',
+    deepSearchTooltip: 'البحث العميق سيبحث في جميع المجلدات الفرعية بشكل تكراري.',
+    root: 'مكتبة المشتريات',
+    article: 'المادة',
+    chapter: 'الباب',
+    section: 'الفصل',
   }
 } as const;
 

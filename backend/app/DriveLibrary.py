@@ -121,12 +121,12 @@ class DriveLibrary:
             # Get file metadata first to verify access and get filename
             file_metadata = self.service.files().get(
                 fileId=file_id,
-                fields="name, mimeType, webContentLink",
+                fields="name, mimeType, webViewLink",
                 supportsAllDrives=True
             ).execute()
 
             # Get the webContentLink (direct download URL)
-            download_url = file_metadata.get('webContentLink')
+            download_url = file_metadata.get('webViewLink')
 
             if not download_url:
                 # If webContentLink is not available, generate a temporary URL

@@ -16,8 +16,11 @@ COPY requirements.txt .
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Create directories for ChromaDB and data
-RUN mkdir -p /app/data /app/chroma_db_ar /app/chroma_db_en
+# Create directories for ChromaDB, data, and credentials
+RUN mkdir -p /app/data /app/chroma_db_ar /app/chroma_db_en /app/credentials
+
+# Copy Google Cloud credentials
+COPY my-project-2024-441219-045b8286058d.json /app/credentials/
 
 # Copy the entire application
 COPY . .
@@ -30,6 +33,7 @@ ENV FLASK_APP=app/app.py
 ENV PORT=8080
 ENV PYTHONPATH=/app
 ENV PYTHONUNBUFFERED=1
+ENV GOOGLE_APPLICATION_CREDENTIALS=/app/credentials/my-project-2024-441219-045b8286058d.json
 
 # Run the Flask app with gunicorn
 CMD exec gunicorn --bind :$PORT \

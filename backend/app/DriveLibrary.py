@@ -2,19 +2,24 @@ from googleapiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
 from googleapiclient.http import MediaIoBaseDownload
 import io
+import sys
+import os
 
 class DriveLibrary:
     """Google Drive Library for Flask Backend"""
 
-    def __init__(self, folder_id):
+    def __init__(self, folder_id, credentials_path=None):
         self.FOLDER_ID = folder_id
+        self.credentials_path = credentials_path or os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
+        if not self.credentials_path:
+            raise ValueError("Credentials path must be provided either through constructor or GOOGLE_APPLICATION_CREDENTIALS environment variable")
         self.service = self._authenticate_drive()
 
     def _authenticate_drive(self):
         """Authenticate with Google Drive using a service account"""
         scopes = ['https://www.googleapis.com/auth/drive']
         credentials = ServiceAccountCredentials.from_json_keyfile_name(
-            'service_account_credentials.json', scopes
+            self.credentials_path, scopes
         )
         return build('drive', 'v3', credentials=credentials)
 

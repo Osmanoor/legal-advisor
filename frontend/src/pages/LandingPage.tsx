@@ -79,7 +79,7 @@ const LandingPage: React.FC = () => {
     ar: {
       title: "مجتمع المشتريات الحكومية",
       subtitle: "نظام المنافسات والمشتريات الحكومية",
-      description: "منصة متكاملة تخص مجتمع المشتريات الحكومية من موظفي وموردين وهي منصة غير رسمية ولا تتبع الى أي جهة حكومية جهد بسيط من زملاء لكم ونرجو ان نقدم من خلالها الفائدة المرجوة علما بانها تحتمل الصواب والخطأ ولا تكفي عن العودة للنظام واللائحة والتعاميم ذات العلاقة",
+      description: "منصة نضع فيها ما يهم موظفي المشتريات الحكومية وهي منصة غير رسمية ولكن عمل  بسيط من زملاء لكم ونرجو ان نقدم من خلالها الفائدة المرجوة ولا تغني اطلاقاً عن العودة للنظام واللائحة والتعاميم ذات العلاقة ",
       searchPlaceholder: "ابحث عن مواد النظام...",
       features: [
         { icon: Search, title: "بحث متقدم", description: "بحث سهل وسريع في مواد النظام بالكلمات", isAvailable: true },
@@ -93,8 +93,8 @@ const LandingPage: React.FC = () => {
           a: "يمكنك استخدام شريط البحث الرئيسي أو تصفح الأقسام والفصول مباشرة"
         },
         {
-          q: "هل الاستشارات مجانية؟",
-          a: "نعم، الاستشارات الأساسية مجانية ومدعومة بالذكاء الاصطناعي"
+          q: "هل تكفي هذه المنصة عن العودة للنظام و اللائحة و التعاميم ذات العلاقة ؟",
+          a: "لا تكفي المنصة عن العودة للانظمه ذات العلاقه من مصادرها الرسمية ما نقدمه وسيلة مساعدة لا اكثر"
         },
         {
           q: "كيف يمكنني تحميل النظام كاملاً؟",
@@ -134,7 +134,7 @@ const LandingPage: React.FC = () => {
     en: {
       title: "Government Procurement Community",
       subtitle: "Government Procurement & Competition System",
-      description: "An integrated platform for the government procurement community including employees and suppliers. This is an unofficial platform, not affiliated with any government entity - a simple effort by your colleagues aiming to provide value, acknowledging that it may contain errors and does not substitute referring to official regulations and related circulars.",
+      description: "A platform where we place what matters to government procurement employees. It is an unofficial platform but a simple effort from your colleagues. We hope to provide the intended benefit through it, but it does not substitute in any way for referring to the system, regulations, and related circulars.",
       searchPlaceholder: "Search regulations...",
       features: [
         { icon: Search, title: "Advanced Search", description: "Fast and easy search through regulations", isAvailable: true },
@@ -148,9 +148,9 @@ const LandingPage: React.FC = () => {
           a: "You can use the main search bar or browse through sections and chapters directly"
         },
         {
-          q: "Are consultations free?",
-          a: "Yes, basic consultations are free and powered by AI"
-        },
+          q: "Does this platform suffice as a substitute for referring to the system, regulations, and related circulars?",
+          a: "No, the platform does not replace referring to the related systems from their official sources. What we provide is merely a helpful tool, nothing more."
+          },
         {
           q: "How can I download the complete regulation?",
           a: "You can download the complete regulation from the procurement library section in PDF format"

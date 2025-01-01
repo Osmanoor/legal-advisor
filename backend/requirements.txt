@@ -13,3 +13,4 @@ Flask-Cors
 oauth2client
 google-api-python-client
 certifi
+gunicorn==21.2.0  # or your preferred version

@@ -12,7 +12,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from src.config import load_config
 from src.rag_system import ArabicRAGSystem
 from data.search_engine import SearchEngine
-from app.DriveLibrary import DriveLibrary
+from DriveLibrary import DriveLibrary
 
 
 

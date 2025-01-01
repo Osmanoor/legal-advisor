@@ -40,18 +40,19 @@ const ChatPage: React.FC = () => {
   }, []);
 
   // Handle sending message
-  const handleSendMessage = async (message: string) => {
+  const handleSendMessage = async (message: string, accent: boolean = false) => {
     try {
       setLoading(true);
-
+  
       const userMessage: ChatMessage = {
         role: 'user',
         content: message,
         timestamp: new Date()
       };
       setMessages(prev => [...prev, userMessage]);
-
-      const response = await chatService.sendMessage(message, language);
+  
+      const lang = accent ? 'sa' : language;
+      const response = await chatService.sendMessage(message, lang);
       
       const assistantMessage: ChatMessage = {
         role: 'assistant',

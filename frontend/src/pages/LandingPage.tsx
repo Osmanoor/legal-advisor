@@ -510,7 +510,7 @@ const LandingPage: React.FC = () => {
           <div className="grid md:grid-cols-4 gap-8">
             <div className="space-y-4">
               <h3 className="font-bold text-lg">Government Procurement Community</h3>
-              <p className="text-gray-400">© 2024 All rights reserved</p>
+              <p className="text-gray-400">© 2025 All rights reserved</p>
             </div>
           </div>
         </div>

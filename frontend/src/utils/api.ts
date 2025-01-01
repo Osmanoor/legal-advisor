@@ -71,7 +71,7 @@ export const searchResources = async ({ query, type }: SearchParams): Promise<Se
 
 export const chatService = {
   // Send a message and get response
-  async sendMessage(message: string, language: 'ar' | 'en'): Promise<ChatResponse> {
+  async sendMessage(message: string, language: 'ar' | 'en' | 'sa'): Promise<ChatResponse> {
     try {
       const response = await fetch(`${API_CONFIG.BASE_URL}/chat`, {
         method: 'POST',

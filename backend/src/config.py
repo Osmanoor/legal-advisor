@@ -26,7 +26,7 @@ def load_config(language= 'ar') -> RAGConfig:
     
     # Get language from environment variable, default to Arabic if not set
     lang = language
-    if lang not in ["ar", "en"]:
+    if lang not in ["ar", "en", "sa"]:
         raise ValueError("RAG_LANGUAGE must be either 'ar' or 'en'")
     
     return RAGConfig(

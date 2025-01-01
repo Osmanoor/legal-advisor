@@ -33,7 +33,7 @@ rag_systems = {}
 chat_histories = {}
 
 # Initialize Drive Library with your Google Drive folder ID
-drive_library = DriveLibrary(folder_id="1BMIRxbgn7CdNCETbULCntFDJ-gEBYPWA", credentials_path="service_account_credentials.json")
+drive_library = DriveLibrary(folder_id="1BMIRxbgn7CdNCETbULCntFDJ-gEBYPWA")
 
 
 search_engine = SearchEngine()

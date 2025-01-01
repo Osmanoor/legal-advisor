@@ -11,7 +11,7 @@ const WelcomeSection: React.FC<Props> = ({ language, onSuggestionClick }) => {
 
   const content = {
     ar: {
-      title: 'المستشار الذكي في خدمتك',
+      title: 'مساعد مجتمع المشتريات الحكومية الذكي في خدمتك',
       description: 'اطرح أسئلتك حول نظام المنافسات والمشتريات الحكومية',
       placeholder: 'اكتب سؤالك هنا...',
       sendButton: 'إرسال',

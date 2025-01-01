@@ -44,3 +44,4 @@ CMD exec gunicorn --bind :$PORT \
     --access-logfile - \
     --error-logfile - \
     app.app:app
+

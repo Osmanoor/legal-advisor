@@ -114,7 +114,7 @@ const ChatInterface: React.FC<Props> = ({ messages, onSendMessage, language, loa
                   `}
                 >
                   <svg
-                    className={`w-7 h-7 ${language === 'ar' ? 'scale-x-[-1]' : ''}`}
+                    className={`w-7 h-7`}
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
                     fill="none"
@@ -138,7 +138,7 @@ const ChatInterface: React.FC<Props> = ({ messages, onSendMessage, language, loa
               value={input}
               onChange={(e) => setInput(e.target.value)}
               className={`w-full px-6 py-4 rounded-xl bg-slate-800/50 border-2 border-slate-700 focus:border-blue-500 focus:outline-none text-lg text-white placeholder-slate-400 shadow-lg resize-none ${
-                language === 'ar' ? 'pr-6 pl-[60px]' : 'pl-6 pr-[60px]'
+                language === 'ar' ? 'pr-6 pl-[100px]' : 'pl-6 pr-[100px]'
               }`}
               placeholder={language === 'ar' ? 'اكتب سؤالك هنا...' : 'Type your question here...'}
               dir={language === 'ar' ? 'rtl' : 'ltr'}

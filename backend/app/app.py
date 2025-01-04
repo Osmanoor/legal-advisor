@@ -12,7 +12,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from src.config import load_config
 from src.rag_system import ArabicRAGSystem
 from data.search_engine import SearchEngine
-from DriveLibrary import DriveLibrary
+from app.DriveLibrary import DriveLibrary
 
 
 
@@ -33,7 +33,7 @@ rag_systems = {}
 chat_histories = {}
 
 # Initialize Drive Library with your Google Drive folder ID
-drive_library = DriveLibrary(folder_id="1BMIRxbgn7CdNCETbULCntFDJ-gEBYPWA",credentials_path="service_account_credentials.json")
+drive_library = DriveLibrary(folder_id="1BMIRxbgn7CdNCETbULCntFDJ-gEBYPWA")
 
 
 search_engine = SearchEngine()

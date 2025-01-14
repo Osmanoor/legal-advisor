@@ -31,6 +31,8 @@ export const translations = {
     article: 'Article',
     chapter: 'Chapter',
     section: 'Section',
+    viewError: 'Error viewing file',
+    loading: 'Loading...'
   },
   ar: {
     pageTitle: 'البحث في الموارد',
@@ -62,6 +64,9 @@ export const translations = {
     article: 'المادة',
     chapter: 'الباب',
     section: 'الفصل',
+    viewError: 'خطأ في عرض الملف',
+    loading: 'جاري التحميل...',
+    
   }
 } as const;
 

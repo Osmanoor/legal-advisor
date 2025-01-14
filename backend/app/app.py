@@ -276,6 +276,26 @@ def download_file():
     except Exception as e:
         print(f"Error in download endpoint: {str(e)}")
         return jsonify({'error': 'Server error during download'}), 500
+    
+@app.route('/api/view-file', methods=['POST'])
+def view_file():
+    try:
+        data = request.get_json()
+        file_id = data.get('file_id')
+
+        if not file_id:
+            return jsonify({'error': 'file_id is required'}), 400
+
+        result = drive_library.get_file_content(file_id)
+        
+        if 'error' in result:
+            return jsonify(result), 500
+
+        return jsonify(result)
+
+    except Exception as e:
+        print(f"Error in view file endpoint: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/contact', methods=['POST'])
 def submit_contact():

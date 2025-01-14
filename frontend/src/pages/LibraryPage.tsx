@@ -20,7 +20,7 @@ interface BreadcrumbItem {
 }
 
 const LibraryPage: React.FC = () => {
-  const {language, setLanguage} = useLanguage();
+  const { language, setLanguage } = useLanguage();
   const [items, setItems] = useState<FileOrFolder[]>([]);
   const [query, setQuery] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -30,9 +30,11 @@ const LibraryPage: React.FC = () => {
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([
     { id: "1BmJ3pNwDU11OOAqSPpkFB6edXCcaaD9g", name: translations[language].root }
   ]);
+  const [viewingFiles, setViewingFiles] = useState<Set<string>>(new Set());
+
   const BASE_URL = 'api';
 
-  const isFolder = (item: FileOrFolder) => 
+  const isFolder = (item: FileOrFolder) =>
     item.mimeType === 'application/vnd.google-apps.folder';
 
   const loadFolderContents = async (folderId: string) => {
@@ -86,47 +88,6 @@ const LibraryPage: React.FC = () => {
     }
   };
 
-  const handleDownload = async (fileId: string, fileName: string) => {
-    setDownloadingFiles(prev => new Set(prev).add(fileId));
-  
-    try {
-      // Get download URL from backend
-      const response = await fetch(`${BASE_URL}/get-download-url`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ file_id: fileId }),
-      });
-  
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to get download URL');
-      }
-  
-      const data = await response.json();
-  
-      // Create an invisible anchor element for download
-      const link = document.createElement('a');
-      link.href = data.url;
-      link.setAttribute('download', data.name || fileName); // Use original filename if available
-      link.setAttribute('target', '_blank'); // Open in new tab if browser blocks direct download
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-  
-    } catch (err) {
-      console.error('Download error:', err);
-      alert(translations[language].downloadError + (err instanceof Error ? `: ${err.message}` : ''));
-    } finally {
-      setDownloadingFiles(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(fileId);
-        return newSet;
-      });
-    }
-  };
-
   const handleFolderClick = async (folder: FileOrFolder) => {
     setBreadcrumbs(prev => [...prev, { id: folder.id, name: folder.name }]);
     await loadFolderContents(folder.id);
@@ -138,11 +99,161 @@ const LibraryPage: React.FC = () => {
     await loadFolderContents(newBreadcrumbs[newBreadcrumbs.length - 1].id);
   };
 
+
+  const handleDownload = async (fileId: string, fileName: string) => {
+    setDownloadingFiles(prev => new Set(prev).add(fileId));
+  
+    try {
+      const response = await fetch(`${BASE_URL}/view-file`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ file_id: fileId }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to fetch file');
+      }
+  
+      const data = await response.json();
+  
+      const binaryContent = atob(data.content);
+      const bytes = new Uint8Array(binaryContent.length);
+      for (let i = 0; i < binaryContent.length; i++) {
+        bytes[i] = binaryContent.charCodeAt(i);
+      }
+      const blob = new Blob([bytes], { type: data.mimeType });
+      
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = data.originalName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Download error:', err);
+      alert(translations[language].downloadError);
+    } finally {
+      setDownloadingFiles(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(fileId);
+        return newSet;
+      });
+    }
+  };
+  
+  const handleView = async (fileId: string, fileName: string) => {
+    setViewingFiles(prev => new Set(prev).add(fileId));
+  
+    try {
+      const response = await fetch(`${BASE_URL}/view-file`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ file_id: fileId }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to fetch file');
+      }
+  
+      const data = await response.json();
+  
+      const binaryContent = atob(data.content);
+      const bytes = new Uint8Array(binaryContent.length);
+      for (let i = 0; i < binaryContent.length; i++) {
+        bytes[i] = binaryContent.charCodeAt(i);
+      }
+      const blob = new Blob([bytes], { type: data.mimeType });
+      const blobUrl = URL.createObjectURL(blob);
+      
+      const viewerWindow = window.open(blobUrl, '_blank');
+      if (viewerWindow) {
+        viewerWindow.onload = () => {
+          URL.revokeObjectURL(blobUrl);
+        };
+      }
+    } catch (err) {
+      console.error('View error:', err);
+      alert(translations[language].viewError);
+    } finally {
+      setViewingFiles(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(fileId);
+        return newSet;
+      });
+    }
+  };
+  
+  const FileActions = ({ item }: { item: FileOrFolder }) => {
+    const isFolder = item.mimeType === 'application/vnd.google-apps.folder';
+    const isViewable = [
+      'application/pdf',
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'image/svg+xml',
+      'text/plain',
+      'text/html',
+    ].includes(item.mimeType);
+    
+    if (isFolder) {
+      return (
+        <button
+          onClick={() => handleFolderClick(item)}
+          className="px-3 py-2 text-white bg-yellow-600 rounded-lg hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 whitespace-nowrap"
+        >
+          {translations[language].openButton}
+        </button>
+      );
+    }
+  
+    return (
+      <div className="flex gap-2">
+        <button
+          onClick={() => handleDownload(item.id, item.name)}
+          disabled={downloadingFiles.has(item.id)}
+          className="px-3 py-2 text-white bg-green-600 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-green-800 disabled:cursor-wait whitespace-nowrap flex items-center gap-2"
+        >
+          {downloadingFiles.has(item.id) ? (
+            <>
+              <Loader className="animate-spin" size={16} />
+              {translations[language].downloading}
+            </>
+          ) : (
+            translations[language].downloadButton
+          )}
+        </button>
+  
+        {isViewable && (
+          <button
+            onClick={() => handleView(item.id, item.name)}
+            disabled={viewingFiles.has(item.id)}
+            className="px-3 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-blue-800 disabled:cursor-wait whitespace-nowrap flex items-center gap-2"
+          >
+            {viewingFiles.has(item.id) ? (
+              <>
+                <Loader className="animate-spin" size={16} />
+                {translations[language].loading}
+              </>
+            ) : (
+              translations[language].openButton
+            )}
+          </button>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className={`min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white ${language === 'ar' ? 'text-right' : 'text-left'}`}>
       <header className="bg-slate-800/50 border-b border-slate-700">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <Link 
+          <Link
             to="/"
             className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 hover:from-blue-300 hover:to-purple-300 transition-colors"
           >
@@ -161,7 +272,7 @@ const LibraryPage: React.FC = () => {
       <main className="max-w-7xl mx-auto px-4 py-6">
         <div className="flex flex-col gap-4 mb-8" dir={language === 'ar' ? 'rtl' : 'ltr'}>
           <h1 className="text-3xl font-bold">{translations[language].libraryTitle}</h1>
-          
+
           {/* Breadcrumb Navigation */}
           {breadcrumbs.length > 1 && (
             <div className="flex items-center gap-2 text-gray-400 overflow-x-auto">
@@ -196,7 +307,7 @@ const LibraryPage: React.FC = () => {
                 {translations[language].searchButton}
               </button>
             </div>
-            
+
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -241,29 +352,8 @@ const LibraryPage: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex-shrink-0">
-                    {isFolder(item) ? (
-                      <button
-                        onClick={() => handleFolderClick(item)}
-                        className="px-3 py-2 text-white bg-yellow-600 rounded-lg hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 whitespace-nowrap"
-                      >
-                        {translations[language].openButton}
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => handleDownload(item.id, item.name)}
-                        disabled={downloadingFiles.has(item.id)}
-                        className="px-3 py-2 text-white bg-green-600 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-green-800 disabled:cursor-wait whitespace-nowrap flex items-center gap-2"
-                      >
-                        {downloadingFiles.has(item.id) ? (
-                          <>
-                            <Loader className="animate-spin" size={16} />
-                            {translations[language].downloading}
-                          </>
-                        ) : (
-                          translations[language].downloadButton
-                        )}
-                      </button>
-                    )}
+                    {/* Replace your existing button code with FileActions */}
+                    <FileActions item={item} />
                   </div>
                 </div>
               </div>

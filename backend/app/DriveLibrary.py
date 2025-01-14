@@ -4,6 +4,8 @@ from googleapiclient.http import MediaIoBaseDownload
 import io
 import sys
 import os
+import base64
+import mimetypes
 
 class DriveLibrary:
     """Google Drive Library for Flask Backend"""
@@ -147,4 +149,54 @@ class DriveLibrary:
 
         except Exception as e:
             print(f"Error generating download URL: {str(e)}")
+            return {'error': str(e)}
+
+
+    def get_file_content(self, file_id):
+        """Download file content and return it with metadata"""
+        try:
+            # Get file metadata
+            file_metadata = self.service.files().get(
+                fileId=file_id,
+                fields="name, mimeType"
+            ).execute()
+
+            # Download file content
+            request = self.service.files().get_media(fileId=file_id)
+            file_io = io.BytesIO()
+            downloader = MediaIoBaseDownload(file_io, request)
+            done = False
+            while not done:
+                _, done = downloader.next_chunk()
+
+            file_io.seek(0)
+            content = file_io.read()
+
+            # Determine if file is viewable
+            viewable_types = [
+                'application/pdf',
+                'image/jpeg',
+                'image/png',
+                'image/gif',
+                'image/svg+xml',
+                'text/plain',
+                'text/html',
+            ]
+            
+            is_viewable = file_metadata['mimeType'] in viewable_types
+            
+            # For viewable files, encode content as base64
+            # For binary files, we still need to encode them but mark them as not viewable
+            encoded_content = base64.b64encode(content).decode('utf-8')
+
+            return {
+                'name': file_metadata['name'],
+                'mimeType': file_metadata['mimeType'],
+                'content': encoded_content,
+                'isViewable': is_viewable,
+                'originalName': file_metadata['name']  # Added to ensure original filename is preserved
+            }
+
+        except Exception as e:
+            print(f"Error downloading file: {str(e)}")
             return {'error': str(e)}

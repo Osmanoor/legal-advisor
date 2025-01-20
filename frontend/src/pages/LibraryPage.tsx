@@ -28,7 +28,7 @@ const LibraryPage: React.FC = () => {
   const [downloadingFiles, setDownloadingFiles] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string>('');
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([
-    { id: "1BmJ3pNwDU11OOAqSPpkFB6edXCcaaD9g", name: translations[language].root }
+    { id: "", name: translations[language].root }
   ]);
   const [viewingFiles, setViewingFiles] = useState<Set<string>>(new Set());
 

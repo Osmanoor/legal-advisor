@@ -13,7 +13,7 @@ from src.config import load_config
 from src.rag_system import ArabicRAGSystem
 from data.search_engine import SearchEngine
 # from DriveLibrary import DriveLibrary
-from app.LocalDriveLibrary import LocalDriveLibrary
+from LocalDriveLibrary import LocalDriveLibrary
 
 
 app = Flask('__name__', static_folder='static', static_url_path='')
@@ -34,7 +34,7 @@ chat_histories = {}
 
 # Initialize Drive Library with your Google Drive folder ID
 # drive_library = DriveLibrary(folder_id="1BMIRxbgn7CdNCETbULCntFDJ-gEBYPWA")
-drive_library = LocalDriveLibrary(root_folder_path="مكتبة المشتريات")
+drive_library = LocalDriveLibrary(root_folder_path="library")
 
 
 search_engine = SearchEngine()

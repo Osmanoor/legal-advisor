@@ -5,6 +5,7 @@ import ChatPage from './pages/ChatPage';
 import ContactAdmin from './pages/ContactAdmin';
 import SearchPage from './pages/SearchPage';
 import LibraryPage from './pages/LibraryPage';
+import CalculatorPage from './pages/CalculatorPage';
 
 const App = () => {
   return (
@@ -16,6 +17,7 @@ const App = () => {
           <Route path="/search" element={<SearchPage />} />
           <Route path="/library" element={<LibraryPage />} />
           <Route path="/admin" element={<ContactAdmin />} />
+          <Route path="/calculator" element={<CalculatorPage />} />
         </Routes>
       </BrowserRouter>
     </LanguageProvider>

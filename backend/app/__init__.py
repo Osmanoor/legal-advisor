@@ -1,0 +1,43 @@
+# app/__init__.py
+from flask import Flask, send_from_directory
+from flask_cors import CORS
+from app.config import Config
+import os
+
+def create_app(config_class=Config):
+    """Create and configure the Flask application"""
+    app = Flask(__name__, static_folder='static', static_url_path='')
+    app.config.from_object(config_class)
+    
+    # Initialize CORS
+    CORS(app)
+    
+    # Register blueprints
+    from app.api.chat import chat_bp
+    from app.api.search import search_bp
+    from app.api.library import library_bp
+    from app.api.admin import admin_bp
+
+    app.register_blueprint(chat_bp, url_prefix='/api/chat')
+    app.register_blueprint(search_bp, url_prefix='/api/search')
+    app.register_blueprint(library_bp, url_prefix='/api/library')
+    app.register_blueprint(admin_bp, url_prefix='/api/admin')
+
+    # React app routes
+    @app.route('/')
+    def serve():
+        return send_from_directory(app.static_folder, 'index.html')
+
+    @app.errorhandler(404)
+    def not_found(e):
+        return send_from_directory(app.static_folder, "index.html")
+
+    @app.route('/<path:path>')
+    def serve_path(path):
+        if path.startswith('api/'):
+            return 'Not found', 404
+        if os.path.exists(os.path.join(app.static_folder, path)):
+            return send_from_directory(app.static_folder, path)
+        return send_from_directory(app.static_folder, 'index.html')
+    
+    return app

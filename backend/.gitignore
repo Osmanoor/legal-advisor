@@ -13,3 +13,8 @@
 /frontend/npm-debug.log*
 /frontend/yarn-debug.log*
 /frontend/yarn-error.log*
+
+backend/.env
+backend/.env.*
+backend/!.env.example
+backend/service_account_credentials.json

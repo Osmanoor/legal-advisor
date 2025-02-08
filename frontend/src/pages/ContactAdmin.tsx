@@ -46,7 +46,7 @@ const ContactAdmin: React.FC = () => {
     const fetchContacts = async () => {
         try {
             setIsLoading(true);
-            const response = await fetch('/api/contacts', {
+            const response = await fetch('/api/admin/contacts', {
                 headers: {
                     'Authorization': 'Basic ' + btoa(`${credentials.username}:${credentials.password}`)
                 }

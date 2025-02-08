@@ -32,7 +32,7 @@ const LibraryPage: React.FC = () => {
   ]);
   const [viewingFiles, setViewingFiles] = useState<Set<string>>(new Set());
 
-  const BASE_URL = 'api';
+  const BASE_URL = 'api/library';
 
   const isFolder = (item: FileOrFolder) =>
     item.mimeType === 'application/vnd.google-apps.folder';

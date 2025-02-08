@@ -17,10 +17,13 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Create directories for ChromaDB, data, and credentials
-RUN mkdir -p /app/data /app/chroma_db_ar /app/chroma_db_en /app/credentials
+RUN mkdir -p /app/data /app/chroma_db_ar /app/chroma_db_en /app/credentials /app/مكتبة\ المشتريات
 
 # Copy Google Cloud credentials
 COPY my-project-2024-441219-045b8286058d.json /app/credentials/
+
+# Copy the library folder first
+COPY مكتبة\ المشتريات /app/مكتبة\ المشتريات/
 
 # Copy the entire application
 COPY . .
@@ -44,4 +47,3 @@ CMD exec gunicorn --bind :$PORT \
     --access-logfile - \
     --error-logfile - \
     app.app:app
-

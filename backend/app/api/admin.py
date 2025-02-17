@@ -1,10 +1,29 @@
-# app/api/admin.py
-from flask import Blueprint, request, jsonify
+from functools import wraps
+from flask import Blueprint, request, jsonify, session
 from app.services.admin_service import AdminService
 from app.utils.auth import require_auth
 
 admin_bp = Blueprint('admin', __name__)
 admin_service = AdminService()
+
+
+def require_auth(f):
+    """
+    Decorator for routes that require basic authentication
+    """
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            return jsonify({'error': 'Unauthorized access'}), 401
+        return f(*args, **kwargs)
+    return decorated
+
+def check_auth(username: str, password: str) -> bool:
+    """
+    Check if username and password are valid
+    """
+    return username == 'admin' and password == '123'
 
 @admin_bp.route('/contact', methods=['POST'])
 def submit_contact():

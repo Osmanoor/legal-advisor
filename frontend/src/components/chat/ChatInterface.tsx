@@ -6,7 +6,7 @@ import LoadingIndicator from './LoadingIndicator';
 
 interface Props {
   messages: ChatMessage[];
-  onSendMessage: (message: string, accent: boolean) => void;
+  onSendMessage: (message: string, accent: boolean, reasoning: boolean) => void;
   language: 'ar' | 'en';
   loading: boolean;
 }
@@ -14,6 +14,7 @@ interface Props {
 const ChatInterface: React.FC<Props> = ({ messages, onSendMessage, language, loading }) => {
   const [input, setInput] = useState('');
   const [useSaudiAccent, setUseSaudiAccent] = useState(false);
+  const [useReasoning, setUseReasoning] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [formHeight, setFormHeight] = useState(0);
   const formRef = useRef<HTMLFormElement>(null);
@@ -21,7 +22,7 @@ const ChatInterface: React.FC<Props> = ({ messages, onSendMessage, language, loa
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim()) {
-      onSendMessage(input, useSaudiAccent);
+      onSendMessage(input, useSaudiAccent, useReasoning);
       setInput('');
     }
   };
@@ -51,15 +52,59 @@ const ChatInterface: React.FC<Props> = ({ messages, onSendMessage, language, loa
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  const CheckboxOption = ({ checked, onChange, label }: { checked: boolean; onChange: (checked: boolean) => void; label: string }) => (
+    <label
+      className={`
+        flex items-center cursor-pointer select-none rounded-md
+        transition-colors duration-200
+        ${
+          checked
+            ? `bg-blue-500 border-blue-500 text-white border-2`
+            : 'bg-slate-800 border-slate-500 hover:bg-slate-700 hover:border-slate-600 border-2'
+        }
+      `}
+    >
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+        className="hidden"
+      />
+      <div className="flex items-center py-2 px-4">
+        <div
+          className={`
+            ${checked ? 'opacity-100' : 'opacity-0'}
+            ${language === 'ar' ? 'order-2 ml-2' : 'order-1 mr-2'}
+          `}
+        >
+          <svg
+            className="w-7 h-7"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        </div>
+        <span className={language === 'ar' ? 'order-1' : 'order-2'}>
+          {label}
+        </span>
+      </div>
+    </label>
+  );
+
   return (
     <div className="relative h-screen flex justify-center">
-      {/* Messages Container with dynamic padding */}
       <div
         className="absolute top-0 bottom-0 w-full max-w-3xl mx-auto overflow-y-auto px-4 md:px-0"
         style={{
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
-          paddingBottom: `${formHeight + 16}px` // Add extra padding for visual spacing
+          paddingBottom: `${formHeight + 16}px`
         }}
       >
         <div className="space-y-4 py-4">
@@ -75,63 +120,23 @@ const ChatInterface: React.FC<Props> = ({ messages, onSendMessage, language, loa
         </div>
       </div>
 
-      {/* Fixed Input Form with max width */}
       <form
         ref={formRef}
         onSubmit={handleSubmit}
         className="fixed bottom-0 left-0 right-0 p-4 border-t border-slate-700 bg-slate-900/95 backdrop-blur-sm"
       >
         <div className="max-w-2xl mx-auto">
-          {/* Checkbox positioned above the input */}
-          <div className={`flex mb-2 ${language === 'ar' ? 'justify-end' : 'justify-start'}`}>
-            <label
-              htmlFor="saudiAccentCheckbox"
-              className={`
-              flex items-center cursor-pointer select-none rounded-md
-              transition-colors duration-200
-              ${
-                useSaudiAccent
-                  ? `bg-blue-500 border-blue-500 text-white border-2`
-                  : 'bg-slate-800 border-slate-500 hover:bg-slate-700 hover:border-slate-600 border-2'
-              }
-            `}
-            >
-              <input
-                type="checkbox"
-                checked={useSaudiAccent}
-                onChange={(e) => setUseSaudiAccent(e.target.checked)}
-                className="hidden"
-                id="saudiAccentCheckbox"
-              />
-
-              {/* Text and Icon Container */}
-              <div className="flex items-center py-2 px-4">
-                {/* Checkmark Icon */}
-                <div
-                  className={`
-                    ${useSaudiAccent ? 'opacity-100' : 'opacity-0'}
-                    ${language === 'ar' ? 'order-2 ml-2' : 'order-1 mr-2'}
-                  `}
-                >
-                  <svg
-                    className={`w-7 h-7`}
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                </div>
-                {/* Text */}
-                <span className={language === 'ar' ? 'order-1' : 'order-2'}>
-                  {language === 'ar' ? 'لهجة سعودية' : 'Saudi Accent'}
-                </span>
-              </div>
-            </label>
+          <div className={`flex mb-2 gap-2 ${language === 'ar' ? 'justify-end' : 'justify-start'}`}>
+            <CheckboxOption
+              checked={useSaudiAccent}
+              onChange={setUseSaudiAccent}
+              label={language === 'ar' ? 'لهجة سعودية' : 'Saudi Accent'}
+            />
+            <CheckboxOption
+              checked={useReasoning}
+              onChange={setUseReasoning}
+              label={language === 'ar' ? 'التفكير المنطقي' : 'Reasoning'}
+            />
           </div>
           <div className="relative flex items-center">
             <textarea
@@ -165,7 +170,6 @@ const ChatInterface: React.FC<Props> = ({ messages, onSendMessage, language, loa
       </form>
 
       <style>{`
-        /* Hide scrollbar for Chrome, Safari and Opera */
         ::-webkit-scrollbar {
           display: none;
         }

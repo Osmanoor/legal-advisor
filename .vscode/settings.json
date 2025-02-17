@@ -1,3 +1,4 @@
 {
-    "python.defaultInterpreterPath": "D:\\Projects\\Work\\legal-advisor\\backend\\venv\\Scripts\\python.exe"
+    "python.defaultInterpreterPath": "D:\\Projects\\Work\\legal-advisor\\backend\\venv\\Scripts\\python.exe",
+    "typescript.tsdk": "./frontend_v2/node_modules/typescript/lib"
 }

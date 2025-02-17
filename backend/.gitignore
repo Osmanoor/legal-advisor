@@ -18,3 +18,7 @@ backend/.env
 backend/.env.*
 backend/!.env.example
 backend/service_account_credentials.json
+
+service_account_credentials.json
+.env
+env.*

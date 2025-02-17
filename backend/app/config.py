@@ -23,7 +23,7 @@ class Config:
     }
 
     # Library configurations
-    LIBRARY_ROOT_FOLDER = "library"
+    LIBRARY_ROOT_FOLDER = "backend/library"
     LIBRARY_CONFIG = {
         'allowed_file_types': ['pdf', 'doc', 'docx', 'txt'],
         'max_file_size': 50 * 1024 * 1024,  # 50MB
@@ -36,4 +36,13 @@ class Config:
         'allowed_email_domains': ['*'],  # Allow all domains
         'max_message_length': 1000,
         'required_fields': ['name', 'email', 'message']
+    }
+
+    # Templates & Email configurations
+    TEMPLATES_DIR = 'backend/app/templates/docs'
+    SMTP_CONFIG = {
+        'server': 'smtp.gmail.com',
+        'port': 587,
+        'username': 'osmanoor2018@gmail.com',
+        'password': 'kjpq qqgc moju mqhe'
     }

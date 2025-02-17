@@ -13,12 +13,12 @@ class RAGConfig:
     openai_api_key: str
     lang: Literal["ar", "en"] = "ar"  # Default to Arabic
     embedding_model: str = "text-embedding-3-small"
-    llm_model: str = "gpt-4-turbo-preview"
+    llm_model: str = "gpt-4-turbo-preview" #gpt-4-turbo-preview   o3-mini
     chunk_size: int = 500
     chunk_overlap: int = 50
-    temperature: float = 0.3
+    temperature: float = 0.3 #0.3
 
-def load_config(language= 'ar') -> RAGConfig:
+def load_config(language= 'ar', reasoning = False) -> RAGConfig:
     """Load configuration from environment variables."""
     openai_api_key = os.getenv("OPENAI_API_KEY")
     if not openai_api_key:
@@ -29,7 +29,13 @@ def load_config(language= 'ar') -> RAGConfig:
     if lang not in ["ar", "en", "sa"]:
         raise ValueError("RAG_LANGUAGE must be either 'ar' or 'en'")
     
-    return RAGConfig(
+    config = RAGConfig(
         openai_api_key=openai_api_key,
         lang=lang
     )
+
+    if reasoning:
+        config.llm_model = "o3-mini"
+        config.temperature = 1
+
+    return config

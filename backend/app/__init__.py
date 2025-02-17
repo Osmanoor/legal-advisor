@@ -12,25 +12,27 @@ def create_app(config_class=Config):
     # Initialize CORS
     CORS(app)
     
-    # Register blueprints
+    # Register blueprints - Move this BEFORE the static routes
     from app.api.chat import chat_bp
     from app.api.search import search_bp
     from app.api.library import library_bp
     from app.api.admin import admin_bp
+    from app.api.templates import templates_bp
+    from app.api.correction import correction_bp
 
+    # Register all API blueprints first
     app.register_blueprint(chat_bp, url_prefix='/api/chat')
     app.register_blueprint(search_bp, url_prefix='/api/search')
     app.register_blueprint(library_bp, url_prefix='/api/library')
+    app.register_blueprint(templates_bp, url_prefix='/api/templates')
     app.register_blueprint(admin_bp, url_prefix='/api/admin')
+    app.register_blueprint(correction_bp, url_prefix='/api/correction')
 
-    # React app routes
+
+    # Static routes should come AFTER API routes
     @app.route('/')
     def serve():
         return send_from_directory(app.static_folder, 'index.html')
-
-    @app.errorhandler(404)
-    def not_found(e):
-        return send_from_directory(app.static_folder, "index.html")
 
     @app.route('/<path:path>')
     def serve_path(path):
@@ -39,5 +41,9 @@ def create_app(config_class=Config):
         if os.path.exists(os.path.join(app.static_folder, path)):
             return send_from_directory(app.static_folder, path)
         return send_from_directory(app.static_folder, 'index.html')
+
+    @app.errorhandler(404)
+    def not_found(e):
+        return send_from_directory(app.static_folder, "index.html")
     
     return app

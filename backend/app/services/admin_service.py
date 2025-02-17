@@ -21,9 +21,9 @@ class AdminService:
         Returns:
             tuple: (response_dict, status_code)
         """
-        name = data.get('name')
-        email = data.get('email')
-        message = data.get('message')
+        name = data.get('Name')
+        email = data.get('Email')
+        message = data.get('Message')
 
         if not all([name, email, message]):
             return jsonify({'error': 'All fields are required'}), 400

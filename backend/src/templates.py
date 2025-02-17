@@ -14,7 +14,7 @@ TEMPLATES = {
 
 قم بتقديم إجابة دقيقة ومباشرة مع ذكر رقم المادة والفصل ذي الصلة:""",
         "collection_name": "arabic_docs",
-        "persist_directory": ".//app//chroma_db_ar_final"
+        "persist_directory": ".//backend//app//chroma_db_ar_final"
     },
     "sa": {
         "qa_template": """أنت مساعد متخصص في الإجابة على الأسئلة المتعلقة بنظام المنافسات والمشتريات الحكومية في المملكة العربية السعودية.
@@ -26,7 +26,7 @@ TEMPLATES = {
 
 قم بتقديم إجابة دقيقة ومباشرة مع ذكر رقم المادة والفصل ذي الصلة:""",
         "collection_name": "arabic_docs",
-        "persist_directory": ".//app//chroma_db_ar_final"
+        "persist_directory": ".//backend//app//chroma_db_ar_final"
     },
     "en": {
         "qa_template": """You are a specialized assistant for answering questions about the Government Tenders and Procurement Law in Saudi Arabia.
@@ -38,7 +38,7 @@ Question: {question}
 
 Provide a precise and direct answer, citing the relevant article and chapter numbers:""",
         "collection_name": "english_docs",
-        "persist_directory": ".//app//chroma_db_final"
+        "persist_directory": ".//backend//app//chroma_db_final"
     }
 }
 

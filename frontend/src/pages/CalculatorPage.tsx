@@ -169,17 +169,20 @@ const CalculatorPage = () => {
       alert('الرجاء إدخال تاريخ البداية');
       return;
     }
-
+  
     try {
+      // Parse the input date string as a local date using Luxon
+      const localStartDate = DateTime.fromFormat(startDate, 'yyyy-MM-dd', { zone: 'local' }).toJSDate();
+  
       const result = DateConverter.calculateEndDate(
-        new Date(startDate),
+        localStartDate,
         {
           days: durationDays ? parseInt(durationDays) : 0,
           months: durationMonths ? parseInt(durationMonths) : 0,
           years: durationYears ? parseInt(durationYears) : 0
         }
       );
-
+  
       // Show both Gregorian and Hijri dates
       const gregorianResult = DateTime.fromJSDate(result).toFormat('yyyy-MM-dd');
       const hijriResult = DateConverter.gregorianToHijri(result);
@@ -188,6 +191,7 @@ const CalculatorPage = () => {
       alert('خطأ في حساب تاريخ النهاية. الرجاء التأكد من المدخلات');
     }
   };
+  
 
 
   return (

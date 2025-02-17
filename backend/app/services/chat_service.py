@@ -21,27 +21,37 @@ class ChatResponse:
 
 class ChatService:
     def __init__(self):
-        self.rag_systems: Dict[str, ArabicRAGSystem] = {}
+        self.rag_systems: Dict[str, Dict[bool, ArabicRAGSystem]] = {}
         self.chat_histories: Dict[str, List[Tuple[str, str]]] = {}
-        self.configs: Dict[str, dict] = {}
+        self.configs: Dict[str, Dict[bool, dict]] = {}
 
-    def get_rag_system(self, language: str) -> ArabicRAGSystem:
-        """Get or create RAG system for specified language"""
+    def get_system_key(self, language: str, reasoning: bool) -> str:
+        """Generate a unique key for the language-reasoning combination"""
+        return f"{language}_{reasoning}"
+
+    def get_rag_system(self, language: str, reasoning: bool = False) -> ArabicRAGSystem:
+        """Get or create RAG system for specified language and reasoning mode"""
         if language not in self.rag_systems:
-            self.configs[language] = load_config(language)
-            self.rag_systems[language] = ArabicRAGSystem(self.configs[language])
-        return self.rag_systems[language]
+            self.rag_systems[language] = {}
+            self.configs[language] = {}
+
+        if reasoning not in self.rag_systems[language]:
+            self.configs[language][reasoning] = load_config(language, reasoning)
+            self.rag_systems[language][reasoning] = ArabicRAGSystem(self.configs[language][reasoning])
+
+        return self.rag_systems[language][reasoning]
 
     def process_chat(self, data: dict):
         """Process chat message and return response"""
         message = data.get('message')
         session_id = data.get('sessionId', 'default')
         language = data.get('language', 'ar')
+        reasoning = data.get('reasoning', False)
 
         if not message:
             return jsonify({"error": "No message provided"}), 400
 
-        rag_system = self.get_rag_system(language)
+        rag_system = self.get_rag_system(language, reasoning)
 
         if session_id not in self.chat_histories:
             self.chat_histories[session_id] = []
@@ -55,8 +65,6 @@ class ChatService:
 
         formatted_sources = []
         for doc in response["source_documents"]:
-            print(doc.metadata)
-            print("\n")
             source = {
                 "content": doc.page_content,
                 "metadata": doc.metadata

@@ -1,0 +1,60 @@
+/* src/styles/responsive.css */
+@layer utilities {
+  /* Hide on specific breakpoints */
+  .hide-xs {
+    @apply xs:hidden;
+  }
+  .hide-sm {
+    @apply sm:hidden;
+  }
+  .hide-md {
+    @apply md:hidden;
+  }
+  .hide-lg {
+    @apply lg:hidden;
+  }
+  .hide-xl {
+    @apply xl:hidden;
+  }
+  .hide-2xl {
+    @apply 2xl:hidden;
+  }
+
+  /* Show only on specific breakpoints */
+  .show-xs {
+    @apply hidden xs:block;
+  }
+  .show-sm {
+    @apply hidden sm:block;
+  }
+  .show-md {
+    @apply hidden md:block;
+  }
+  .show-lg {
+    @apply hidden lg:block;
+  }
+  .show-xl {
+    @apply hidden xl:block;
+  }
+  .show-2xl {
+    @apply hidden 2xl:block;
+  }
+
+  /* Container paddings */
+  .container-padding {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Responsive spacing */
+  .responsive-gap {
+    @apply gap-4 md:gap-6 lg:gap-8;
+  }
+  
+  .responsive-margin {
+    @apply m-4 md:m-6 lg:m-8;
+  }
+  
+  .responsive-padding {
+    @apply p-4 md:p-6 lg:p-8;
+  }
+}

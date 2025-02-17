@@ -33,7 +33,7 @@ interface LanguageResponse {
 
 // API configuration
 const API_CONFIG = {
-  BASE_URL: 'api',
+  BASE_URL: 'http://127.0.0.1:8080/api',
   HEADERS: {
     'Content-Type': 'application/json',
   },
@@ -71,7 +71,7 @@ export const searchResources = async ({ query, type }: SearchParams): Promise<Se
 
 export const chatService = {
   // Send a message and get response
-  async sendMessage(message: string, language: 'ar' | 'en' | 'sa'): Promise<ChatResponse> {
+  async sendMessage(message: string, language: 'ar' | 'en' | 'sa', reasoning:boolean): Promise<ChatResponse> {
     try {
       const response = await fetch(`${API_CONFIG.BASE_URL}/chat`, {
         method: 'POST',
@@ -79,6 +79,7 @@ export const chatService = {
         body: JSON.stringify({
           message,
           language,
+          reasoning,
           sessionId: localStorage.getItem('sessionId') || 'default'
         }),
       });

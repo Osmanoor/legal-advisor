@@ -12,6 +12,9 @@ export const ar = {
     back: 'رجوع',
     next: 'التالي',
     comingSoon: 'قريباً',
+    downloading: 'جاري التنزيل...',
+    sending: 'جاري الإرسال...',
+    retry: 'حاول مرة أخرى',
   },
   auth: {
     login: 'تسجيل الدخول',
@@ -26,6 +29,8 @@ export const ar = {
     search: 'البحث',
     calculator: 'الحاسبة',
     admin: 'المشرف',
+    correction: 'تصحيح لغوي',
+    templates: 'القوالب',
   },
   procurement: {
     systemName: 'نظام المنافسات والمشتريات الحكومية',
@@ -361,4 +366,29 @@ export const ar = {
       back: 'رجوع'
     }
   },
+  templates: {
+    title: 'قوالب المستندات',
+    placeholders: 'الحقول المطلوبة',
+    generate: 'إنشاء المستند',
+    generation: {
+      success: 'تم إنشاء المستند بنجاح',
+      error: 'خطأ في إنشاء المستند'
+    },
+    download: {
+      docx: 'تحميل DOCX',
+      pdf: 'تحميل PDF',
+      success: 'تم تحميل المستند بنجاح',
+      error: 'خطأ في تحميل المستند'
+    },
+    email: {
+      button: 'إرسال عبر البريد الإلكتروني',
+      title: 'إرسال المستند',
+      recipient: 'البريد الإلكتروني للمستلم',
+      subject: 'الموضوع',
+      body: 'الرسالة',
+      send: 'إرسال',
+      success: 'تم إرسال البريد الإلكتروني بنجاح',
+      error: 'خطأ في إرسال البريد الإلكتروني'
+    }
+  }
 };

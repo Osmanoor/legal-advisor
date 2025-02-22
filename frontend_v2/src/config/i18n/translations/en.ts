@@ -12,6 +12,9 @@ export const en = {
     back: 'Back',
     next: 'Next',
     comingSoon: 'Coming Soon',
+    downloading: 'Downloading...',
+    sending: 'Sending...',
+    retry: 'Try Again',
   },
   auth: {
     login: 'Login',
@@ -26,6 +29,8 @@ export const en = {
     search: 'Search',
     calculator: 'Calculator',
     admin: 'Admin',
+    correction: 'correction',
+    templates: 'Templates',
   },
   procurement: {
     systemName: 'Government Procurement System',
@@ -354,6 +359,32 @@ export const en = {
       reset: 'Reset',
       calculate: 'Calculate',
       back: 'Back'
+    }
+  },
+  templates: {
+    title: 'Document Templates',
+    fields: 'Required Fields',
+    generate: 'Generate Document',
+    back: 'Back to Templates',
+    generation: {
+      success: 'Document generated successfully',
+      error: 'Error generating document'
+    },
+    download: {
+      docx: 'Download DOCX',
+      pdf: 'Download PDF',
+      success: 'Document downloaded successfully',
+      error: 'Error downloading document'
+    },
+    email: {
+      button: 'Send via Email',
+      title: 'Send Document',
+      recipient: 'Recipient Email',
+      subject: 'Subject',
+      body: 'Message',
+      send: 'Send Email',
+      success: 'Email sent successfully',
+      error: 'Error sending email'
     }
   }
 };

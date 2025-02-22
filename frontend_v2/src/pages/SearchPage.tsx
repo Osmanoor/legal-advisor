@@ -62,18 +62,6 @@ export default function SearchPage() {
     <div className={`min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white ${
       language === 'ar' ? 'text-right' : 'text-left'
     }`}>
-      <header className="bg-slate-800/50 border-b border-slate-700">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <Link 
-            to="/"
-            className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 hover:from-blue-300 hover:to-purple-300 transition-colors"
-          >
-            {t('procurement.communityName')}
-          </Link>
-          <LanguageSwitch />
-        </div>
-      </header>
-
       <main className="max-w-7xl mx-auto px-4 py-6">
         <div className="grid grid-cols-1 md:grid-cols-[250px_1fr] gap-8">
           {/* Filters Sidebar */}

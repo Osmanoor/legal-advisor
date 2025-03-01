@@ -7,7 +7,7 @@
 /backend/*.pyd
 /backend/.mypy_cache/
 /backend/.pytest_cache/
-/backend/library/
+# /backend/library/
 
 # Ignore Node.js dependencies in frontend
 /frontend/node_modules/

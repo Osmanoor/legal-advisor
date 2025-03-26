@@ -1,4 +1,5 @@
 # app/services/admin_service.py
+
 import csv
 import os
 from datetime import datetime
@@ -10,6 +11,7 @@ class AdminService:
     def __init__(self):
         """Initialize admin service"""
         os.makedirs(os.path.dirname(Config.CONTACTS_FILE), exist_ok=True)
+        os.makedirs(os.path.dirname(Config.EMAILS_FILE), exist_ok=True)
 
     def save_contact(self, data: Dict) -> tuple:
         """
@@ -65,3 +67,23 @@ class AdminService:
         except Exception as e:
             print(f"Error reading contacts: {str(e)}")
             return jsonify({'error': 'Failed to read contacts'}), 500
+            
+    def get_all_emails(self) -> tuple:
+        """
+        Get all sent email records
+        
+        Returns:
+            tuple: (response_dict, status_code)
+        """
+        if not os.path.exists(Config.EMAILS_FILE):
+            return jsonify([]), 200
+
+        try:
+            emails = []
+            with open(Config.EMAILS_FILE, 'r', encoding='utf-8') as file:
+                reader = csv.DictReader(file)
+                emails = list(reader)
+            return jsonify(emails), 200
+        except Exception as e:
+            print(f"Error reading emails: {str(e)}")
+            return jsonify({'error': 'Failed to read emails'}), 500

@@ -19,6 +19,8 @@ def create_app(config_class=Config):
     from app.api.admin import admin_bp
     from app.api.templates import templates_bp
     from app.api.correction import correction_bp
+    from app.api.journey import journey_bp 
+    from app.api.tender_mapping import tender_mapping_bp 
 
     # Register all API blueprints first
     app.register_blueprint(chat_bp, url_prefix='/api/chat')
@@ -27,7 +29,8 @@ def create_app(config_class=Config):
     app.register_blueprint(templates_bp, url_prefix='/api/templates')
     app.register_blueprint(admin_bp, url_prefix='/api/admin')
     app.register_blueprint(correction_bp, url_prefix='/api/correction')
-
+    app.register_blueprint(journey_bp, url_prefix='/api/journey')
+    app.register_blueprint(tender_mapping_bp, url_prefix='/api/tender-mapping')
 
     # Static routes should come AFTER API routes
     @app.route('/')

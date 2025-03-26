@@ -1,4 +1,5 @@
 // src/pages/AdminPage.tsx
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Download } from 'lucide-react';
@@ -8,7 +9,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Credentials } from '@/types/admin';
+import { ContactsTable } from '@/features/admin/components/ContactsTable';
+import { EmailsTable } from '@/features/admin/components/EmailsTable';
 
 export default function AdminPage() {
   const { t } = useLanguage();
@@ -20,11 +24,13 @@ export default function AdminPage() {
 
   const {
     contacts,
+    emails,
     isLoading,
     error,
     isAuthenticated,
     fetchContacts,
-    exportToCSV,
+    exportContactsToCSV,
+    exportEmailsToCSV,
     logout
   } = useAdmin();
 
@@ -81,18 +87,9 @@ export default function AdminPage() {
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-2xl font-bold text-gray-900">
-              {t('admin.contacts.title')}
+              {t('admin.title')}
             </h1>
-            <div className="flex gap-4">
-              <Button
-                onClick={exportToCSV}
-                disabled={contacts.length === 0}
-                variant="secondary"
-                className="flex items-center gap-2"
-              >
-                <Download className="h-4 w-4" />
-                {t('admin.contacts.export')}
-              </Button>
+            <div>
               <Button
                 onClick={logout}
                 variant="danger"
@@ -102,34 +99,66 @@ export default function AdminPage() {
             </div>
           </div>
 
-          {isLoading ? (
-            <div className="text-center py-8">
-              {t('common.loading')}
-            </div>
-          ) : (
-            <div className="shadow-lg rounded-lg overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>{t('admin.contacts.date')}</TableHead>
-                    <TableHead>{t('admin.contacts.name')}</TableHead>
-                    <TableHead>{t('admin.contacts.email')}</TableHead>
-                    <TableHead>{t('admin.contacts.message')}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {contacts.map((contact, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{contact.Date}</TableCell>
-                      <TableCell>{contact.Name}</TableCell>
-                      <TableCell>{contact.Email}</TableCell>
-                      <TableCell>{contact.Message}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
+          <Tabs defaultValue="contacts">
+            <TabsList className="mb-6">
+              <TabsTrigger value="contacts">{t('admin.tabs.contacts')}</TabsTrigger>
+              <TabsTrigger value="emails">{t('admin.tabs.emails')}</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="contacts">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold">{t('admin.contacts.title')}</h2>
+                <Button
+                  onClick={exportContactsToCSV}
+                  disabled={contacts.length === 0}
+                  variant="secondary"
+                  className="flex items-center gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  {t('admin.contacts.export')}
+                </Button>
+              </div>
+
+              {isLoading ? (
+                <div className="text-center py-8">
+                  {t('common.loading')}
+                </div>
+              ) : contacts.length > 0 ? (
+                <ContactsTable contacts={contacts} />
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  {t('admin.contacts.noData')}
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="emails">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold">{t('admin.emails.title')}</h2>
+                <Button
+                  onClick={exportEmailsToCSV}
+                  disabled={emails.length === 0}
+                  variant="secondary"
+                  className="flex items-center gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  {t('admin.emails.export')}
+                </Button>
+              </div>
+
+              {isLoading ? (
+                <div className="text-center py-8">
+                  {t('common.loading')}
+                </div>
+              ) : emails.length > 0 ? (
+                <EmailsTable emails={emails} />
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  {t('admin.emails.noData')}
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
         </div>
       )}
     </div>

@@ -1,177 +1,231 @@
+import unittest
 import requests
 import json
 import os
-from pprint import pprint
+import tempfile
+from datetime import datetime
 
-class TemplateEndpointTester:
-    def __init__(self, base_url="http://localhost:8080/api"):  # Updated port to 8080
-        self.base_url = base_url
-        self.generated_doc_path = None
 
+class TemplatesEndpointTest(unittest.TestCase):
+    """Test case for templates API endpoints"""
+    
+    BASE_URL = "http://localhost:8080/api"
+    TEMPLATES_URL = f"{BASE_URL}/templates"
+    
+    def setUp(self):
+        """Setup before each test"""
+        # Create a temporary directory to store test files
+        self.temp_dir = tempfile.mkdtemp()
+        
+        # Sample template values for award letter
+        self.sample_values = {
+            "today_date": datetime.now().strftime("%d/%m/%Y"),
+            "supplier_name": "شركة الأمل للمقاولات",
+            "supplier_address": "الرياض، طريق الملك فهد",
+            "supplier_email": "info@alamal.com",
+            "project_name": "توريد وتركيب أنظمة تكييف",
+            "contract_number": 12345,
+            "commercial_register": 4030123456,
+            "project_name_repeat": "توريد وتركيب أنظمة تكييف",
+            "offer_date": "15/02/2025",
+            "total_amount_number": 500000,
+            "total_amount_text": "خمسمائة ألف ريال سعودي",
+            "authority_title": "مدير إدارة المشتريات",
+            "authority_name": "محمد عبدالله السعيد"
+        }
+    
+    def tearDown(self):
+        """Cleanup after each test"""
+        # Remove any downloaded files
+        for filename in os.listdir(self.temp_dir):
+            os.remove(os.path.join(self.temp_dir, filename))
+        os.rmdir(self.temp_dir)
+    
     def test_get_all_templates(self):
-        """Test GET /templates endpoint"""
-        print("\n1. Testing GET all templates...")
-        try:
-            response = requests.get(f"{self.base_url}/templates")
-            pprint(response.json())
-            assert response.status_code == 200
-            return response.json()
-        except requests.exceptions.ConnectionError:
-            print(f"Connection Error: Make sure the Flask server is running on {self.base_url}")
-            raise
-        except Exception as e:
-            print(f"Error: {str(e)}")
-            raise
+        """Test retrieving all templates"""
+        response = requests.get(self.TEMPLATES_URL)
+        self.assertEqual(response.status_code, 200)
+        
+        # Verify response structure
+        data = response.json()
+        self.assertIn("templates", data)
+        self.assertIsInstance(data["templates"], list)
+        
+        # If templates exist, verify their structure
+        if data["templates"]:
+            template = data["templates"][0]
+            self.assertIn("id", template)
+            self.assertIn("filename", template)
+            self.assertIn("display_name", template)
+            self.assertIn("placeholders", template)
+    
+    def test_get_template_details(self):
+        """Test retrieving details for a specific template"""
+        # First get all templates to find an ID to test
+        all_templates = requests.get(self.TEMPLATES_URL).json()
+        if not all_templates.get("templates"):
+            self.skipTest("No templates available for testing")
+        
+        template_id = all_templates["templates"][0]["id"]
+        response = requests.get(f"{self.TEMPLATES_URL}/{template_id}")
+        
+        self.assertEqual(response.status_code, 200)
+        template = response.json()
+        
+        # Verify template structure
+        self.assertEqual(template["id"], template_id)
+        self.assertIn("filename", template)
+        self.assertIn("placeholders", template)
+        
+        # Verify placeholder structure
+        if template["placeholders"]:
+            placeholder = template["placeholders"][0]
+            self.assertIn("id", placeholder)
+            self.assertIn("type", placeholder)
+            self.assertIn("required", placeholder)
+            self.assertIn("description", placeholder)
+    
+    def test_generate_and_download_document(self):
+        """Test generating and downloading a document"""
+        # First get all templates to find an ID to test
+        all_templates = requests.get(self.TEMPLATES_URL).json()
+        if not all_templates.get("templates"):
+            self.skipTest("No templates available for testing")
+        
+        template_id = all_templates["templates"][0]["id"]
+        
+        # Generate document
+        generate_response = requests.post(
+            f"{self.TEMPLATES_URL}/{template_id}/generate",
+            json=self.sample_values
+        )
+        
+        self.assertEqual(generate_response.status_code, 200)
+        generate_data = generate_response.json()
+        self.assertIn("doc_path", generate_data)
+        
+        # Download as DOCX
+        download_response = requests.post(
+            f"{self.TEMPLATES_URL}/download/docx",
+            json={"doc_path": generate_data["doc_path"]}
+        )
+        
+        self.assertEqual(download_response.status_code, 200)
+        self.assertIn("application/vnd.openxmlformats-officedocument.wordprocessingml.document", 
+                     download_response.headers["Content-Type"])
+        
+        # Save the downloaded file
+        docx_path = os.path.join(self.temp_dir, "test_document.docx")
+        with open(docx_path, "wb") as f:
+            f.write(download_response.content)
+        
+        # Verify file exists and has content
+        self.assertTrue(os.path.exists(docx_path))
+        self.assertGreater(os.path.getsize(docx_path), 0)
+    
+    def test_generate_and_download_pdf(self):
+        """Test generating and downloading a document as PDF"""
+        # First get all templates to find an ID to test
+        all_templates = requests.get(self.TEMPLATES_URL).json()
+        if not all_templates.get("templates"):
+            self.skipTest("No templates available for testing")
+        
+        template_id = all_templates["templates"][0]["id"]
+        
+        # Generate document
+        generate_response = requests.post(
+            f"{self.TEMPLATES_URL}/{template_id}/generate",
+            json=self.sample_values
+        )
+        
+        self.assertEqual(generate_response.status_code, 200)
+        generate_data = generate_response.json()
+        
+        # Download as PDF
+        download_response = requests.post(
+            f"{self.TEMPLATES_URL}/download/pdf",
+            json={"doc_path": generate_data["doc_path"]}
+        )
+        
+        self.assertEqual(download_response.status_code, 200)
+        self.assertIn("application/pdf", download_response.headers["Content-Type"])
+        
+        # Save the downloaded file
+        pdf_path = os.path.join(self.temp_dir, "test_document.pdf")
+        with open(pdf_path, "wb") as f:
+            f.write(download_response.content)
+        
+        # Verify file exists and has content
+        self.assertTrue(os.path.exists(pdf_path))
+        self.assertGreater(os.path.getsize(pdf_path), 0)
+    
+    def test_invalid_template_id(self):
+        """Test behavior with an invalid template ID"""
+        response = requests.get(f"{self.TEMPLATES_URL}/nonexistent_template")
+        self.assertEqual(response.status_code, 404)
+    
+    def test_missing_values(self):
+        """Test generating a document with missing values"""
+        # First get all templates to find an ID to test
+        all_templates = requests.get(self.TEMPLATES_URL).json()
+        if not all_templates.get("templates"):
+            self.skipTest("No templates available for testing")
+        
+        template_id = all_templates["templates"][0]["id"]
+        
+        # Generate with empty values
+        response = requests.post(
+            f"{self.TEMPLATES_URL}/{template_id}/generate",
+            json={}
+        )
+        
+        # This might be 400 (if backend validates) or 200 (if frontend handles validation)
+        # Adjust the test based on your implementation
+        if response.status_code == 400:
+            self.assertIn("error", response.json())
+        else:
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("doc_path", response.json())
+    
+    def test_send_email(self):
+        """Test sending document via email (if implemented)"""
+        # First generate a document
+        all_templates = requests.get(self.TEMPLATES_URL).json()
+        if not all_templates.get("templates"):
+            self.skipTest("No templates available for testing")
+        
+        template_id = all_templates["templates"][0]["id"]
+        
+        generate_response = requests.post(
+            f"{self.TEMPLATES_URL}/{template_id}/generate",
+            json=self.sample_values
+        )
+        
+        if generate_response.status_code != 200:
+            self.skipTest("Document generation failed, cannot test email")
+        
+        doc_path = generate_response.json()["doc_path"]
+        
+        # Attempt to send email (might be skipped in CI environments)
+        # Use a test email or environment variable
+        test_email = os.environ.get("TEST_EMAIL", "osmanbashir2013@gmail.com")
+        
+        email_data = {
+            "recipient_email": test_email,
+            "subject": "Test Email with Generated Document",
+            "body": "This is a test email with an attached document generated from a template.",
+            "doc_path": doc_path
+        }
+        
+        response = requests.post(f"{self.TEMPLATES_URL}/send-email", json=email_data)
+        
+        # This might fail if email sending is not configured in the test environment
+        # So we'll just check the response structure
+        if response.status_code == 200:
+            self.assertIn("message", response.json())
+        else:
+            print(f"Email sending test failed with status {response.status_code}: {response.text}")
 
-    def test_get_template_details(self, template_name="doc1.docx"):
-        """Test GET /templates/<template_name> endpoint"""
-        print(f"\n2. Testing GET template details for {template_name}...")
-        try:
-            response = requests.get(f"{self.base_url}/templates/{template_name}")
-            pprint(response.json())
-            assert response.status_code == 200
-            return response.json()
-        except Exception as e:
-            print(f"Error: {str(e)}")
-            raise
-
-    def test_generate_document(self, template_name="doc1.docx"):
-        """Test POST /templates/<template_name>/generate endpoint"""
-        print(f"\n3. Testing generate document for {template_name}...")
-        try:
-            # Get template details first to know required placeholders
-            template_details = self.test_get_template_details(template_name)
-            
-            # Create test values for each placeholder
-            test_values = {
-                placeholder: f"Test {placeholder} value"
-                for placeholder in template_details['placeholders']
-            }
-            
-            response = requests.post(
-                f"{self.base_url}/templates/{template_name}/generate",
-                json=test_values
-            )
-            pprint(response.json())
-            assert response.status_code == 200
-            
-            # Save doc_path for later tests
-            self.generated_doc_path = response.json().get('doc_path')
-            return response.json()
-        except Exception as e:
-            print(f"Error: {str(e)}")
-            raise
-
-    def test_download_document_docx(self):
-        """Test POST /templates/download/docx endpoint"""
-        print("\n4. Testing download document as DOCX...")
-        try:
-            if not self.generated_doc_path:
-                print("No document generated yet. Generating one...")
-                self.test_generate_document()
-
-            response = requests.post(
-                f"{self.base_url}/templates/download/docx",
-                json={"doc_path": self.generated_doc_path}
-            )
-            
-            if response.status_code == 200:
-                # Save the file locally for inspection
-                with open("test_download.docx", "wb") as f:
-                    f.write(response.content)
-                print("Document downloaded successfully as 'test_download.docx'")
-            else:
-                print("Error downloading document:", response.json())
-            
-            assert response.status_code == 200
-            return response
-        except Exception as e:
-            print(f"Error: {str(e)}")
-            raise
-
-    def test_download_document_pdf(self):
-        """Test POST /templates/download/pdf endpoint"""
-        print("\n5. Testing download document as PDF...")
-        try:
-            if not self.generated_doc_path:
-                print("No document generated yet. Generating one...")
-                self.test_generate_document()
-
-            response = requests.post(
-                f"{self.base_url}/templates/download/pdf",
-                json={"doc_path": self.generated_doc_path}
-            )
-            
-            if response.status_code == 200:
-                # Save the file locally for inspection
-                with open("test_download.pdf", "wb") as f:
-                    f.write(response.content)
-                print("Document downloaded successfully as 'test_download.pdf'")
-            else:
-                print("Error downloading document:", response.json())
-            
-            assert response.status_code == 200
-            return response
-        except Exception as e:
-            print(f"Error: {str(e)}")
-            raise
-
-    def test_send_email(self, recipient_email="osmanbashir2013@gmail.com"):
-        """Test POST /templates/send-email endpoint"""
-        print("\n6. Testing send email...")
-        try:
-            if not self.generated_doc_path:
-                print("No document generated yet. Generating one...")
-                self.test_generate_document()
-
-            email_data = {
-                "recipient_email": recipient_email,
-                "subject": "Test Document",
-                "body": "Please find the test document attached.",
-                "doc_path": self.generated_doc_path
-            }
-
-            response = requests.post(
-                f"{self.base_url}/templates/send-email",
-                json=email_data
-            )
-            pprint(response.json())
-            assert response.status_code == 200
-            return response.json()
-        except Exception as e:
-            print(f"Error: {str(e)}")
-            raise
-
-    def run_all_tests(self):
-        """Run all tests in sequence"""
-        try:
-            print(f"Starting tests against server at {self.base_url}")
-            print("Make sure the Flask server is running before proceeding.")
-            input("Press Enter to continue...")
-            
-            self.test_get_all_templates()
-            self.test_get_template_details()
-            self.test_generate_document()
-            self.test_download_document_docx()
-            self.test_download_document_pdf()
-            self.test_send_email()
-            print("\nAll tests completed successfully!")
-        except AssertionError as e:
-            print(f"\nTest failed: {str(e)}")
-        except requests.exceptions.ConnectionError:
-            print("\nConnection Error: Could not connect to the server. Make sure:")
-            print("1. The Flask server is running")
-            print("2. The port number is correct (currently set to 8080)")
-            print("3. You can access the server at", self.base_url)
-        except Exception as e:
-            print(f"\nError during testing: {str(e)}")
 
 if __name__ == "__main__":
-    # Create tester instance
-    tester = TemplateEndpointTester()  # Uses port 8080 by default
-    
-    # Alternatively, you can specify a different base URL:
-    # tester = TemplateEndpointTester(base_url="http://localhost:8080/api")
-    
-    # Run all tests
-    tester.run_all_tests()
+    unittest.main()

@@ -17,6 +17,8 @@ import AdminPage from './pages/AdminPage';
 import CorrectionPage from './pages/CorrectionPage';
 import CalculatorPage from './pages/CalculatorPage';
 import TemplatesPage from './pages/TemplatesPage';
+import JourneyPage from './pages/JourneyPage';
+import TenderMappingPage from './pages/TenderMappingPage';
 
 
 
@@ -37,6 +39,9 @@ function App() {
                 <Route path="/correction" element={<CorrectionPage />} />
                 <Route path="/calculator" element={<CalculatorPage />} />
                 <Route path="/templates" element={<TemplatesPage />} />
+                <Route path="/journey" element={<JourneyPage />} />
+                <Route path="/journey/:levelId" element={<JourneyPage />} />
+                <Route path="/tender-mapping" element={<TenderMappingPage />} />
               </Routes>
             </AppLayout>
           </BrowserRouter>

@@ -1,0 +1,162 @@
+{
+  "templates": [
+    {
+      "id": "award_letter",
+      "filename": "خطاب ترسية.docx",
+      "display_name": {
+        "ar": "خطاب ترسية",
+        "en": "Award Letter"
+      },
+      "description": {
+        "ar": "خطاب رسمي لإبلاغ المورد بترسية المشروع",
+        "en": "Official letter to inform the supplier about the project award"
+      },
+      "placeholders": [
+        {
+          "id": "today_date",
+          "placeholder_tag": "{{1}}",
+          "original_text": "(تاريخ اليوم)",
+          "type": "date",
+          "required": true,
+          "description": {
+            "ar": "تاريخ اليوم الحالي",
+            "en": "Current date"
+          },
+          "source": "user_input"
+        },
+        {
+          "id": "supplier_name",
+          "placeholder_tag": "{{2}}",
+          "original_text": "(المورد حسب الموجود في النظام)",
+          "type": "string",
+          "required": true,
+          "description": {
+            "ar": "اسم المورد كما هو مسجل في النظام",
+            "en": "Supplier name as registered in the system"
+          },
+          "source": "user_input"
+        },
+        {
+          "id": "supplier_address",
+          "placeholder_tag": "{{3}}",
+          "original_text": "(العنوان حسب الموجود في النظام)",
+          "type": "string",
+          "required": true,
+          "description": {
+            "ar": "عنوان المورد كما هو مسجل في النظام",
+            "en": "Supplier address as registered in the system"
+          },
+          "source": "user_input"
+        },
+        {
+          "id": "supplier_email",
+          "placeholder_tag": "{{4}}",
+          "original_text": "(ايميل المورد حسب الموجود في النظام)",
+          "type": "string",
+          "required": true,
+          "description": {
+            "ar": "البريد الإلكتروني للمورد كما هو مسجل في النظام",
+            "en": "Supplier email as registered in the system"
+          },
+          "source": "user_input"
+        },
+        {
+          "id": "project_name",
+          "placeholder_tag": "{{5}}",
+          "original_text": "(اسم المشروع مدخل من قبل موظف المشتريات)",
+          "type": "string",
+          "required": true,
+          "description": {
+            "ar": "اسم المشروع الذي يتم إدخاله من قبل موظف المشتريات",
+            "en": "Project name entered by the procurement officer"
+          },
+          "source": "user_input"
+        },
+        {
+          "id": "contract_number",
+          "placeholder_tag": "{{6}}",
+          "original_text": "(رقم امر الشراء مربوط بطلب الشراء)",
+          "type": "integer",
+          "required": true,
+          "description": {
+            "ar": "رقم العقد أو أمر الشراء المرتبط بطلب الشراء",
+            "en": "Contract number or purchase order linked to the purchase request"
+          },
+          "source": "user_input"
+        },
+        {
+          "id": "commercial_register",
+          "placeholder_tag": "{{7}}",
+          "original_text": "(حسب الموجود في النظام)",
+          "type": "integer",
+          "required": true,
+          "description": {
+            "ar": "رقم السجل التجاري للمورد",
+            "en": "Supplier's commercial registration number"
+          },
+          "source": "user_input"
+        },
+        {
+          "id": "offer_date",
+          "placeholder_tag": "{{8}}",
+          "original_text": "(تاريخ سريان عرض السعر)",
+          "type": "date",
+          "required": true,
+          "description": {
+            "ar": "تاريخ سريان عرض السعر المقدم من المورد",
+            "en": "Validity date of the price offer submitted by the supplier"
+          },
+          "source": "user_input"
+        },
+        {
+          "id": "total_amount_number",
+          "placeholder_tag": "{{9}}",
+          "original_text": "(القيمة نقدا حسب الموجود في امر الشراء)",
+          "type": "number",
+          "required": true,
+          "description": {
+            "ar": "القيمة الإجمالية للمشروع بالأرقام",
+            "en": "Total project value in numbers"
+          },
+          "source": "user_input"
+        },
+        {
+          "id": "total_amount_text",
+          "placeholder_tag": "{{10}}",
+          "original_text": "(القيمة كتابتا)",
+          "type": "string",
+          "required": true,
+          "description": {
+            "ar": "القيمة الإجمالية للمشروع مكتوبة بالحروف",
+            "en": "Total project value written in words"
+          },
+          "source": "total_amount_number"
+        },
+        {
+          "id": "authority_title",
+          "placeholder_tag": "{{11}}",
+          "original_text": "(صلاحية صاحب الصلاحية)",
+          "type": "string",
+          "required": true,
+          "description": {
+            "ar": "المنصب الوظيفي لصاحب الصلاحية",
+            "en": "Job title of the authorized person"
+          },
+          "source": "user_input"
+        },
+        {
+          "id": "authority_name",
+          "placeholder_tag": "{{12}}",
+          "original_text": "(اسم صاحب الصلاحية)",
+          "type": "string",
+          "required": true,
+          "description": {
+            "ar": "اسم الشخص المخول بالتوقيع",
+            "en": "Name of the authorized signatory"
+          },
+          "source": "user_input"
+        }
+      ]
+    }
+  ]
+}

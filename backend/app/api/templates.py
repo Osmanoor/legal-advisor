@@ -1,3 +1,4 @@
+# app/api/templates.py
 from flask import Blueprint, jsonify, request, send_file, current_app
 from ..services.templates_service import TemplateService
 from werkzeug.exceptions import BadRequest
@@ -15,17 +16,17 @@ def get_templates():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@templates_bp.route('/<template_name>', methods=['GET'])
-def get_template_details(template_name):
+@templates_bp.route('/<template_id>', methods=['GET'])
+def get_template_details(template_id):
     """Get details for a specific template"""
     try:
-        template = template_service.get_template_details(template_name)
+        template = template_service.get_template_details(template_id)
         return jsonify(template)
     except Exception as e:
         return jsonify({"error": str(e)}), 404
 
-@templates_bp.route('/<template_name>/generate', methods=['POST'])
-def generate_document(template_name):
+@templates_bp.route('/<template_id>/generate', methods=['POST'])
+def generate_document(template_id):
     """Generate document from template"""
     try:
         values = request.json
@@ -33,7 +34,7 @@ def generate_document(template_name):
             raise BadRequest("No values provided")
 
         # Generate document
-        doc_path = template_service.generate_document(template_name, values)
+        doc_path = template_service.generate_document(template_id, values)
         
         # Return document path in session
         return jsonify({
@@ -52,7 +53,7 @@ def download_document(format):
         if not doc_path or not os.path.exists(doc_path):
             raise BadRequest("Invalid document path")
 
-        if format == 'pdf':
+        if format.lower() == 'pdf':
             pdf_path = template_service.convert_to_pdf(doc_path)
             response = send_file(pdf_path, as_attachment=True, download_name='document.pdf')
             # Clean up after sending

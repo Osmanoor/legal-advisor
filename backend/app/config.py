@@ -5,6 +5,7 @@ from typing import Dict, Any
 class Config:
     """Application configuration"""
     CONTACTS_FILE = os.path.join('data', 'contacts.csv')
+    EMAILS_FILE = os.path.join('data', 'emails.csv')
     ADMIN_USERNAME = 'admin'
     ADMIN_PASSWORD = '123'
 
@@ -46,3 +47,9 @@ class Config:
         'username': 'osmanoor2018@gmail.com',
         'password': 'kjpq qqgc moju mqhe'
     }
+
+    #Journey
+    Journey_DIR = os.path.join('backend','data', 'journey')
+
+    #Tender Mapping
+    TENDER_MAPPING_DIR = os.path.join('backend','data', 'tender_mapping')

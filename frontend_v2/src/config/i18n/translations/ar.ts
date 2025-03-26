@@ -31,6 +31,8 @@ export const ar = {
     admin: 'المشرف',
     correction: 'تصحيح لغوي',
     templates: 'القوالب',
+    journey: 'رحلة التعلم',
+    tenderMapping: 'تحديد المنافسات',
   },
   procurement: {
     systemName: 'نظام المنافسات والمشتريات الحكومية',
@@ -201,12 +203,17 @@ export const ar = {
     }
   },
   admin: {
+    title: 'لوحة المشرف',
     login: {
       title: 'تسجيل دخول المشرف',
       username: 'اسم المستخدم',
       password: 'كلمة المرور',
       submit: 'تسجيل الدخول',
       error: 'بيانات غير صحيحة'
+    },
+    tabs: {
+      contacts: 'جهات الاتصال',
+      emails: 'رسائل البريد الإلكتروني'
     },
     contacts: {
       title: 'رسائل التواصل',
@@ -217,6 +224,17 @@ export const ar = {
       export: 'تصدير CSV',
       noData: 'لا توجد رسائل تواصل',
       error: 'فشل في تحميل الرسائل'
+    },
+    emails: {
+      title: 'سجلات البريد الإلكتروني',
+      date: 'التاريخ',
+      recipient: 'المستلم',
+      subject: 'الموضوع',
+      body: 'الرسالة',
+      attachment: 'المرفق',
+      export: 'تصدير CSV',
+      noData: 'لا توجد سجلات بريد إلكتروني',
+      error: 'فشل في تحميل سجلات البريد'
     },
     logout: 'تسجيل الخروج'
   },
@@ -390,5 +408,61 @@ export const ar = {
       success: 'تم إرسال البريد الإلكتروني بنجاح',
       error: 'خطأ في إرسال البريد الإلكتروني'
     }
-  }
+  },
+  journey: {
+    title: 'رحلة التعلم',
+    description: 'موارد تعليمية خطوة بخطوة لمحترفي المشتريات',
+    levels: 'مستويات الرحلة',
+    level: 'المستوى',
+    resources: 'الموارد',
+    levelDescription: 'وصف المستوى',
+    noLevels: 'لم يتم العثور على مستويات للرحلة',
+    noResources: 'لم يتم العثور على موارد لهذا المستوى',
+    back: 'العودة إلى المستويات',
+    viewResource: 'عرض',
+    downloadResource: 'تحميل',
+    resourceDetails: 'تفاصيل المورد',
+    size: 'الحجم',
+    type: 'النوع',
+    created: 'تاريخ الإنشاء',
+    modified: 'تاريخ التعديل',
+    loading: 'جاري التحميل...',
+    error: 'حدث خطأ أثناء تحميل البيانات',
+    yourProgress: 'تقدمك',
+  previousLevel: 'المستوى السابق',
+  nextLevel: 'المستوى التالي',
+  start: 'ابدأ',
+  continue: 'متابعة',
+  backToJourney: 'العودة إلى الرحلة',
+  },
+  tenderMapping: {
+    title: 'تحديد نوع المنافسة',
+    description: 'اعثر على نوع المنافسة الأنسب بناءً على متطلبات مشروعك',
+    inputs: {
+      title: 'تفاصيل المشروع',
+      description: 'حدد الخيارات المناسبة لمشروعك',
+      submit: 'تحديد نوع المنافسة',
+      reset: 'إعادة تعيين'
+    },
+    results: {
+      title: 'نوع المنافسة الموصى به',
+      confidenceHigh: 'تطابق قوي',
+      confidenceMedium: 'تطابق متوسط',
+      confidenceLow: 'تطابق ضعيف',
+      alternativesTitle: 'خيارات بديلة',
+      attributes: 'سمات المنافسة',
+      noResult: 'لم يتم العثور على نوع منافسة مطابق',
+      tryAgain: 'يرجى تجربة خيارات مختلفة'
+    },
+    saveRule: {
+      title: 'حفظ هذا التعيين',
+      description: 'احفظ هذا التكوين كقاعدة جديدة للرجوع إليها في المستقبل',
+      ruleName: 'اسم القاعدة',
+      submit: 'حفظ القاعدة',
+      success: 'تم حفظ القاعدة بنجاح',
+      error: 'حدث خطأ أثناء حفظ القاعدة'
+    },
+    loading: 'جارٍ البحث عن أفضل نوع منافسة...',
+    error: 'حدث خطأ أثناء معالجة طلبك'
+  },
 };

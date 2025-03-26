@@ -13,7 +13,7 @@ import { EmailDialog } from '@/features/templates/components/EmailDialog';
 import { DownloadActions } from '@/features/templates/components/DownloadActions';
 
 export default function TemplatesPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { showToast } = useToast();
   
   // State
@@ -31,7 +31,6 @@ export default function TemplatesPage() {
 
   // Handlers
   const handleSelectTemplate = (template: Template) => {
-    showToast(t('templates.generation.success'), 'success');
     setSelectedTemplate(template);
     setGeneratedDocPath('');
   };
@@ -41,7 +40,7 @@ export default function TemplatesPage() {
       if (!selectedTemplate) return;
 
       const result = await generateDocument.mutateAsync({
-        templateName: selectedTemplate.filename,
+        templateId: selectedTemplate.id,
         values
       });
 
@@ -126,7 +125,7 @@ export default function TemplatesPage() {
             </Button>
           )}
           <h1 className="text-3xl font-bold">
-            {selectedTemplate ? selectedTemplate.display_name : t('templates.title')}
+            {selectedTemplate ? selectedTemplate.display_name[language] : t('templates.title')}
           </h1>
         </div>
 
@@ -136,7 +135,7 @@ export default function TemplatesPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {getAllTemplates.data?.map((template) => (
               <TemplateCard
-                key={template.filename}
+                key={template.id}
                 template={template}
                 onSelect={handleSelectTemplate}
               />

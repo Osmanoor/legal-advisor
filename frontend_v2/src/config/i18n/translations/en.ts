@@ -31,6 +31,8 @@ export const en = {
     admin: 'Admin',
     correction: 'correction',
     templates: 'Templates',
+    journey: 'Learning Journey',
+    tenderMapping: 'Tender Mapping',
   },
   procurement: {
     systemName: 'Government Procurement System',
@@ -201,26 +203,43 @@ export const en = {
       apply: 'Apply Filters'
     }
   },
-  admin: {
-    login: {
-      title: 'Admin Login',
-      username: 'Username',
-      password: 'Password',
-      submit: 'Login',
-      error: 'Invalid credentials'
-    },
-    contacts: {
-      title: 'Contact Submissions',
-      date: 'Date',
-      name: 'Name',
-      email: 'Email',
-      message: 'Message',
-      export: 'Export CSV',
-      noData: 'No contact submissions found',
-      error: 'Failed to load contacts'
-    },
-    logout: 'Logout'
+  
+admin: {
+  title: 'Admin Dashboard',
+  login: {
+    title: 'Admin Login',
+    username: 'Username',
+    password: 'Password',
+    submit: 'Login',
+    error: 'Invalid credentials'
   },
+  tabs: {
+    contacts: 'Contacts',
+    emails: 'Emails'
+  },
+  contacts: {
+    title: 'Contact Submissions',
+    date: 'Date',
+    name: 'Name',
+    email: 'Email',
+    message: 'Message',
+    export: 'Export CSV',
+    noData: 'No contact submissions found',
+    error: 'Failed to load contacts'
+  },
+  emails: {
+    title: 'Email Records',
+    date: 'Date',
+    recipient: 'Recipient',
+    subject: 'Subject',
+    body: 'Message',
+    attachment: 'Attachment',
+    export: 'Export CSV',
+    noData: 'No email records found',
+    error: 'Failed to load emails'
+  },
+  logout: 'Logout'
+},
   correction: {
     title: 'Text Correction Tool',
     inputLabel: 'Enter Text to Correct',
@@ -386,5 +405,61 @@ export const en = {
       success: 'Email sent successfully',
       error: 'Error sending email'
     }
-  }
+  },
+  journey: {
+    title: 'Learning Journey',
+    description: 'Step-by-step learning resources for procurement professionals',
+    levels: 'Journey Levels',
+    level: 'Level',
+    resources: 'Resources',
+    levelDescription: 'Level Description',
+    noLevels: 'No journey levels found',
+    noResources: 'No resources found for this level',
+    back: 'Back to Levels',
+    viewResource: 'View',
+    downloadResource: 'Download',
+    resourceDetails: 'Resource Details',
+    size: 'Size',
+    type: 'Type',
+    created: 'Created',
+    modified: 'Modified',
+    loading: 'Loading...',
+    error: 'An error occurred while loading data',
+    yourProgress: 'Your Progress',
+  previousLevel: 'Previous Level',
+  nextLevel: 'Next Level',
+  start: 'Start',
+  continue: 'Continue',
+  backToJourney: 'Back to Journey',
+  },
+  tenderMapping: {
+    title: 'Tender Type Mapping',
+    description: 'Find the most suitable tender type based on your project requirements',
+    inputs: {
+      title: 'Project Details',
+      description: 'Select the appropriate options for your project',
+      submit: 'Find Tender Type',
+      reset: 'Reset Form'
+    },
+    results: {
+      title: 'Recommended Tender Type',
+      confidenceHigh: 'Strong Match',
+      confidenceMedium: 'Moderate Match',
+      confidenceLow: 'Weak Match',
+      alternativesTitle: 'Alternative Options',
+      attributes: 'Tender Attributes',
+      noResult: 'No matching tender type found',
+      tryAgain: 'Please try different options'
+    },
+    saveRule: {
+      title: 'Save This Mapping',
+      description: 'Save this configuration as a new rule for future reference',
+      ruleName: 'Rule Name',
+      submit: 'Save Rule',
+      success: 'Rule saved successfully',
+      error: 'Error saving rule'
+    },
+    loading: 'Finding the best tender type...',
+    error: 'An error occurred while processing your request'
+  },
 };

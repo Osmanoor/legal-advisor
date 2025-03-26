@@ -19,7 +19,9 @@ export function AppLayout({ children }: AppLayoutProps) {
     { path: '/library', label: 'navigation.library' },
     { path: '/calculator', label: 'navigation.calculator' },
     { path: '/correction', label: 'navigation.correction' },
-    { path: '/templates', label: 'navigation.templates'}
+    { path: '/templates', label: 'navigation.templates'},
+    { path: '/journey', label: 'navigation.journey'} ,
+    { path: '/tender-mapping', label: 'navigation.tenderMapping'} 
   ];
 
   const isActive = (path: string) => {

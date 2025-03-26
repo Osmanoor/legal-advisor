@@ -2,10 +2,29 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/axios';
 
+export interface Placeholder {
+  id: string;
+  type: string;
+  required: boolean;
+  description: {
+    ar: string;
+    en: string;
+  };
+  source: string;
+}
+
 export interface Template {
+  id: string;
   filename: string;
-  placeholders: string[];
-  display_name: string;
+  display_name: {
+    ar: string;
+    en: string;
+  };
+  description: {
+    ar: string;
+    en: string;
+  };
+  placeholders: Placeholder[];
 }
 
 interface GenerateDocResponse {
@@ -31,24 +50,24 @@ export function useTemplates() {
   });
 
   // Get template details
-  const getTemplateDetails = (templateName: string) => 
+  const getTemplateDetails = (templateId: string) => 
     useQuery({
-      queryKey: ['template-details', templateName],
+      queryKey: ['template-details', templateId],
       queryFn: async () => {
-        const response = await api.get<Template>(`/templates/${templateName}`);
+        const response = await api.get<Template>(`/templates/${templateId}`);
         return response.data;
       },
-      enabled: !!templateName
+      enabled: !!templateId
     });
 
   // Generate document
   const generateDocument = useMutation<
     GenerateDocResponse,
     Error,
-    { templateName: string; values: Record<string, string> }
+    { templateId: string; values: Record<string, string> }
   >({
-    mutationFn: async ({ templateName, values }) => {
-      const response = await api.post(`/templates/${templateName}/generate`, values);
+    mutationFn: async ({ templateId, values }) => {
+      const response = await api.post(`/templates/${templateId}/generate`, values);
       return response.data;
     }
   });

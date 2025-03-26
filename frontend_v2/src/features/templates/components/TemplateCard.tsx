@@ -9,7 +9,7 @@ interface TemplateCardProps {
 }
 
 export function TemplateCard({ template, onSelect }: TemplateCardProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   
   return (
     <Card 
@@ -17,10 +17,13 @@ export function TemplateCard({ template, onSelect }: TemplateCardProps) {
       onClick={() => onSelect(template)}
     >
       <CardHeader>
-        <CardTitle>{template.display_name}</CardTitle>
+        <CardTitle>{template.display_name[language]}</CardTitle>
         <CardDescription>
-          {t('templates.fields')}: {template.placeholders.length}
+          {template.description[language]}
         </CardDescription>
+        <div className="text-sm text-gray-500 mt-2">
+          {t('templates.fields')}: {template.placeholders.length}
+        </div>
       </CardHeader>
     </Card>
   );

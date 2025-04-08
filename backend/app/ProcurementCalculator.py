@@ -1,13 +1,12 @@
+# app/ProcurementCalculator.py
+
 import datetime
 import json
+import re
 from dataclasses import dataclass
 from enum import Enum, auto
 from typing import List, Dict, Optional, Union, Tuple
-import pandas as pd
-import re
-
-from html_gen import save_html_report
-
+import os
 
 class ProcurementType(Enum):
     """Enum representing different procurement types"""
@@ -814,25 +813,3 @@ class ProcurementSystem:
             "stages": stages_dict,
             "total_duration": result.total_duration
         }
-
-
-# Example usage
-if __name__ == "__main__":
-    # Initialize procurement system with articles data file
-    procurement_system = ProcurementSystem(articles_file=r"D:\Projects\Work\legal-advisor\backend\data\final_ar.json")
-    
-    # Example input
-    result = procurement_system.process_input(
-        work_type="الخدمات الاستشارية",  # This references article 33
-        budget=6000000,
-        start_date="2025-04-02",
-        project_duration=12,
-        holidays=["2025-05-01", "2025-05-02"]
-    )
-    
-    # Print result
-    import json
-    print(json.dumps(result, indent=2, ensure_ascii=False))
-    with open('result.json', 'w', encoding='utf-8') as f:
-        json.dump(result, f, ensure_ascii=False, indent=4)
-    save_html_report(result, "procurement_report.html", "مجتمع مشترون")

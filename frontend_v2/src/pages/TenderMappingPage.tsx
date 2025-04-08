@@ -1,39 +1,42 @@
-// src/pages/TenderMappingPage.tsx
+// Update to src/pages/TenderMappingPage.tsx
+
 import { useState } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
-import { TenderMappingResult } from '@/types/tenderMapping';
-import { useTenderCategories, useTenderMap } from '@/hooks/api/useTenderMapping';
+import { TenderCalculationResult } from '@/types/tenderMapping';
+import { useTenderWorkTypes, useCalculateProcurement } from '@/hooks/api/useTenderMapping';
 import { TenderMappingForm } from '@/features/tenderMapping/components/TenderMappingForm';
 import { TenderResultCard } from '@/features/tenderMapping/components/TenderResultCard';
-import { SaveRuleForm } from '@/features/tenderMapping/components/SaveRuleForm';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
 
 export default function TenderMappingPage() {
   const { t } = useLanguage();
-  const [inputs, setInputs] = useState<Record<string, string>>({});
-  const [mappingResult, setMappingResult] = useState<TenderMappingResult | null>(null);
+  const [calculationResult, setCalculationResult] = useState<TenderCalculationResult | null>(null);
   
   const { 
-    data: categories, 
-    isLoading: isLoadingCategories, 
-    error: categoriesError 
-  } = useTenderCategories();
+    data: workTypes, 
+    isLoading: isLoadingWorkTypes, 
+    error: workTypesError 
+  } = useTenderWorkTypes();
   
-  const tenderMapMutation = useTenderMap();
+  const calculateMutation = useCalculateProcurement();
 
-  const handleSubmit = async (values: Record<string, string>) => {
+  const handleSubmit = async (values: {
+    work_type: string;
+    budget: number;
+    start_date: string;
+    project_duration: number;
+  }) => {
     try {
-      setInputs(values);
-      const result = await tenderMapMutation.mutateAsync(values);
-      setMappingResult(result);
+      const result = await calculateMutation.mutateAsync(values);
+      setCalculationResult(result);
     } catch (error) {
-      console.error('Error mapping tender type:', error);
+      console.error('Error calculating procurement:', error);
     }
   };
 
-  if (isLoadingCategories) {
+  if (isLoadingWorkTypes) {
     return (
       <div className="flex justify-center items-center min-h-[calc(100vh-4rem)]">
         <LoadingSpinner size="lg" />
@@ -41,7 +44,7 @@ export default function TenderMappingPage() {
     );
   }
 
-  if (categoriesError) {
+  if (workTypesError) {
     return (
       <div className="max-w-4xl mx-auto py-8 px-4">
         <Alert variant="destructive">
@@ -64,29 +67,20 @@ export default function TenderMappingPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
           <TenderMappingForm
-            categories={categories || []}
-            isLoading={tenderMapMutation.isPending}
+            workTypes={workTypes || []}
+            isLoading={calculateMutation.isPending}
             onSubmit={handleSubmit}
           />
-          
-          {mappingResult && (
-            <div className="mt-8">
-              <SaveRuleForm 
-                result={mappingResult} 
-                inputs={inputs}
-              />
-            </div>
-          )}
         </div>
 
         <div>
-          {tenderMapMutation.isPending ? (
+          {calculateMutation.isPending ? (
             <div className="flex flex-col items-center justify-center py-12 bg-gray-50 rounded-lg border">
               <LoadingSpinner size="lg" className="mb-4" />
               <p>{t('tenderMapping.loading')}</p>
             </div>
-          ) : mappingResult ? (
-            <TenderResultCard result={mappingResult} />
+          ) : calculationResult ? (
+            <TenderResultCard result={calculationResult} />
           ) : null}
         </div>
       </div>

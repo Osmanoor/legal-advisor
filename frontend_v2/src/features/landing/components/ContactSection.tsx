@@ -17,7 +17,7 @@ interface ContactForm {
 
 export function ContactSection() {
   const { t, direction } = useLanguage();
-  const { addToast } = useToast();
+  const { showToast } = useToast();
   const { submitContact } = useAdmin();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState<ContactForm>({
@@ -38,10 +38,10 @@ export function ContactSection() {
       });
 
       // Clear form and show success message
-      addToast(t('landing.contact.form.success'), { type: 'success' });
+      // showToast(t('landing.contact.form.success'), { type: 'success' });
       setForm({ name: '', email: '', message: '' });
     } catch (error) {
-      addToast(t('landing.contact.form.error'), { type: 'error' });
+      // showToast(t('landing.contact.form.error'), { type: 'error' });
     } finally {
       setIsSubmitting(false);
     }

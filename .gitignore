@@ -19,3 +19,5 @@
 # Ignore all compiled Python files, including those with Python version suffixes
 *.py[cod]
 __pycache__/
+**/.env
+**/.env.*

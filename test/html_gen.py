@@ -17,11 +17,47 @@ def generate_html_report(result: dict, title="مجتمع مشترون") -> str:
     stages = result.get('stages', [])
     guidelines = result.get('implementation_guidelines', '')
     articles = result.get('referenced_articles', [])
+    articles_data = result.get('referenced_articles_data', [])
     
     # Format articles references if any
-    articles_text = ""
+    articles_references = ""
     if articles:
-        articles_text = f"المواد المرجعية: {', '.join([str(art) for art in articles])}"
+        articles_references = f"المواد المرجعية: {', '.join([str(art) for art in articles])}"
+    
+    # Create detailed articles HTML
+    articles_html = ""
+    if articles_data:
+        articles_html = "<div class='articles-container'>"
+        
+        for article in articles_data:
+            article_num = article.get('number', '')
+            content = article.get('content', '')
+            summary = article.get('summary', '')
+            keywords = article.get('keywords', [])
+            section = article.get('section', {}).get('name', '')
+            chapter = article.get('chapter', {}).get('name', '')
+            
+            # Format keywords
+            keywords_html = ""
+            if keywords:
+                keywords_html = "<div class='article-keywords'>"
+                keywords_html += "<span class='keywords-label'>الكلمات المفتاحية: </span>"
+                keywords_html += ", ".join(keywords)
+                keywords_html += "</div>"
+            
+            articles_html += f"""
+            <div class='article-item'>
+                <h4>المادة {article_num}</h4>
+                <div class='article-meta'>
+                    <span class='article-section'>{chapter} - {section}</span>
+                </div>
+                <div class='article-summary'>{summary}</div>
+                <div class='article-content'>{content}</div>
+                {keywords_html}
+            </div>
+            """
+        
+        articles_html += "</div>"
     
     # Create timeline HTML
     timeline_html = ""
@@ -56,7 +92,7 @@ def generate_html_report(result: dict, title="مجتمع مشترون") -> str:
         </div>
         """
     
-    # Create specifications table
+    # Create specifications table - CHANGES ARE HERE
     specs_table = """
     <div class="specs-container">
         <h2>تفاصيل المنافسة</h2>
@@ -90,12 +126,10 @@ def generate_html_report(result: dict, title="مجتمع مشترون") -> str:
                 <td>{}</td>
             </tr>
             <tr>
-                <td>الضمان الابتدائي</td>
-                <td>{}</td>
+                <td>موافقة كفاءة الانفاق</td>  <td>{}</td>
             </tr>
             <tr>
-                <td>الضمان النهائي</td>
-                <td>{}</td>
+                <td>اجازة وزارة المالية</td>   <td>{}</td>
             </tr>
             <tr>
                 <td>هيكل الملفات</td>
@@ -114,22 +148,23 @@ def generate_html_report(result: dict, title="مجتمع مشترون") -> str:
         result.get('required_participants', ''),
         result.get('sme_priority', ''),
         result.get('performance_guarantee', ''),
-        result.get('initial_guarantee', ''),
-        result.get('final_guarantee', ''),
+        result.get('initial_guarantee', ''), # The key in the result dict remains the same
+        result.get('final_guarantee', ''),   # The key in the result dict remains the same
         result.get('file_structure', ''),
         result.get('total_duration', '')
     )
     
     # Create guidelines section
     guidelines_html = ""
-    if guidelines:
+    if guidelines or articles_references:
         guidelines_html = f"""
         <div class="guidelines-container">
             <h2>ضوابط تحقيق الأسلوب</h2>
             <div class="guidelines-content">
                 <p>{guidelines}</p>
-                <p class="articles">{articles_text}</p>
+                <p class="articles-reference">{articles_references}</p>
             </div>
+            {articles_html}
         </div>
         """
     
@@ -374,15 +409,67 @@ def generate_html_report(result: dict, title="مجتمع مشترون") -> str:
         
         .guidelines-content {{
             line-height: 1.8;
+            margin-bottom: 20px;
         }}
         
         .guidelines-content p {{
             margin-bottom: 15px;
         }}
         
-        .guidelines-content .articles {{
+        .articles-reference {{
             font-weight: bold;
             color: var(--primary-color);
+            margin-bottom: 25px;
+        }}
+        
+        /* Articles Container */
+        .articles-container {{
+            margin-top: 30px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }}
+        
+        .article-item {{
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }}
+        
+        .article-item h4 {{
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }}
+        
+        .article-meta {{
+            color: var(--light-text);
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }}
+        
+        .article-summary {{
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #e3f2fd;
+            border-radius: 4px;
+        }}
+        
+        .article-content {{
+            margin-bottom: 15px;
+            line-height: 1.7;
+        }}
+        
+        .article-keywords {{
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: var(--light-text);
+        }}
+        
+        .keywords-label {{
+            font-weight: bold;
         }}
         
         /* Specifications Table */

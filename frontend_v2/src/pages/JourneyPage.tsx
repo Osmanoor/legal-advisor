@@ -117,7 +117,7 @@ export default function JourneyPage() {
           {/* Resources section */}
           <div>
             <h2 className="text-xl font-semibold mb-6">{t('journey.resources')}</h2>
-            <ResourceList resources={levelDetails.resources} levelId={levelId} />
+            <ResourceList resources={levelDetails.resources ?? []} levelId={levelId} />
           </div>
 
           {/* Level navigation */}

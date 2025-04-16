@@ -17,10 +17,10 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Create directories for ChromaDB, data, and credentials
-RUN mkdir -p /app/data /app/chroma_db_ar /app/chroma_db_en /app/credentials /app/library
+RUN mkdir -p /app/data /app/chroma_db_ar /app/chroma_db_en /app/credentials /app/backend/library
 
 # Copy the library folder first (if it exists)
-COPY library /app/library
+COPY library /app/backend/library
 
 # Copy the entire application content
 COPY . .

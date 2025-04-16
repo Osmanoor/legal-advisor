@@ -17,18 +17,15 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Create directories for ChromaDB, data, and credentials
-RUN mkdir -p /app/data /app/chroma_db_ar /app/chroma_db_en /app/credentials /app/مكتبة\ المشتريات
+RUN mkdir -p /app/data /app/chroma_db_ar /app/chroma_db_en /app/credentials /app/library
 
-# Copy Google Cloud credentials
-COPY my-project-2024-441219-045b8286058d.json /app/credentials/
+# Copy the library folder first (if it exists)
+COPY library /app/library
 
-# Copy the library folder first
-COPY مكتبة\ المشتريات /app/مكتبة\ المشتريات/
-
-# Copy the entire application
+# Copy the entire application content
 COPY . .
 
-# Expose port 8080 (Cloud Run expects port 8080)
+# Expose port 8080 (used by the app)
 EXPOSE 8080
 
 # Set environment variables
@@ -36,14 +33,6 @@ ENV FLASK_APP=app/app.py
 ENV PORT=8080
 ENV PYTHONPATH=/app
 ENV PYTHONUNBUFFERED=1
-ENV GOOGLE_APPLICATION_CREDENTIALS=/app/credentials/my-project-2024-441219-045b8286058d.json
 
-# Run the Flask app with gunicorn
-CMD exec gunicorn --bind :$PORT \
-    --workers 1 \
-    --threads 8 \
-    --timeout 0 \
-    --chdir /app \
-    --access-logfile - \
-    --error-logfile - \
-    app.app:app
+# Start the app
+CMD ["python", "run.py"]

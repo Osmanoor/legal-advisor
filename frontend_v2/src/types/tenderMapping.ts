@@ -12,6 +12,7 @@ export interface TenderStage {
   duration: number;
   is_working_days: boolean;
   notes: string;
+  original_duration?: number;
 }
 
 export interface TenderCalculationResult {

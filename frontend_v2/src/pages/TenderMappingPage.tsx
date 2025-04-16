@@ -1,4 +1,4 @@
-// Update to src/pages/TenderMappingPage.tsx
+// src/pages/TenderMappingPage.tsx
 
 import { useState } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -34,6 +34,11 @@ export default function TenderMappingPage() {
     } catch (error) {
       console.error('Error calculating procurement:', error);
     }
+  };
+
+  // Handle updates to the calculation result (from editing timeline stages)
+  const handleResultUpdate = (updatedResult: TenderCalculationResult) => {
+    setCalculationResult(updatedResult);
   };
 
   if (isLoadingWorkTypes) {
@@ -80,7 +85,10 @@ export default function TenderMappingPage() {
               <p>{t('tenderMapping.loading')}</p>
             </div>
           ) : calculationResult ? (
-            <TenderResultCard result={calculationResult} />
+            <TenderResultCard 
+              result={calculationResult} 
+              onUpdateResult={handleResultUpdate}
+            />
           ) : null}
         </div>
       </div>

@@ -1,21 +1,42 @@
-// Updated src/types/tenderMapping.ts
+// src/types/tenderMapping.ts
 
 export interface WorkType {
   id: string;
   name: string;
 }
 
+// Represents a single stage in the procurement timeline
 export interface TenderStage {
+  id: string; // Using name as ID if no unique ID from API
   name: string;
-  start_date: string;
-  end_date: string;
+  start_date: string; // ISO format string
+  end_date: string;   // ISO format string
   duration: number;
   is_working_days: boolean;
-  notes: string;
+  notes?: string | null;
   original_duration?: number;
 }
 
+// Represents a key-value pair for the "Competition Details" tab
+export interface TenderDetail {
+  key: string;
+  label: string;
+  value: string;
+  icon?: string;
+}
+
+// Represents a regulation/source for the "General Regulations" tab
+export interface TenderRegulation {
+  id: string; // Using content as ID if no unique ID from API
+  type: 'system' | 'regulation';
+  content: string;
+  summary: string;
+}
+
+// The main result object from the API after calculation
+// --- FIX: Added missing properties from API response ---
 export interface TenderCalculationResult {
+  report_title?: string; // Make optional if not always present
   procurement_type: string;
   announcement_period: string | number;
   review_period: string | number;
@@ -30,16 +51,6 @@ export interface TenderCalculationResult {
   referenced_articles_data: any[];
   stages: TenderStage[];
   total_duration: number;
-}
-
-// Keep other existing interfaces if needed
-export interface TenderCategory {
-  category: string;
-  options: string[];
-}
-
-export interface MappingRule {
-  conditions: Record<string, string>;
-  matched_tender_type: string;
-  attributes: Record<string, string>;
+  regulations_summary: string[];
+  regulations_sources: TenderRegulation[];
 }

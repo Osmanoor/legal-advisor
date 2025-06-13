@@ -1,49 +1,43 @@
 // src/features/chat/components/WelcomeSection.tsx
-import { MessageSquare } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 
 interface WelcomeSectionProps {
   onSuggestionClick: (suggestion: string) => void;
 }
 
-export function WelcomeSection({ onSuggestionClick }: WelcomeSectionProps) {
+export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onSuggestionClick }) => {
   const { t } = useLanguage();
 
   const suggestions = [
     t('chat.suggestions.first'),
     t('chat.suggestions.second'),
-    t('chat.suggestions.third')
+    t('chat.suggestions.third'),
   ];
 
   return (
-    <div className="flex flex-col items-center py-12 px-4 text-white">
-      <div className="w-24 h-24 rounded-full bg-primary-600/10 flex items-center justify-center mb-6">
-        <MessageSquare className="w-12 h-12 text-primary-600" />
-      </div>
-      
-      <h1 className="text-3xl font-bold text-center mb-3 bg-clip-text text-transparent bg-gradient-to-r from-primary-400 to-primary-600">
-        {t('chat.welcome.title')}
-      </h1>
-      
-      <p className="text-slate-300 mb-8 text-center max-w-2xl">
-        {t('chat.welcome.description')}
+    <div className="flex flex-col items-center">
+      {/* Suggestions Title */}
+      <p className="text-sm text-text-on-light-muted mb-4" style={{fontFamily: 'var(--font-primary-arabic)'}}>
+        {t('chat.suggestions.title')}
       </p>
-
-      <div className="w-full max-w-4xl grid gap-4 md:grid-cols-3">
+      
+      {/* Suggestions Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-4xl">
         {suggestions.map((suggestion, index) => (
-          <Card 
+          <Card
             key={index}
-            className="bg-slate-800/50 border-slate-700 hover:border-primary-500 transition-colors cursor-pointer"
+            className="p-4 md:p-6 text-right cursor-pointer hover:border-cta hover:bg-cta/5 transition-colors border-border-default"
             onClick={() => onSuggestionClick(suggestion)}
           >
-            <CardContent className="p-6">
-              <p>{suggestion}</p>
+            <CardContent className="p-0">
+              <p className="text-sm font-light text-text-on-light-muted" style={{fontFamily: 'var(--font-primary-arabic)', lineHeight: '150%'}}>
+                {suggestion}
+              </p>
             </CardContent>
           </Card>
         ))}
       </div>
     </div>
   );
-}
+};

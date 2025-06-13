@@ -1,53 +1,85 @@
 // src/features/chat/components/MessageBubble.tsx
-import { ChatMessage } from '@/types';
-import { Card, CardContent } from '@/components/ui/card';
+import React from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
+import { ChatMessage } from '@/types';
 import { ResourceCard } from './ResourceCard';
+import { Button } from '@/components/ui/button';
+import { RotateCw, Copy, Share2, Bookmark, MoreVertical, User } from 'lucide-react';
+import UserAvatar from '/public/images/avatars/avatar1.png'; // Placeholder user avatar
+import AssistantAvatar from '/public/images/avatars/assistant-avatar.png'; // New assistant avatar
 
 interface MessageBubbleProps {
   message: ChatMessage;
 }
 
-export function MessageBubble({ message }: MessageBubbleProps) {
-  const { t, direction } = useLanguage();
+export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
+  const { t } = useLanguage();
   const isUser = message.role === 'user';
 
+  const formatTimestamp = (isoString: string) => {
+    return new Date(isoString).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
+  };
+
+  const actionButtons = [
+    { Icon: RotateCw, label: t('chat.actions.regenerate') },
+    { Icon: Copy, label: t('chat.actions.copy') },
+    { Icon: Share2, label: t('chat.actions.share') },
+    { Icon: Bookmark, label: t('chat.actions.bookmark') },
+    { Icon: MoreVertical, label: 'More' },
+  ];
+
+  if (isUser) {
+    return (
+      <div className="flex items-start gap-3 justify-end">
+        <div className="flex flex-col items-end max-w-[80%]">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="text-xs text-text-on-light-muted">{formatTimestamp(message.timestamp)}</span>
+            <span className="text-sm font-medium text-text-on-light-strong">Masy Hathore</span>
+          </div>
+          <p className="bg-white border border-border-default rounded-xl rounded-br-none p-4 text-sm text-text-on-light-muted text-right">
+            {message.content}
+          </p>
+        </div>
+        <img src={UserAvatar} alt="User Avatar" className="w-6 h-6 rounded-full mt-8" />
+      </div>
+    );
+  }
+
+  // Assistant Message
   return (
-    <div className={`max-w-[80%] ${isUser ? 'ml-auto' : 'mr-auto'}`}>
-      <Card className={`
-        ${isUser 
-          ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white border-0' 
-          : 'bg-slate-800/50 border-slate-700'
-        }
-      `}>
-        <CardContent className="p-4">
-          <p className="whitespace-pre-wrap">
+    <div className="flex items-start gap-3">
+      <img src={AssistantAvatar} alt="Assistant Avatar" className="w-6 h-6 rounded-full mt-8" />
+      <div className="flex-1 max-w-[80%] bg-white border border-border-default rounded-xl rounded-bl-none p-4 md:p-6">
+        <div className="flex flex-col items-end">
+          <div className="flex items-center gap-3 mb-2 w-full justify-end">
+            <span className="text-xs text-text-on-light-muted">{formatTimestamp(message.timestamp)}</span>
+            <span className="text-sm font-medium text-text-on-light-strong">{t('chat.welcome.title')}</span>
+          </div>
+          <p className="w-full text-sm text-text-on-light-muted text-right whitespace-pre-wrap">
             {message.content}
           </p>
           
           {message.resources && message.resources.length > 0 && (
-            <div className="mt-4 space-y-2">
-              <h4 className="text-sm text-slate-300">
-                {t('chat.sources')}:
-              </h4>
-              <div className="space-y-2">
-                {message.resources.map((resource, index) => (
-                  <ResourceCard
-                    key={index}
-                    resource={resource}
-                  />
-                ))}
-              </div>
+            <div className="w-full space-y-2 mt-4">
+              {message.resources.map((resource, index) => (
+                <ResourceCard key={index} resource={resource} />
+              ))}
             </div>
           )}
           
-          <div className="text-xs text-slate-400 mt-2">
-            {new Date(message.timestamp).toLocaleTimeString(
-              direction === 'rtl' ? 'ar-SA' : 'en-US'
-            )}
+          <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border-default w-full justify-end">
+            {actionButtons.map(({ Icon, label }) => (
+              <Button key={label} variant="ghost" size="icon" className="text-text-on-light-muted h-7 w-7" aria-label={label}>
+                <Icon size={14} />
+              </Button>
+            ))}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
-}
+};

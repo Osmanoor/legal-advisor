@@ -1,147 +1,100 @@
 // src/features/tenderMapping/components/EditableTimelineStage.tsx
-
-import { useState } from 'react';
-import { TenderStage } from '@/types/tenderMapping';
-import { CalendarDays, Edit, Check, X } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch-rtl';
-import { Label } from '@/components/ui/label';
+import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
+import { TenderStage } from '@/types/tenderMapping';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch-rtl';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Edit2, Calendar, Check, X } from 'lucide-react';
 
 interface EditableTimelineStageProps {
   stage: TenderStage;
-  index: number;
   isEditing: boolean;
-  onEdit: () => void;
-  onCancel: () => void;
+  onEditClick: () => void;
   onSave: (updatedStage: TenderStage) => void;
+  onCancel: () => void;
 }
 
-export function EditableTimelineStage({
+export const EditableTimelineStage: React.FC<EditableTimelineStageProps> = ({
   stage,
-  index,
   isEditing,
-  onEdit,
+  onEditClick,
+  onSave,
   onCancel,
-  onSave
-}: EditableTimelineStageProps) {
-  const { direction } = useLanguage();
-  const [editedDuration, setEditedDuration] = useState(stage.duration.toString());
-  const [editedIsWorkingDays, setEditedIsWorkingDays] = useState(stage.is_working_days);
-  
+}) => {
+  const { t } = useLanguage();
+  const [duration, setDuration] = useState(stage.duration.toString());
+  const [isWorkingDays, setIsWorkingDays] = useState(stage.is_working_days);
+
+  // Reset local state if the parent stage prop changes (e.g., on a global reset)
+  useEffect(() => {
+    setDuration(stage.duration.toString());
+    setIsWorkingDays(stage.is_working_days);
+  }, [stage]);
+
   const handleSave = () => {
-    // Validate duration is a positive number
-    const durationValue = parseInt(editedDuration);
-    if (isNaN(durationValue) || durationValue < 0) {
-      return; // Invalid input
+    const durationValue = parseInt(duration, 10);
+    if (!isNaN(durationValue) && durationValue >= 0) {
+      onSave({
+        ...stage,
+        duration: durationValue,
+        is_working_days: isWorkingDays,
+      });
     }
-    
-    onSave({
-      ...stage,
-      duration: durationValue,
-      is_working_days: editedIsWorkingDays,
-      // Keep track of original values in case we need them
-      original_duration: stage.original_duration ?? stage.duration
-    });
   };
-  
+
   return (
-    <div className="flex">
-      <div className={`${direction === 'rtl' ? 'ml-4' : 'mr-4'} flex flex-col items-center`}>
-        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-          stage.notes ? 'bg-yellow-100 text-yellow-600' : 'bg-blue-100 text-blue-600'
-        }`}>
-          {index + 1}
-        </div>
-        {/* Only show the line if not the last item - assuming 6 stages max */}
-        {index < 5 && <div className="w-px h-full bg-gray-200 my-1"></div>}
-      </div>
-      
-      <div className="flex-1">
-        <div className="bg-gray-50 p-3 rounded-lg">
-          <div className="flex justify-between items-start">
-            <div className="font-medium">{stage.name || "مرحلة"}</div>
-            
-            {!isEditing ? (
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={onEdit}
-                className="p-1 h-auto"
-              >
-                <Edit className="w-4 h-4 text-gray-500" />
-              </Button>
-            ) : (
-              <div className={`flex ${direction === 'rtl' ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={onCancel}
-                  className="p-1 h-auto text-red-500"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={handleSave}
-                  className="p-1 h-auto text-green-500"
-                >
-                  <Check className="w-4 h-4" />
-                </Button>
-              </div>
-            )}
+    <div className="bg-white border border-inputTheme-border rounded-lg p-4">
+      <div className="flex justify-between items-start gap-4">
+        {/* Title and Date Info */}
+        <div className="flex-grow text-right">
+          <p className="text-sm font-medium text-text-on-light-strong" style={{ fontFamily: 'var(--font-primary-arabic)' }}>
+            {stage.name}
+          </p>
+          <div className="flex items-center justify-end gap-2 mt-1 text-xs text-text-on-light-muted">
+            <span>{`${stage.start_date} إلى ${stage.end_date} (${stage.duration} أيام)`}</span>
+            <Calendar size={14} />
           </div>
-          
-          {!isEditing ? (
-            <div className="text-sm text-gray-500 flex items-center mt-1">
-              <CalendarDays className={`w-4 h-4 ${direction === 'rtl' ? 'ml-1' : 'mr-1'}`} />
-              <span>
-                {stage.start_date || ""} إلى {stage.end_date || ""} ({stage.duration} {stage.is_working_days ? 'أيام عمل' : 'أيام'})
-              </span>
-            </div>
-          ) : (
-            <div className="mt-2 space-y-2">
-              <div className={`flex items-center ${direction === 'rtl' ? 'space-x-reverse' : ''} gap-2`}>
-                <Input
-                  type="number"
-                  value={editedDuration}
-                  onChange={(e) => setEditedDuration(e.target.value)}
-                  className="w-24 h-8 text-sm"
-                  min="0"
-                  dir="ltr" // Keep numbers as LTR
-                />
-                
-                {/* RTL-friendly switch group */}
-                <div className={`flex items-center ${direction === 'rtl' ? 'flex-row-reverse' : 'flex-row'} gap-2`}>
-                  <Switch
-                    id={`working-days-${index}`}
-                    checked={editedIsWorkingDays}
-                    onCheckedChange={setEditedIsWorkingDays}
-                    className="data-[state=checked]:bg-primary-600"
-                  />
-                  <Label htmlFor={`working-days-${index}`} className="text-sm">
-                    أيام عمل
-                  </Label>
-                </div>
-              </div>
-              <div className="text-xs text-gray-500">
-                <CalendarDays className={`w-3 h-3 inline-block ${direction === 'rtl' ? 'ml-1' : 'mr-1'}`} />
-                <span>
-                  {stage.start_date || ""} إلى {stage.end_date || ""}
-                </span>
-              </div>
-            </div>
-          )}
-          
-          {stage.notes && (
-            <div className="mt-2 text-sm text-yellow-600 bg-yellow-50 p-2 rounded">
-              {stage.notes}
-            </div>
-          )}
         </div>
+        
+        {/* Edit Icon */}
+        <Button variant="ghost" size="icon" className="w-8 h-8 text-cta" onClick={onEditClick}>
+          <Edit2 size={16} />
+        </Button>
       </div>
+
+      {/* Collapsible Edit Section */}
+      {isEditing && (
+        <div className="mt-4 pt-4 border-t border-border-default space-y-4">
+          <div className="flex flex-col sm:flex-row items-center justify-end gap-4">
+             <div className="flex items-center gap-2">
+                <Checkbox
+                    id={`working-days-${stage.id}`}
+                    checked={isWorkingDays}
+                    onCheckedChange={(checked) => setIsWorkingDays(!!checked)}
+                />
+                <Label htmlFor={`working-days-${stage.id}`} className="text-xs font-light" style={{ fontFamily: 'var(--font-primary-arabic)' }}>
+                    {t('tenderMapping.results.workingDays')}
+                </Label>
+            </div>
+            <Input
+              type="number"
+              value={duration}
+              onChange={(e) => setDuration(e.target.value)}
+              className="h-9 w-40 text-sm text-center"
+              placeholder={t('tenderMapping.results.editDuration')}
+              min="0"
+              dir="ltr"
+            />
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" size="sm" onClick={onCancel}>{t('tenderMapping.results.cancel')}</Button>
+            <Button size="sm" onClick={handleSave}>{t('tenderMapping.results.save')}</Button>
+          </div>
+        </div>
+      )}
     </div>
   );
-}
+};

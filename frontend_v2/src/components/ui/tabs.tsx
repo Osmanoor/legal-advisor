@@ -2,37 +2,55 @@
 import * as React from "react";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/hooks/useLanguage"; // Import useLanguage
 
 const Tabs = TabsPrimitive.Root;
 
 const TabsList = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.List>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
->(({ className, ...props }, ref) => (
-  <TabsPrimitive.List
-    ref={ref}
-    className={cn(
-      "inline-flex h-9 items-center justify-center rounded-lg bg-gray-100 p-1 text-gray-500",
-      className
-    )}
-    {...props}
-  />
-));
+>(({ className, ...props }, ref) => {
+  const { direction } = useLanguage(); // Get direction
+  return (
+    <TabsPrimitive.List
+      ref={ref}
+      className={cn(
+        "inline-flex h-auto items-center justify-center rounded-lg bg-tab-inactiveBg p-1 gap-1.5", // background: #ECFFEA; border-radius: 8px; padding: 4px; gap: 6px;
+                                                                                                // h-auto to let content define height, gap-1.5 approx 6px
+        direction === 'rtl' ? "flex-row-reverse" : "", // Ensure tabs flow correctly for RTL
+        className
+      )}
+      {...props}
+    />
+  );
+});
 TabsList.displayName = TabsPrimitive.List.displayName;
 
 const TabsTrigger = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
->(({ className, ...props }, ref) => (
+>(({ className, children, ...props }, ref) => {
+  const { direction } = useLanguage(); // Get direction
+  return (
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
-      "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-gray-950 data-[state=active]:shadow",
+      "inline-flex items-center justify-center whitespace-nowrap rounded-md px-6 py-2.5 text-xs font-medium transition-all", // font-size: 12px; border-radius: 4px; padding: 8px (py-2.5 px-6 is approx)
+                                                                                                                        // height: 36px
+      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+      "disabled:pointer-events-none disabled:opacity-50",
+      "data-[state=active]:bg-tab-activeBg data-[state=active]:text-tab-activeText data-[state=active]:shadow-input-shadow data-[state=active]:font-semibold", // Active state
+      "data-[state=inactive]:text-tab-inactiveText data-[state=inactive]:font-normal", // Inactive state (font-weight: 400 from CSS)
+      direction === 'rtl' ? "flex-row-reverse" : "", // Icon on left of text for RTL
       className
     )}
+    style={{fontFamily: direction === 'rtl' ? 'var(--font-primary-arabic)' : 'var(--font-primary-latin)', height: '36px'}} // Montserrat for Arabic
     {...props}
-  />
-));
+  >
+    {children} {/* Expecting Icon and Text as children */}
+  </TabsPrimitive.Trigger>
+  );
+});
 TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
 
 const TabsContent = React.forwardRef<
@@ -42,7 +60,9 @@ const TabsContent = React.forwardRef<
   <TabsPrimitive.Content
     ref={ref}
     className={cn(
-      "mt-2 ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2",
+      "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-background",
+      // New: Added border and padding to match the main content box style
+      "bg-white border border-inputTheme-border rounded-2xl p-6 md:p-8 shadow-lg", // rounded-2xl for 16px
       className
     )}
     {...props}

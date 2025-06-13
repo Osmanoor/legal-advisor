@@ -1,194 +1,141 @@
-import { useState } from 'react';
+// src/pages/CorrectionPage.tsx
+
+import React, { useState } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useCorrection } from '@/hooks/api/useCorrection';
 import { useToast } from '@/hooks/useToast';
-import { 
-  Card, 
-  CardHeader, 
-  CardTitle, 
-  CardDescription,
-  CardContent,
-  CardFooter
-} from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import LoadingSpinner from '@/components/ui/loading-spinner';
-import { 
-  Languages,
-  ArrowRight,
-  ArrowLeft,
-  RotateCcw,
-  Check,
-  X
-} from 'lucide-react';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Sparkle, Edit3, Pilcrow } from 'lucide-react';
+
+import { CorrectionEditor, CorrectionProcessState } from '@/features/correction/components/CorrectionEditor';
+import { TafqitCalculator } from '@/features/correction/components/TafqitCalculator';
+
+type ActiveCorrectionTab = 'correction' | 'tafqit';
 
 export default function CorrectionPage() {
-  const { t, language, direction } = useLanguage();
-  const [inputText, setInputText] = useState('');
-  const [correctedText, setCorrectedText] = useState('');
-  const [selectedLanguage, setSelectedLanguage] = useState<'ar' | 'en'>('en');
+  const { t, direction } = useLanguage();
   const { showToast } = useToast();
-  const correction = useCorrection();
+  const correctionMutation = useCorrection();
 
-  const handleSubmit = async () => {
-    if (!inputText.trim()) {
+  const [activeTab, setActiveTab] = useState<ActiveCorrectionTab>('correction');
+  const [correctionState, setCorrectionState] = useState<CorrectionProcessState>('writing');
+  
+  const [inputText, setInputText] = useState('');
+  const [outputText, setOutputText] = useState('');
+
+  const handleTextApiCall = async (type: 'correct' | 'enhance') => {
+    const plainText = inputText.replace(/<[^>]*>?/gm, '').trim();
+    if (!plainText) {
       showToast(t('correction.error'), 'error');
       return;
     }
 
+    setCorrectionState(type === 'correct' ? 'loadingCorrection' : 'loadingEnhancement');
+    
     try {
-      const result = await correction.mutateAsync({
-        text: inputText,
-        language: selectedLanguage,
-      });
-
-      if (result.status === 'success') {
-        setCorrectedText(result.corrected_text);
-        showToast(t('correction.success'), 'success');
-      }
-    } catch (error) {
+      const result = await correctionMutation.mutateAsync({ text: inputText, language: 'ar' });
+      setOutputText(result.corrected_text);
+      setCorrectionState('corrected');
+      showToast(type === 'correct' ? t('correction.success') : t('correction.enhanceSuccess'), 'success');
+    } catch (err) {
       showToast(t('correction.error'), 'error');
+      setCorrectionState('writing');
     }
   };
 
-  const handleReset = () => {
+  const handleCorrectText = () => handleTextApiCall('correct');
+  const handleEnhanceText = () => handleTextApiCall('enhance');
+  
+  const handleReEnter = () => {
     setInputText('');
-    setCorrectedText('');
+    setOutputText('');
+    setCorrectionState('writing');
   };
 
+  const handleCopyResult = () => {
+    const plainTextResult = new DOMParser().parseFromString(outputText, "text/html").body.textContent || "";
+    navigator.clipboard.writeText(plainTextResult);
+    showToast(t('correction.copiedToClipboard'), 'success');
+  };
+
+  const isLoading = correctionState === 'loadingCorrection' || correctionState === 'loadingEnhancement';
+  const showActionButtons = activeTab === 'correction';
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12 px-4">
-      <div className="max-w-5xl mx-auto">
-        {/* Header Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            {t('correction.title')}
-          </h1>
-          <p className="text-gray-600">
-            Enter your text below and select the language for correction
-          </p>
-        </div>
+    <div className="p-4 md:p-6 lg:p-8" dir={direction}>
+      <div className={`mb-6 md:mb-8 ${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
+        <h1
+          className="text-design-22 font-medium text-text-on-light-strong"
+          style={{ fontFamily: 'var(--font-primary-arabic)', fontWeight: 500, lineHeight: '130%' }}
+        >
+          {t('correction.title')}
+        </h1>
+        <p
+          className="text-[14px] text-text-on-light-faint mt-1"
+          style={{ fontFamily: 'var(--font-primary-latin)', fontWeight: 400, lineHeight: '150%' }}
+        >
+          {t('correction.subtitlePlaceholder')}
+        </p>
+      </div>
 
-        {/* Main Content */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Input Section */}
-          <Card className="bg-white border-0 shadow-md">
-            <CardHeader>
-              <CardTitle className="text-gray-900">
-                {t('correction.inputLabel')}
-              </CardTitle>
-              <CardDescription>
-                {t('correction.inputPlaceholder')}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <Select
-                  value={selectedLanguage}
-                  onValueChange={(value: 'ar' | 'en') => setSelectedLanguage(value)}
-                >
-                  <SelectTrigger className="w-full border-gray-200 focus:border-blue-500 focus:ring-blue-500">
-                    <Languages className="w-4 h-4 mr-2" />
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ar">العربية</SelectItem>
-                    <SelectItem value="en">English</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Textarea
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                  placeholder={t('correction.inputPlaceholder')}
-                  className="min-h-[200px] resize-none border-gray-200 focus:border-blue-500 focus:ring-blue-500"
-                  dir={selectedLanguage === 'ar' ? 'rtl' : 'ltr'}
-                />
+      <div className="w-full max-w-[854px] mx-auto">
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as ActiveCorrectionTab)} className="w-full">
+          <TabsList className={`w-full flex mb-6 ${direction === 'rtl' ? 'md:flex-row-reverse' : ''}`}>
+            <TabsTrigger value="correction" className="flex-1">
+              <div className={`flex items-center justify-center gap-2 ${direction === 'rtl' ? 'flex-row-reverse' : ''}`}>
+                <Edit3 className="w-4 h-4" />
+                <span>{t('correction.tabTitleCorrect')}</span>
               </div>
-            </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button
-                variant="outline"
-                onClick={handleReset}
-                className="text-gray-600 hover:text-gray-900"
-                disabled={!inputText || correction.isPending}
-              >
-                <RotateCcw className="w-4 h-4 mr-2" />
-                {t('common.reset')}
-              </Button>
-              <Button
-                onClick={handleSubmit}
-                disabled={!inputText || correction.isPending}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                {correction.isPending ? (
-                  <>
-                    <LoadingSpinner size="sm" className="mr-2" />
-                    {t('correction.correcting')}
-                  </>
-                ) : (
-                  <>
-                    {t('correction.correct')}
-                    {direction === 'rtl' ? (
-                      <ArrowLeft className="w-4 h-4 ml-2" />
-                    ) : (
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    )}
-                  </>
-                )}
-              </Button>
-            </CardFooter>
-          </Card>
+            </TabsTrigger>
+            <TabsTrigger value="tafqit" className="flex-1">
+              <div className={`flex items-center justify-center gap-2 ${direction === 'rtl' ? 'flex-row-reverse' : ''}`}>
+                <Pilcrow className="w-4 h-4" />
+                <span>{t('correction.tabTitleTafqit')}</span>
+              </div>
+            </TabsTrigger>
+          </TabsList>
 
-          {/* Output Section */}
-          <Card className="bg-white border-0 shadow-md">
-            <CardHeader>
-              <CardTitle className="text-gray-900">
-                {t('correction.outputLabel')}
-              </CardTitle>
-              <CardDescription>
-                Corrected text will appear here
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {correction.error ? (
-                <Alert variant="destructive">
-                  <X className="w-4 h-4 mr-2" />
-                  <AlertDescription>
-                    {t('correction.error')}
-                  </AlertDescription>
-                </Alert>
-              ) : correctedText ? (
-                <div className="space-y-4">
-                  <Alert className="bg-green-50 border-green-200">
-                    <Check className="w-4 h-4 mr-2 text-green-600" />
-                    <AlertDescription className="text-green-800">
-                      {t('correction.success')}
-                    </AlertDescription>
-                  </Alert>
-                  <div
-                    className="p-4 rounded-lg bg-gray-50 min-h-[200px] whitespace-pre-wrap text-gray-900"
-                    dir={selectedLanguage === 'ar' ? 'rtl' : 'ltr'}
-                  >
-                    {correctedText}
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center justify-center min-h-[200px] text-gray-400 bg-gray-50 rounded-lg">
-                  No corrections yet
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+          <TabsContent value="correction" className="focus-visible:ring-0 focus-visible:ring-offset-0">
+            <CorrectionEditor
+              state={correctionState}
+              onTextChange={setInputText}
+              initialContent={inputText}
+              resultContent={outputText}
+              onCopyResult={handleCopyResult}
+            />
+          </TabsContent>
+
+          <TabsContent value="tafqit" className="focus-visible:ring-0 focus-visible:ring-offset-0">
+            <TafqitCalculator />
+          </TabsContent>
+        </Tabs>
+
+        {showActionButtons && (
+          <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center max-w-[808px] mx-auto">
+            {correctionState === 'writing' ? (
+              <>
+                <Button onClick={handleCorrectText} disabled={isLoading} className="flex-1 h-[42px] bg-white text-cta border border-cta rounded-lg hover:bg-cta/10 text-[14px] font-normal" style={{ fontFamily: 'var(--font-primary-arabic)', fontWeight: 400 }}>
+                  {t('correction.correctTextButton')}
+                </Button>
+                <Button onClick={handleEnhanceText} disabled={isLoading} className="flex-1 h-[42px] bg-cta text-white rounded-lg hover:bg-cta-hover text-[14px] font-normal flex items-center justify-center gap-2" style={{ fontFamily: 'var(--font-primary-arabic)', fontWeight: 400 }}>
+                  <Sparkle size={16} />
+                  {t('correction.enhanceTextButton')}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button onClick={handleReEnter} disabled={isLoading} className="flex-1 h-[42px] bg-white text-cta border border-cta rounded-lg hover:bg-cta/10 text-[14px] font-normal" style={{ fontFamily: 'var(--font-primary-arabic)', fontWeight: 400 }}>
+                  {t('correction.reEnterButton')}
+                </Button>
+                <Button onClick={handleEnhanceText} disabled={isLoading} className="flex-1 h-[42px] bg-cta text-white rounded-lg hover:bg-cta-hover text-[14px] font-normal flex items-center justify-center gap-2" style={{ fontFamily: 'var(--font-primary-arabic)', fontWeight: 400 }}>
+                  <Sparkle size={16} />
+                  {t('correction.enhanceTextButton')}
+                </Button>
+              </>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

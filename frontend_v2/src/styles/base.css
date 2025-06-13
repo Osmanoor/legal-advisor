@@ -3,127 +3,188 @@
 @tailwind components;
 @tailwind utilities;
 
+/* --- MONTSERRAT ARABIC --- */
+@font-face {
+  font-family: 'Montserrat-Arabic';
+  src: url('/fonts/MontserratArabic-Light.woff2') format('woff2'); /* Adjust filename if different */
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Montserrat-Arabic';
+  src: url('/fonts/MontserratArabic-Regular.woff2') format('woff2'); /* Adjust filename if different */
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Montserrat-Arabic';
+  src: url('/fonts/MontserratArabic-Medium.woff2') format('woff2'); /* Adjust filename if different */
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Montserrat-Arabic';
+  src: url('/fonts/MontserratArabic-SemiBold.woff2') format('woff2'); /* Adjust filename if different */
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Montserrat-Arabic';
+  src: url('/fonts/MontserratArabic-Bold.woff2') format('woff2'); /* Adjust filename if different */
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* --- INTER --- */
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Light.woff2') format('woff2'); /* Adjust filename if different */
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Regular.woff2') format('woff2'); /* Adjust filename if different */
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Medium.woff2') format('woff2'); /* Adjust filename if different */
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-SemiBold.woff2') format('woff2'); /* Adjust filename if different */
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Bold.woff2') format('woff2'); /* Adjust filename if different */
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+
 @layer base {
   :root {
-    --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-      'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji',
-      'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-    --font-arabic: 'Noto Sans Arabic', Arial, sans-serif;
+    --font-primary-arabic: 'Montserrat-Arabic'; /* For Arabic content */
+    --font-primary-latin: 'Inter';      /* For Latin content */
+
+    /* New Green Theme Colors (referenced by Tailwind config) */
+    --color-primary-dark: #296436;
+    --color-primary-base: #3E8E48;
+    --color-primary-cta: #51B749;
+    --color-primary-light: #EDFFEC;
+    --color-primary-logo-accent: #2BB673;
+
+    --color-text-on-dark: #FFFFFF;
+    --color-text-subtle-on-dark: #E7E7E7;
+    --color-text-on-light-strong: #000000;
+    --color-text-on-light-default: #2C3131;
+    --color-text-on-light-muted: #4C5259;
+    --color-text-on-light-faint: #706D79;
+    --color-text-on-light-placeholder: #A9A9A9;
+
+    --color-background-body: #FFFFFF;
+    --color-background-section-alt: #F9F9FD;
+
+    --border-color-default: #E3E3E3;
+    --border-color-subtle: rgba(0, 0, 0, 0.1);
+
+    /* Define background and text colors directly for the body */
+    background-color: var(--color-background-body);
+    color: var(--color-text-on-light-default);
   }
 
-  /* Set core body defaults */
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply bg-gray-50 text-gray-900 antialiased;
-    text-rendering: optimizeLegibility;
+    @apply antialiased; /* Tailwind handles text rendering optimization with antialiased */
+    font-feature-settings: 'liga' 1, 'calt' 1; /* Common OpenType features */
   }
 
-  /* RTL Support */
   [dir="rtl"] {
-    font-family: var(--font-arabic);
+    font-family: var(--font-primary-arabic), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   }
 
   [dir="ltr"] {
-    font-family: var(--font-sans);
+    font-family: var(--font-primary-latin), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   }
 
-  /* Focus styles */
-  :focus-visible {
-    @apply outline-none ring-2 ring-blue-500 ring-offset-2;
-  }
-
-  /* Scrollbar styles */
+  /* Custom scrollbar (optional, but often part of a redesign) */
   ::-webkit-scrollbar {
-    @apply w-2 h-2;
+    width: 8px;
+    height: 8px;
   }
-
   ::-webkit-scrollbar-track {
-    @apply bg-gray-100;
+    /* Use Tailwind's theme function for colors if a class is not directly applicable here */
+    /* For direct CSS, you might need to hardcode or use CSS variables if Tailwind's theme() doesn't work in @layer base for scrollbar */
+     background-color: #F3F4F6; /* Equivalent to colors.gray.100 */
   }
-
   ::-webkit-scrollbar-thumb {
-    @apply bg-gray-300 rounded-full;
+    background-color: #9CA3AF; /* Equivalent to colors.gray.400 */
+    border-radius: 4px;
   }
-
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-gray-400;
+     background-color: #6B7280; /* Equivalent to colors.gray.500 */
   }
-}
-
-@layer components {
-  /* Container styles */
-  .container {
-    @apply mx-auto px-4 sm:px-6 lg:px-8;
-    max-width: 80rem;
-  }
-
-  /* Button base styles */
-  .btn {
-    @apply inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
-  }
-
-  .btn-primary {
-    @apply bg-primary-600 text-white hover:bg-primary-700 focus-visible:ring-blue-500;
-  }
-
-  .btn-secondary {
-    @apply bg-gray-100 text-gray-900 hover:bg-gray-200 focus-visible:ring-gray-500;
-  }
-
-  /* Form control base styles */
-  .form-control {
-    @apply block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm;
-  }
-
-  /* Card base styles */
-  .card {
-    @apply rounded-lg border border-gray-200 bg-white shadow-sm;
-  }
-
-  .card-header {
-    @apply border-b border-gray-200 px-4 py-3;
-  }
-
-  .card-body {
-    @apply px-4 py-3;
-  }
-
-  /* Badge base styles */
-  .badge {
-    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
-  }
-
-  .badge-primary {
-    @apply bg-primary-100 text-primary-800;
-  }
-
-  .badge-success {
-    @apply bg-success-300 text-success-800;
-  }
-
-  .badge-warning {
-    @apply bg-warning-300 text-warning-800;
-  }
-
-  .badge-error {
-    @apply bg-error-300 text-error-800;
+  /* Customize default focus-visible outline for all elements */
+  *:focus-visible {
+    outline: 2px solid theme('colors.cta.DEFAULT'); /* Or your desired green, e.g., var(--color-primary-cta) */
+    outline-offset: 2px;
+    /* Or use ring utilities if you prefer Tailwind's ring approach */
+    /* @apply ring-2 ring-offset-2 ring-cta; */
   }
 }
 
 @layer utilities {
-  /* Direction-aware utilities */
-  .margin-start {
-    @apply [dir="ltr"]:ml-0 [dir="rtl"]:mr-0;
+  .animate-marquee {
+    animation: marquee 30s linear infinite;
+  }
+  
+  @keyframes marquee {
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-100%); }
   }
 
-  .margin-end {
-    @apply [dir="ltr"]:mr-0 [dir="rtl"]:ml-0;
+   .mix-blend-luminosity {
+    mix-blend-mode: luminosity;
   }
-
-  .padding-start {
-    @apply [dir="ltr"]:pl-0 [dir="rtl"]:pr-0;
+  .filter-blur-110 {
+    filter: blur(110px);
   }
-
-  .padding-end {
-    @apply [dir="ltr"]:pr-0 [dir="rtl"]:pl-0;
+  .filter-blur-15 {
+    filter: blur(15px);
+  }
+   .filter-blur-7-5 {
+    filter: blur(7.5px);
+  }
+  .filter-blur-26-5 {
+    filter: blur(26.5px);
+  }
+  .filter-blur-10-5 {
+    filter: blur(10.5px);
+  }
+  .animate-continuous-marquee {
+    animation: continuousMarquee 30s linear infinite; /* Adjust duration */
+  }
+  @keyframes continuousMarquee {
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-50%); } /* This assumes the content inside is doubled */
   }
 }

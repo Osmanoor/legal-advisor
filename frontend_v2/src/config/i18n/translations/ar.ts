@@ -33,38 +33,57 @@ export const ar = {
     templates: 'القوالب',
     journey: 'رحلة التعلم',
     tenderMapping: 'تحديد المنافسات',
+    // New Nav Keys from Design
+    userReviews: "أراء المستخدمين",
+    faq: "الأسئلة الشائعة",
+    whatSetsUsApart: "ما يميزنا",
+    solutions: "حلولنا",
   },
   procurement: {
     systemName: 'نظام المنافسات والمشتريات الحكومية',
-    communityName: 'مجتمع المشتريات الحكومية',
+    communityName: 'شبكة المشتريات الحكومية', // Updated from new logo
     searchPlaceholder: 'ابحث في النظام...',
   },
   chat: {
     // Welcome Section
     welcome: {
-      title: "مساعد مجتمع المشتريات الحكومية الذكي",
+      title: "مرحباً بك، ماسي",
       description: "اطرح أسئلتك حول نظام المنافسات والمشتريات الحكومية",
       getStarted: "ابدأ الآن",
+      
     },
+    // Message options and actions
+    saudiAccent: "لهجة سعودية",
+    reasoning: "التفكير المنطقي",
+    sources: "المصادر",
+    viewDetails: "عرض التفاصيل", // For source cards
+    regenerate: "إعادة إنشاء",
+    copy: "نسخ",
+    share: "مشاركة",
+    bookmark: "حفظ",
     // Chat Interface
     placeholder: "اكتب رسالتك هنا...",
     send: "إرسال",
     sending: "جاري الإرسال...",
-    // Message Options
-    saudiAccent: "لهجة سعودية",
-    reasoning: "التفكير المنطقي",
     // Status Messages
     loading: "جاري التحميل...",
     error: "حدث خطأ",
     connecting: "جاري الاتصال...",
     reconnecting: "جاري إعادة الاتصال...",
     // Resources and Sources
-    sources: "المصادر",
     article: "المادة",
     section: "الفصل",
     chapter: "الباب",
     content: "المحتوى",
     summary: "الملخص",
+    // History View
+    historyButton: "السجل",
+    historyTitle: "المحادثات",
+    searchHistoryPlaceholder: "ابحث عن محادثات",
+    sortBy: "ترتيب حسب",
+    // Active Chat View
+    newChat: "محادثة جديدة",
+    chatTitlePlaceholder: "عنوان المحادثة",
     // Suggested Questions
     suggestions: {
       title: "أو اختر من الأسئلة المقترحة",
@@ -72,12 +91,17 @@ export const ar = {
       second: "كيف يتم تقييم العروض في المنافسات الحكومية؟",
       third: "ما هي مدة سريان الضمان النهائي؟"
     },
+    // Timestamps & Counts
+    questionCount: "سؤال",
+    questionsCount: "أسئلة",
+    today: "اليوم",
+    yesterday: "الأمس",
     // Error Messages
     errorMessages: {
       failed: "فشل في إرسال الرسالة",
       network: "حدث خطأ في الشبكة",
       retry: "يرجى المحاولة مرة أخرى"
-    }
+    },
   },
   library: {
     title: 'المكتبة',
@@ -113,54 +137,146 @@ export const ar = {
     viewTooltip: 'عرض هذا الملف',
     openFolderTooltip: 'فتح هذا المجلد'
   },
-  landing: {
+  // --- START: NEW AND MERGED LANDING PAGE TRANSLATIONS ---
+  landingPage: {
     hero: {
-      title: 'مجتمع المشتريات الحكومية',
-      subtitle: 'نظام المنافسات والمشتريات الحكومية',
+      title: 'كل ما يتعلق بالمشتريات الحكومية في مكان واحد',
       description: 'منصة نضع فيها ما يهم موظفي المشتريات الحكومية وهي منصة غير رسمية ولكن عمل بسيط من زملاء لكم ونرجو ان نقدم من خلالها الفائدة المرجوة ولا تغني اطلاقاً عن العودة للنظام واللائحة والتعاميم ذات العلاقة',
-      cta: 'ابدأ الآن',
-      learnMore: 'اكتشف المزيد',
+      startNowButton: 'أبدأ الان',
+      aiAssistantTitle: 'أستخدم الأن المساعد الألي الأكثر تطوراً',
+      aiAssistantPlaceholder: 'كيف يمكن أن أساعدك ؟',
+      trustedBy: 'مستخدم و محبوب من قبل الأشخاص في الشركات المبدعة',
+      // Old keys
+      subtitle: 'نظام المنافسات والمشتريات الحكومية', // Old, for reference
+      cta: 'ابدأ الآن', // Old, for reference
+      learnMore: 'اكتشف المزيد', // Old, for reference
     },
-    search: {
+    search: { // Old section
       placeholder: 'ابحث في النظام...',
     },
+    solutionsTitle: 'حلولنا',
+    solutions: {
+      aiAssistant: {
+        title: 'المساعد الذكي',
+        description: 'إجابات دقيقة لاستفساراتك في المشتريات الحكومية.',
+      },
+      calculator: {
+        title: 'الحاسبة',
+        description: 'مجموعة شاملة من الأدوات لحساب النسب والتواريخ.', // Adjusted
+      },
+      textCorrection: {
+        title: 'معالج النصوص',
+        description: 'تصحيح الأخطاء الإملائية وتحويل الأرقام إلى نصوص تلقائيًا.',
+      },
+      procurementSystem: {
+        title: 'نظام الطرح', // (Your feature 4)
+        description: 'إنشاء تقارير وخرائط طريق كاملة للمنافسات.',
+      },
+      advancedSearch: {
+        title: 'البحث المتقدم', // (Your feature 1, "Smart AI assistant which answer user query...")
+        description: 'وصول سريع ودقيق لمستندات النظام واللوائح مع إجابات مدعومة بالذكاء الاصطناعي.',
+      },
+    },
+    featuresTitle: 'ما يميزنا',
+    featuresDescription: 'نؤمن بالوضوح، نعمل بكفاءة، ونبني علاقات توريد قائمة على الثقة والسهولة.',
     features: {
-      search: {
-        title: 'بحث متقدم',
-        description: 'بحث سهل وسريع في مواد النظام',
+      aiAssistant: {
+        title: "اسأل.. وجوابك حاضر!",
+        description: "مساعد المشتريات الذكي معك في كل استفسار، بكل سهولة وسرعة.",
+        readyToHelp: "مرحباً بك، أنا في خدمتك",
+        prompt: "كيف يمكن أن أساعدك ؟",
       },
-      assistant: {
-        title: 'مساعد مجتمع المشتريات الذكي',
-        description: 'إجابات دقيقة لاستفساراتك في المشتريات الحكومية',
+      calculator: {
+        title: "احسبها ببساطة.. خطط بثقة",
+        description: "حاسبة متطورة تجمع لك كل احتياجاتك في ضغطة زر.",
       },
-      library: {
-        title: 'مكتبة المشتريات',
-        description: 'مجموعة شاملة من وثائق المشتريات الحكومية',
-      },
+      everythingInOnePlace: {
+        title: "كل ما تحتاجه ... في مكان واحد",
+        description: "يجمع لك كل التفاصيل، ويوجهك خطوة بخطوة نحو أفضل القرارات.",
+      }
     },
+    testimonialsTitle: 'أراء المستخدمين',
+    testimonials: {
+      person1: {
+        name: "علي حسن",
+        title: "مدير المشتريات، وزارة البنية التحتية",
+        quote: "لقد أحدثت هذه المنصة ثورة في كيفية تعاملنا مع المناقصات الحكومية. المساعد الذكي يقدم إجابات سريعة ودقيقة بناءً على الأنظمة واللوائح، مما يوفر علينا ساعات لا تحصى."
+      },
+      person2: {
+        name: "فاطمة السالم",
+        title: "أخصائية عقود، الهيئة الصحية",
+        quote: "أداة تصحيح وتحسين النصوص رائعة لضمان خلو مستنداتنا الرسمية من الأخطاء. حاسبة التواريخ أيضًا أداة أساسية يوميًا."
+      },
+      person3: {
+        name: "خالد إبراهيم",
+        title: "مسؤول مشتريات، مديرية التعليم",
+        quote: "أصبح إنشاء تقارير المنافسات الكاملة مع الجداول الزمنية أمرًا سهلاً للغاية الآن. القدرة على تعديل الجداول الزمنية ميزة كبيرة لإدارة تغييرات المشروع."
+      },
+      person4: {
+        name: "نورة عبد الله",
+        title: "مسؤولة مشتريات مبتدئة",
+        quote: "بصفتي جديدة في هذا المجال، كانت رحلة التعلم والمساعد الذكي لا تقدر بثمن في فهم أنظمة ولوائح المشتريات المعقدة."
+      },
+      person5: {
+        name: "سعد المطيري",
+        title: "رئيس لجنة المناقصات",
+        quote: "الشفافية والكفاءة التي توفرها هذه الشبكة جديرة بالثناء. إنها تبسط الالتزام بقوانين المشتريات الحكومية."
+      },
+      person6: {
+        name: "ليلى القحطاني",
+        title: "محللة مالية، قسم المشتريات",
+        quote: "أدوات الحاسبة دقيقة وتغطي جميع احتياجاتنا، من النسب المئوية إلى حسابات التواريخ المفصلة لتخطيط المشاريع."
+      },
+      person7: {
+        name: "عمر يوسف",
+        title: "كبير المشترين، الخدمات البلدية",
+        quote: "كان العثور على بنود محددة في اللوائح مهمة شاقة في السابق. البحث الذكي والمساعد الاصطناعي جعلا الأمر سهلاً وسريعًا بشكل ملحوظ. موصى به بشدة!"
+      },
+      person8: {
+        name: "عائشة بكر",
+        title: "مستشارة قانونية، قسم المشتريات",
+        quote: "تركيز المنصة على الامتثال لقوانين المشتريات الحكومية السعودية واضح. فهم الذكاء الاصطناعي لهذه المستندات مثير للإعجاب."
+      },
+      person9: {
+        name: "فهد الغامدي",
+        title: "منسق مشاريع",
+        quote: "إدارة خرائط طريق المنافسات ومتطلباتها لم تكن أسهل من أي وقت مضى. هذه الأداة تبقي كل شيء منظمًا وعلى المسار الصحيح."
+      },
+      person10: {
+        name: "ريم الجاسر",
+        title: "متدربة في قسم المشتريات",
+        quote: "مصدر تعليمي رائع ومجموعة أدوات عملية. لقد ساعدتني على اكتساب الخبرة بسرعة أكبر مما توقعت."
+      }
+    },
+    faqTitle: 'الأسئلة الشائعة',
     faq: {
-      title: 'الأسئلة الشائعة',
-      items: [
-        {
-          question: 'كيف يمكنني البحث في النظام؟',
-          answer: 'يمكنك استخدام شريط البحث الرئيسي أو تصفح الأقسام والفصول مباشرة',
-        },
-        {
-          question: 'هل تكفي هذه المنصة عن العودة للنظام و اللائحة و التعاميم ذات العلاقة؟',
-          answer: 'لا تكفي المنصة عن العودة للانظمه ذات العلاقه من مصادرها الرسمية ما نقدمه وسيلة مساعدة لا اكثر',
-        },
-        {
-          question: 'كيف يمكنني تحميل النظام كاملاً؟',
-          answer: 'يمكنك تحميل النظام كاملاً من قسم مكتبة المشتريات بصيغة PDF',
-        },
-      ],
+      q1: {
+        question: "هل أستطيع استخدام الحاسبة لحساب جميع أنواع التكاليف؟",
+        answer: "نعم، الحاسبة مصممة لتغطية مختلف سيناريوهات التكاليف في المشتريات الحكومية."
+      },
+      q2: {
+        question: "كيف يساعدني مساعد المشتريات في اختيار المورد المناسب؟",
+        answer: "يقدم المساعد تحليلات بناءً على معاييرك، ويقترح الموردين الأكثر ملاءمة بناءً على البيانات التاريخية وتقييمات الأداء."
+      },
+      q3: {
+        question: "ما هي أنواع العقود التي يدعمها النظام؟",
+        answer: "يدعم النظام مجموعة واسعة من أنواع العقود المتوافقة مع لوائح المشتريات الحكومية السعودية."
+      },
+      q4: {
+        question: "كيف أبدأ رحلتي مع نظام المشتريات؟",
+        answer: "لبدء استخدام نظام المشتريات، قم أولاً بإنشاء حساب عبر بوابتنا الإلكترونية بخطوات سهلة وسريعة. بعد تسجيل الدخول، ستجد أمامك واجهة مصممة خصيصًا لتبسيط رحلتك الشرائية. يمكنك الاستعانة بمساعد المشتريات الذكي الذي سيرشدك خطوة بخطوة، بدايةً من تحديد احتياجاتك، مرورًا باختيار المورد الأنسب، ووصولاً إلى إتمام الطلب والموافقة عليه إلكترونيًا."
+      },
+      q5: {
+        question: "هل يتوافق النظام مع لوائح المشتريات الحكومية السعودية؟",
+        answer: "بالتأكيد، تم تصميم النظام ليكون متوافقًا تمامًا مع جميع اللوائح والإجراءات الخاصة بالمشتريات الحكومية في المملكة العربية السعودية."
+      }
     },
-    stats: {
+    stats: { // Old section
       articles: 'مادة في النظام',
       users: 'مستخدم نشط',
       accuracy: 'دقة الإجابات',
     },
-    contact: {
+    contact: { // Old section
       title: 'تواصل معنا',
       form: {
         name: 'الاسم',
@@ -174,7 +290,12 @@ export const ar = {
         invalidEmail: 'يرجى إدخال بريد إلكتروني صحيح'
       }
     },
+    footer: {
+      loginButton: "سجل دخول الان",
+      copyright: "حقوق النشر © {year} . جميع الحقوق محفوظة.",
+    }
   },
+  // --- END: NEW AND MERGED LANDING PAGE TRANSLATIONS ---
   search: {
     pageTitle: 'البحث في المواد',
     placeholder: 'ادخل كلمات البحث...',
@@ -239,99 +360,127 @@ export const ar = {
     logout: 'تسجيل الخروج'
   },
   correction: {
-    title: 'أداة تصحيح النصوص',
+    title: 'معالج النصوص',
+    subtitlePlaceholder: 'Lorem ipsum dolor sit amet consectetur adipiscing elit sed', // Add this key
     inputLabel: 'أدخل النص للتصحيح',
-    inputPlaceholder: 'اكتب أو الصق النص هنا...',
+    inputPlaceholder: 'أدخل النص المراد تعديله', // Updated placeholder
     outputLabel: 'النص المصحح',
     correct: 'تصحيح النص',
     correcting: 'جاري التصحيح...',
-    error: 'حدث خطأ أثناء تصحيح النص.',
+    enhancing: 'جاري التحسين...', // Add this key
+    error: 'حدث خطأ أثناء معالجة النص.', // Updated for generic use
     success: 'تم تصحيح النص بنجاح.',
+    enhanceSuccess: 'تم تحسين النص بنجاح.', // Add this key
+    copiedToClipboard: 'تم النسخ إلى الحافظة!', // Add this key
+    copyError: 'فشل النسخ إلى الحافظة.', // Add this key
+    copy: 'نسخ', // Add this key
+    // New keys for the new design
+    tabTitleCorrect: 'تصحيح النصوص',
+    tabTitleTafqit: 'التفقيط',
+    enhanceTextButton: 'تحسين النص',
+    correctTextButton: 'تصحيح النص',
+    reEnterButton: 'إعادة الإدخال',
   },
   calculator: {
-    title: 'أدوات حاسبة المشتريات',
+    mainTitle: 'تفقد جميع الادوات الحسابية',
+    mainSubtitle: 'هذا النص هو مثال لنص يمكن أن يستبدل في نفس المساحة، لقد تم توليد هذا النص من مولد النص العربى، حيث يمكنك أن تولد مثل هذا النص أو العديد من النصوص الأخرى إضافة إلى زيادة عدد الحروف التى يولدها التطبيق.', // Placeholder subtitle
     tabs: {
+      numericalValues: 'القيم الحسابية',
+      dates: 'التواريخ',
+      // Old tabs
       percentage: 'النسبة المئوية',
       vat: 'الضريبة',
       amount: 'المبلغ مع نسبة',
-      date: 'التواريخ',
       tafqit: 'التفقيط'
     },
-    // Percentage Calculator
+    selectNumericalType: 'اختر نوع الحساب العددي',
+    selectDateType: 'اختر نوع حساب التاريخ',
+    selectCalculation: 'اختر نوع العملية',
+
+    subTabs: {
+      percentageChange: 'حساب النسبة المئوية',
+      vatCalculation: 'حساب ضريبة القيمة المضافة',
+      amountWithPercentage: 'حساب المبلغ مع نسبة',
+      dateConversion: 'تحويل التواريخ',
+      dateDifference: 'الفرق بين تاريخين',
+      dateDuration: 'حساب المدة وتاريخ الانتهاء',
+    },
+
     percentage: {
       title: 'حساب النسبة المئوية',
       baseAmount: 'المبلغ الأساسي',
       newAmount: 'المبلغ الجديد',
       calculate: 'احسب النسبة',
+      resultLabel: 'القيمة',
       result: 'النتيجة'
     },
-    // VAT Calculator
+
     vat: {
       title: 'حساب الضريبة',
       operation: {
         label: 'نوع العملية',
-        total: 'حساب المبلغ مع الضريبة',
-        extract: 'استخراج المبلغ الأصلي من مبلغ الضريبة',
-        amount: 'حساب مبلغ الضريبة'
+        total: 'حساب الصافي والضريبة من الإجمالي (شامل الضريبة)',
+        extract: 'حساب الإجمالي (شامل الضريبة) من الصافي',
+        amount: 'حساب مبلغ الضريبة من الصافي'
       },
-      amount: 'المبلغ',
-      rate: 'نسبة الضريبة',
-      calculate: 'احسب',
+      selectOperationPlaceholder: 'اختر نوع عملية الضريبة',
+      amountInputLabel: 'المبلغ',
+      rateLabel: 'نسبة الضريبة',
+      calculate: 'احسب الضريبة',
       results: {
+        netAmountLabel: 'القيمة', // As per Image 2 "القيمة" for 100
+        vatAmountLabel: 'قيمة الضريبة', // As per Image 2
+        totalAmountLabel: 'المبلغ الكلي', // As per Image 2
         net: 'المبلغ الصافي',
         vat: 'مبلغ الضريبة',
         total: 'المبلغ الإجمالي'
       }
     },
-    // Amount with Percentage
+
     amountPercentage: {
       title: 'حساب المبلغ مع النسبة',
-      amount: 'المبلغ',
-      percentage: 'النسبة',
+      amountLabel: 'المبلغ',
+      percentageLabel: 'النسبة',
       calculate: 'احسب',
       results: {
+        originalAmountLabel: 'القيمة', // As per Image 3
+        adjustmentAmountLabel: 'قيمة التعديل', // As per Image 3
+        finalAmountLabel: 'القيمة النهائية', // As per Image 3
         original: 'المبلغ الأصلي',
         adjustment: 'مبلغ التعديل',
         final: 'المبلغ النهائي'
       }
     },
-    // Date Calculator
+
     date: {
       conversion: {
-        title: 'تحويل التواريخ'
-      },
-      gregorian: {
-        label: 'التاريخ الميلادي',
-        convert: 'حول إلى هجري',
-        result: 'التاريخ الهجري'
-      },
-      hijri: {
-        label: 'التاريخ الهجري',
-        convert: 'حول إلى ميلادي',
-        current: 'التاريخ الهجري الحالي',
-        placeholder: 'مثال: 1445/07/29',
-        result: 'التاريخ الميلادي'
+        title: 'تحويل التواريخ',
+        gregorianLabel: 'التاريخ الميلادي', // Old
+        hijriLabel: 'التاريخ الهجري', // Old
+        inputLabelGregorian: 'التاريخ بالميلادي', // New for Image 4
+        inputLabelHijri: 'التاريخ بالهجري',       // New for Image 4
+        convertToHijri: 'حول إلى هجري',
+        convertToGregorian: 'حول إلى ميلادي',
+        convertActionLabel: 'تحويل التواريخ',
       },
       difference: {
         title: 'حساب الفرق بين تاريخين',
         start: 'تاريخ البداية',
         end: 'تاريخ النهاية',
         calculate: 'احسب الفرق',
-        years: 'السنوات',
-        months: 'الشهور',
-        days: 'الأيام',
-        result: 'الفرق بين التاريخين'
+        result: 'الفرق بين التاريخين',
       },
       duration: {
         title: 'حساب تاريخ النهاية',
         start: 'تاريخ البداية',
         duration: {
           label: 'المدة',
-          days: 'الأيام',
-          months: 'الشهور',
-          years: 'السنوات'
+          years: 'عدد السنين', // Placeholder for years input from Image 6
+          months: 'عدد الشهور',// Placeholder for months input from Image 6
+          days: 'عدد الأيام',  // Placeholder for days input from Image 6
         },
-        calculate: 'احسب تاريخ النهاية',
+        calculate: 'احسب', // "أحسب" from Image 6
+        resultLabel: 'تاريخ النهاية المحسوب', // Label for the result display
         result: 'تاريخ النهاية',
         resultFormat: '{gregorian} (هجري: {hijri})',
         separator: ' و ',
@@ -344,7 +493,7 @@ export const ar = {
         start: 'تاريخ البداية (هجري)',
         calculate: 'احسب تاريخ النهاية',
         result: 'تاريخ النهاية الهجري',
-        placeholder: 'أدخل التاريخ بتنسيق: 1445/07/29'
+        placeholder: 'أدخل التاريخ بتنسيق: س س س س / ش ش / ي ي' // Updated placeholder
       },
       units: {
         year: 'سنة',
@@ -353,9 +502,19 @@ export const ar = {
         months: 'شهور',
         day: 'يوم',
         days: 'أيام'
+      },
+      hijri: {
+        label: 'التاريخ الهجري',
+        current: 'التاريخ الهجري الحالي',
+        placeholder: 'س س س س/ش ش/ي ي', // Generic placeholder
+        result: 'التاريخ الميلادي'
+      },
+      gregorian: {
+        label: 'التاريخ الميلادي',
+        result: 'التاريخ الهجري'
       }
     },
-    // Tafqit
+
     tafqit: {
       title: 'تفقيط المبلغ',
       amount: 'المبلغ',
@@ -366,28 +525,36 @@ export const ar = {
       },
       convert: 'حول إلى كلمات',
       result: 'النتيجة',
-      placeholder: 'أدخل المبلغ'
-    },
-    // Common
+      placeholder: 'أدخل المبلغ',
+      resultPlaceholder: 'النتيجة كتابة', // Add this key
+  },
+    
     common: {
+      enterAmountPlaceholder: 'أدخل المبلغ',
+      enterPercentagePlaceholder: 'أدخل النسبة',
+      noResultYet: 'أدخل القيم للحساب',
+      reset: 'إعادة تعيين',
+      calculate: 'احسب',
+      back: 'رجوع',
       validation: {
         required: 'هذا الحقل مطلوب',
         invalidDate: 'تاريخ غير صحيح',
-        invalidNumber: 'رقم غير صحيح',
+        invalidNumber: 'رقم غير صحيح أو مبلغ أساسي صفر',
         endDateBeforeStart: 'تاريخ النهاية يجب أن يكون بعد تاريخ البداية',
-        positiveNumber: 'يجب أن يكون الرقم موجباً'
-      },
-      loading: 'جاري الحساب...',
-      error: 'حدث خطأ في العملية',
-      reset: 'إعادة تعيين',
-      calculate: 'احسب',
-      back: 'رجوع'
+        positiveNumber: 'يجب أن يكون الرقم موجباً',
+        selectBothDates: 'يرجى تحديد تاريخي البداية والنهاية',
+        enterStartDate: 'يرجى إدخال تاريخ البداية',
+        enterGregorian: 'يرجى إدخال التاريخ الميلادي',
+        enterHijri: 'يرجى إدخال التاريخ الهجري',
+        invalidHijriFormat: 'صيغة التاريخ الهجري غير صحيحة (س س س س/ش ش/ي ي)',
+      }
     }
   },
   templates: {
     title: 'قوالب المستندات',
-    placeholders: 'الحقول المطلوبة',
+    placeholders: 'الحقول المطلوبة', // Changed from 'الحقول المطلوبة' in old ar.ts
     generate: 'إنشاء المستند',
+    back: 'العودة إلى القوالب', // New
     generation: {
       success: 'تم إنشاء المستند بنجاح',
       error: 'خطأ في إنشاء المستند'
@@ -407,7 +574,12 @@ export const ar = {
       send: 'إرسال',
       success: 'تم إرسال البريد الإلكتروني بنجاح',
       error: 'خطأ في إرسال البريد الإلكتروني'
-    }
+    },
+     procurementSystem: {
+        title: 'نظام الطرح',
+        description: 'مجموعة شاملة من وثائق المشتريات الحكومية.'
+    },
+    autoCalculated: '(يُحسب تلقائيًا)' // For TemplateForm
   },
   journey: {
     title: 'رحلة التعلم',
@@ -429,40 +601,71 @@ export const ar = {
     loading: 'جاري التحميل...',
     error: 'حدث خطأ أثناء تحميل البيانات',
     yourProgress: 'تقدمك',
-  previousLevel: 'المستوى السابق',
-  nextLevel: 'المستوى التالي',
-  start: 'ابدأ',
-  continue: 'متابعة',
-  backToJourney: 'العودة إلى الرحلة',
+    previousLevel: 'المستوى السابق',
+    nextLevel: 'المستوى التالي',
+    start: 'ابدأ',
+    continue: 'متابعة',
+    backToJourney: 'العودة إلى الرحلة',
   },
   tenderMapping: {
-    title: 'تحديد نوع المنافسة',
+    title: 'نظام الطرح',
     description: 'اعثر على نوع المنافسة الأنسب بناءً على متطلبات مشروعك',
+    
+    // Form Inputs
     inputs: {
-      title: 'تفاصيل المشروع',
-      description: 'حدد الخيارات المناسبة لمشروعك',
+      title: 'حدد نوع المنافسة',
+      description: 'Lorem ipsum dolor sit amet consectetur adipiscing elit sed', // Placeholder subtitle
+      workType: 'نوع العمل',
+      workTypePlaceholder: 'اختر نوع العملية',
+      budget: 'الميزانية',
+      budgetPlaceholder: 'أدخل المبلغ',
+      startDate: 'تاريخ البدء',
+      startDatePlaceholder: 'أدخل التاريخ',
+      projectDuration: 'مدة المشروع (بالأشهر)',
+      projectDurationPlaceholder: 'أدخل المدة',
       submit: 'تحديد نوع المنافسة',
       reset: 'إعادة تعيين'
     },
+    
+    // Result View
     results: {
-      title: 'نوع المنافسة الموصى به',
-      confidenceHigh: 'تطابق قوي',
-      confidenceMedium: 'تطابق متوسط',
-      confidenceLow: 'تطابق ضعيف',
-      alternativesTitle: 'خيارات بديلة',
-      attributes: 'سمات المنافسة',
-      noResult: 'لم يتم العثور على نوع منافسة مطابق',
+      title: 'تقرير المنافسة',
+      
+      // Tabs
+      tabs: {
+        details: 'تفاصيل المنافسة',
+        timeline: 'الجدول الزمني',
+        regulations: 'ضوابط عامة'
+      },
+      
+      // Details Tab Labels (example keys)
+      procurementStyle: 'أسلوب الطرح',
+      stageCount: 'عدد المراحل',
+      offerSubmission: 'تقديم العروض',
+      offerDuration: 'مدة تقديم العروض',
+      exeedApproval: 'موافقة كفاءة الانفاق',
+      financeApproval: 'أجازة وزارة المالية',
+      totalDuration: 'المدة الإجمالية',
+      localContentMechanism: 'الية المحتوى المحلي',
+
+      // Timeline Tab
+      workingDays: 'أيام عمل',
+      save: 'حفظ',
+      cancel: 'إلغاء',
+      editDuration: 'تعديل المدة',
+      
+      // Regulations Tab
+      sources: 'المصادر',
+      moreDetails: 'المزيد عن التفاصيل',
+      system: 'النظام',
+      regulation: 'اللائحة',
+      
+      // General
+      noResult: 'لم يتم الع"ور على نوع منافسة مطابق',
       tryAgain: 'يرجى تجربة خيارات مختلفة'
     },
-    saveRule: {
-      title: 'حفظ هذا التعيين',
-      description: 'احفظ هذا التكوين كقاعدة جديدة للرجوع إليها في المستقبل',
-      ruleName: 'اسم القاعدة',
-      submit: 'حفظ القاعدة',
-      success: 'تم حفظ القاعدة بنجاح',
-      error: 'حدث خطأ أثناء حفظ القاعدة'
-    },
-    loading: 'جارٍ البحث عن أفضل نوع منافسة...',
+    
+    loading: 'جارٍ حساب نوع المنافسة...',
     error: 'حدث خطأ أثناء معالجة طلبك'
   },
 };

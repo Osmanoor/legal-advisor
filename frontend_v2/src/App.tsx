@@ -4,10 +4,10 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ThemeProvider } from './providers/ThemeProvider';
 import { LanguageProvider } from './providers/LanguageProvider';
 import { ToastProvider } from './providers/ToastProvider';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { AppLayout } from './components/layouts/AppLayout';
+import { BrowserRouter, Route, Routes, Outlet } from 'react-router-dom'; // Added Outlet
+import { AppLayout } from './components/layouts/AppLayout'; // This is now the DashboardLayout
 import { queryClient } from './lib/Client';
-import { usePageTracking } from './hooks/usePageTracking'; 
+import { usePageTracking } from './hooks/usePageTracking';
 
 import './styles/base.css';
 import LandingPage from './pages/LandingPage';
@@ -21,24 +21,31 @@ import TemplatesPage from './pages/TemplatesPage';
 import JourneyPage from './pages/JourneyPage';
 import TenderMappingPage from './pages/TenderMappingPage';
 
-// Helper component to call the hook within the Router context
 function GaPageTracker() {
-  usePageTracking(); // <-- Call the hook here
-  return null; // This component renders nothing itself
+  usePageTracking();
+  return null;
 }
+
+// New component for dashboard routes that use AppLayout
+const DashboardRoutes = () => (
+  <AppLayout>
+    <Outlet /> {/* Child routes will render here */}
+  </AppLayout>
+);
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <LanguageProvider>
-          {/* BrowserRouter MUST wrap the component using the hook */}
           <BrowserRouter>
-            <GaPageTracker /> {/* Place the tracker component inside Router */}
+            <GaPageTracker />
             <ToastProvider />
-            <AppLayout>
-              <Routes>
-                <Route path="/" element={<LandingPage />} />
+            <Routes>
+              <Route path="/" element={<LandingPage />} /> {/* Landing page uses its own layout */}
+              
+              {/* All other routes use the Dashboard Layout (AppLayout) */}
+              <Route element={<DashboardRoutes />}>
                 <Route path="/search" element={<SearchPage />} />
                 <Route path="/library" element={<LibraryPage />} />
                 <Route path="/chat" element={<ChatPage />} />
@@ -49,9 +56,9 @@ function App() {
                 <Route path="/journey" element={<JourneyPage />} />
                 <Route path="/journey/:levelId" element={<JourneyPage />} />
                 <Route path="/tender-mapping" element={<TenderMappingPage />} />
-                {/* Add other routes as needed */}
-              </Routes>
-            </AppLayout>
+                {/* Add other dashboard routes here */}
+              </Route>
+            </Routes>
           </BrowserRouter>
         </LanguageProvider>
       </ThemeProvider>

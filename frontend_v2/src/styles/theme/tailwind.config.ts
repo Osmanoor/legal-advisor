@@ -2,6 +2,20 @@
 import type { Config } from 'tailwindcss';
 import { theme as customTheme } from './index'; // Import our custom theme
 
+// Utility to convert readonly tuples to mutable tuples
+function mutableFontSize(fontSizeObj: typeof customTheme.fontSize) {
+  const result: Record<string, any> = {};
+  for (const key of Object.keys(fontSizeObj) as Array<keyof typeof customTheme.fontSize>) {
+    const value = fontSizeObj[key];
+    if (Array.isArray(value)) {
+      result[key] = [...value] as any; // Spread to make mutable
+    } else {
+      result[key] = value;
+    }
+  }
+  return result;
+}
+
 const config = {
   content: [
     "./index.html", // Make sure this is correct if your index.html is elsewhere
@@ -34,7 +48,7 @@ const config = {
         // inter: customTheme.fontFamily.inter,
         // 'montserrat-arabic': customTheme.fontFamily['montserrat-arabic'],
       },
-      fontSize: customTheme.fontSize,
+      fontSize: mutableFontSize(customTheme.fontSize),
       borderRadius: customTheme.borderRadius,
       boxShadow: {
         ...customTheme.boxShadow,

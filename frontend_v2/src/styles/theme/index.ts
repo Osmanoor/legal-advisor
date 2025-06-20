@@ -168,25 +168,21 @@ export const theme = {
   },
 
   fontSize: { // Match to design (14px, 15px, 16px, 18px, 22px, 30.4px, 48px)
-    xs: ['0.75rem', { lineHeight: '1rem' }],    // 12px
-    sm: ['0.875rem', { lineHeight: '1.25rem' }],// 14px (prompt box placeholder)
-    base: ['1rem', { lineHeight: '1.5rem' }],  // 16px (hero subtitle, footer copyright)
-    lg: ['1.125rem', { lineHeight: '1.75rem' }],// 18px (hero "مستخدم و محبوب", solution desc, FAQ Q)
-    xl: ['1.25rem', { lineHeight: '1.75rem' }],// 20px
-    '2xl': ['1.375rem', { lineHeight: '2rem' }],// 22px (solution title, header "الرئيسية")
-                                                // Design uses 22px font-size, lineHeight 24px or 26px
-
-    '3xl': ['1.875rem', { lineHeight: '2.25rem' }],// 30px (approx 30.4px for "اسأل.. وجوابك حاضر!")
-                                                // Design: 30.4px, line-height: 38px
-    '4xl': ['2.25rem', { lineHeight: '2.5rem' }],  // 36px
-    '5xl': ['3rem', { lineHeight: '1' }],      // 48px (hero title, section titles)
-                                                // Design: 48px, line-height: 59px or 26px
+    xs: ['0.75rem', { lineHeight: '1rem' } as const] as const,    // 12px
+    sm: ['0.875rem', { lineHeight: '1.25rem' } as const] as const,// 14px (prompt box placeholder)
+    base: ['1rem', { lineHeight: '1.5rem' } as const] as const,  // 16px (hero subtitle, footer copyright)
+    lg: ['1.125rem', { lineHeight: '1.75rem' } as const] as const,// 18px (hero "مستخدم و محبوب", solution desc, FAQ Q)
+    xl: ['1.25rem', { lineHeight: '1.75rem' } as const] as const,// 20px
+    '2xl': ['1.375rem', { lineHeight: '2rem' } as const] as const,// 22px (solution title, header "الرئيسية")
+    '3xl': ['1.875rem', { lineHeight: '2.25rem' } as const] as const,// 30px (approx 30.4px for "اسأل.. وجوابك حاضر!")
+    '4xl': ['2.25rem', { lineHeight: '2.5rem' } as const] as const,  // 36px
+    '5xl': ['3rem', { lineHeight: '1' } as const] as const,      // 48px (hero title, section titles)
     // Specific sizes from design not fitting Tailwind's scale well
-    'design-15': ['0.9375rem', { lineHeight: '1.125rem' }], // 15px, 18px line-height (header nav)
-    'design-22': ['1.375rem', { lineHeight: '1.5rem' }], // 22px, 24px line-height (solution title)
-    'design-30': ['1.9rem', { lineHeight: '2.375rem' }], // 30.4px, 38px line-height ("اسأل..")
-    'design-48': ['3rem', { lineHeight: '3.6875rem' }], // 48px, 59px line-height (hero title)
-    'design-48-tight': ['3rem', { lineHeight: '1.625rem' }], // 48px, 26px line-height (section titles)
+    'design-15': ['0.9375rem', { lineHeight: '1.125rem' } as const] as const, // 15px, 18px line-height (header nav)
+    'design-22': ['1.375rem', { lineHeight: '1.5rem' } as const] as const, // 22px, 24px line-height (solution title)
+    'design-30': ['1.9rem', { lineHeight: '2.375rem' } as const] as const, // 30.4px, 38px line-height ("اسأل..")
+    'design-48': ['3rem', { lineHeight: '3.6875rem' } as const] as const, // 48px, 59px line-height (hero title)
+    'design-48-tight': ['3rem', { lineHeight: '1.625rem' } as const] as const, // 48px, 26px line-height (section titles)
   },
 
   borderRadius: {

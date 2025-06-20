@@ -272,9 +272,8 @@ export function TenderResultCard({ result, onUpdateResult }: TenderResultCardPro
                   <EditableTimelineStage
                     key={index}
                     stage={stage}
-                    index={index}
                     isEditing={editingStageIndex === index}
-                    onEdit={() => handleStageEdit(index)}
+                    onEditClick={() => handleStageEdit(index)}
                     onCancel={handleStageEditCancel}
                     onSave={(updatedStage) => handleStageEditSave(updatedStage, index)}
                   />

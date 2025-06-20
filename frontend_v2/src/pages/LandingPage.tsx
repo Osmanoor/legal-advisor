@@ -13,11 +13,11 @@ const LandingPage = () => {
     <div className="min-h-screen bg-background-body flex flex-col"> {/* Added flex flex-col for footer */}
       <LandingPageHeader /> {/* Use landing page specific header */}
       <div className="flex-grow"> {/* Wrapper for content to push footer down */}
-        <NewHeroSection />
-        <SolutionsSection />
-        <StickyCardsSection />
-        <TestimonialsSection />
-        <FaqSection />
+        <NewHeroSection id="home" />
+        <SolutionsSection id="solutions" />
+        <StickyCardsSection id="features" />
+        <TestimonialsSection id="reviews" />
+        <FaqSection id="faq" />
       </div>
       <LandingPageFooter /> {/* Use landing page specific footer */}
     </div>

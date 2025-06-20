@@ -41,7 +41,7 @@ export const HistoryItem: React.FC<HistoryItemProps> = ({ session, onClick }) =>
     className="flex flex-row-reverse items-center p-4 bg-white border border-border-default rounded-lg shadow-sm hover:border-cta hover:bg-cta/5 transition-all cursor-pointer"
   >
     {/* Options (left in RTL) */}
-    <div className="flex flex-row-reverse items-center gap-4 text-text-on-light-muted flex-shrink-0">
+    <div className="flex flex-row-reverse items-center gap-6 text-text-on-light-muted flex-shrink-0">
       <Button
         variant="ghost"
         size="icon"
@@ -50,14 +50,15 @@ export const HistoryItem: React.FC<HistoryItemProps> = ({ session, onClick }) =>
       >
         <MoreVertical size={16} />
       </Button>
-      <div className="flex items-center gap-2 text-xs">
-        <Clock size={14} />
-        <span>{session.questionCount}</span>
-      </div>
-      <div className="flex items-center gap-2 text-xs">
+      <div className="flex flex-row-reverse w-20 items-center gap-2 text-xs">
         <MessageSquare size={14} />
         <span>{formatRelativeTime(session.lastUpdated, t)}</span>
       </div>
+      <div className="flex flex-row-reverse items-center gap-2 text-xs">
+        <Clock size={14} />
+        <span>{session.questionCount}</span>
+      </div>
+      
     </div>
   
     {/* Title (right in RTL) */}

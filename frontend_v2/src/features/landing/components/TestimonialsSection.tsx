@@ -90,12 +90,15 @@ const testimonialData = [
   },
 ];
 
+interface TestimonialsSectionProps {
+  id?: string;
+}
 
-export const TestimonialsSection = () => {
+export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ id }) => {
   const { t } = useLanguage();
 
   return (
-    <section className="py-16 md:py-24 bg-background-body relative">
+    <section id={id} className="py-16 md:py-24 bg-background-body relative">
       {/* This div creates the gradient fade at the bottom of the section */}
       <div
         className="absolute bottom-20 left-0 right-0 h-64 z-10 pointer-events-none" // Increased height for a more gradual fade

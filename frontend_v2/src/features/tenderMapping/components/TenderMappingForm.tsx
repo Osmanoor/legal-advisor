@@ -86,7 +86,7 @@ export function TenderMappingForm({ workTypes, isLoading, onSubmit, onReset }: T
               </div>
             </div>
           </div>
-          <Button type="submit" disabled={!isFormValid || isLoading} className="w-full h-11 text-base">{t('tenderMapping.inputs.submit')}</Button>
+          <Button type="submit" disabled={!isFormValid || isLoading} className="w-full h-11 text-base bg-cta">{t('tenderMapping.inputs.submit')}</Button>
         </form>
       </div>
     </div>

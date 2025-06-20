@@ -61,7 +61,7 @@ export const TafqitCalculator = () => {
           <Label className="text-right block mb-1.5 text-[14px] font-normal text-text-on-light-strong" style={{ fontFamily: 'var(--font-primary-arabic)' }}>
             {t('calculator.tafqit.result')}
           </Label>
-          <div className="relative bg-resultTheme-background border border-inputTheme-border rounded-lg p-4 min-h-[84px] flex items-center justify-center text-center shadow-input-shadow">
+          <div className="relative bg-[#ECFFEA] border border-inputTheme-border rounded-lg p-4 min-h-[84px] flex items-center justify-center text-center shadow-input-shadow">
             <Button
               variant="ghost"
               size="icon"
@@ -73,7 +73,7 @@ export const TafqitCalculator = () => {
               <Copy size={16} />
             </Button>
             <p
-              className="text-resultTheme-valueText text-[23px] font-medium leading-tight text-center flex-grow mx-10"
+              className="text-resultTheme-valueText text-[#51B749] text-[23px] font-medium leading-tight text-center flex-grow mx-10"
               style={{ fontFamily: 'var(--font-primary-arabic)', lineHeight: '130%' }}
               dir="rtl"
             >

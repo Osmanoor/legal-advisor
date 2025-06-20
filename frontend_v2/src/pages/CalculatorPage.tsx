@@ -122,8 +122,12 @@ export default function CalculatorPage() {
           {/* Content for "القيم الحسابية" Tab */}
           <TabsContent value="numericalValues">
             {/* Dropdown for selecting numerical calculator type */}
-            <div className={`mb-6 md:w-[370px] ${direction === 'rtl' ? 'mr-auto text-right' : 'ml-auto md:ml-0 text-left'}`}>
-              <Label htmlFor="numerical-calc-type" className={`${designConfig.labelClass} text-right`} style={{fontFamily: 'var(--font-primary-arabic)'}}>
+            <div className={`mb-6 md:w-[370px] ${direction === 'rtl' ? 'ml-auto text-right' : 'mr-auto text-left'}`}>
+              <Label 
+                htmlFor="numerical-calc-type" 
+                className={`${designConfig.labelClass} ${direction === 'rtl' ? 'text-right' : 'text-left'}`}
+                style={{fontFamily: 'var(--font-primary-arabic)'}}
+              >
                 {t('calculator.selectNumericalType')}
               </Label>
               <Select
@@ -131,7 +135,10 @@ export default function CalculatorPage() {
                 value={selectedNumericalCalc}
                 onValueChange={(value) => setSelectedNumericalCalc(value as NumericalCalcType)}
               >
-                <SelectTrigger id="numerical-calc-type" className={`${designConfig.selectTriggerClass} text-right`}>
+                <SelectTrigger 
+                  id="numerical-calc-type" 
+                  className={`${designConfig.selectTriggerClass} ${direction === 'rtl' ? 'text-right' : 'text-left'}`}
+                >
                   <SelectValue placeholder={t('calculator.selectCalculation')} />
                 </SelectTrigger>
                 <SelectContent className={designConfig.selectContentClass}>
@@ -148,8 +155,12 @@ export default function CalculatorPage() {
 
           {/* Content for "التواريخ" Tab */}
           <TabsContent value="dates">
-             <div className={`mb-6 md:w-[370px] ${direction === 'rtl' ? 'mr-auto text-right' : 'ml-auto md:ml-0 text-left'}`}>
-              <Label htmlFor="date-calc-type" className={`${designConfig.labelClass} text-right`} style={{fontFamily: 'var(--font-primary-arabic)'}}>
+             <div className={`mb-6 md:w-[370px] ${direction === 'rtl' ? 'ml-auto text-right' : 'mr-auto text-left'}`}>
+              <Label 
+                htmlFor="date-calc-type" 
+                className={`${designConfig.labelClass} ${direction === 'rtl' ? 'text-right' : 'text-left'}`}
+                style={{fontFamily: 'var(--font-primary-arabic)'}}
+              >
                 {t('calculator.selectDateType')}
               </Label>
               <Select
@@ -157,7 +168,10 @@ export default function CalculatorPage() {
                 value={selectedDateCalc}
                 onValueChange={(value) => setSelectedDateCalc(value as DateCalcType)}
               >
-                <SelectTrigger id="date-calc-type" className={`${designConfig.selectTriggerClass} text-right`}>
+                <SelectTrigger 
+                  id="date-calc-type" 
+                  className={`${designConfig.selectTriggerClass} ${direction === 'rtl' ? 'text-right' : 'text-left'}`}
+                >
                   <SelectValue placeholder={t('calculator.selectCalculation')} />
                 </SelectTrigger>
                 <SelectContent className={designConfig.selectContentClass}>

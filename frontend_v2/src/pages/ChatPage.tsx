@@ -5,7 +5,7 @@ import { useLanguage } from '@/hooks/useLanguage';
 import { useChat } from '@/hooks/api/useChat';
 import { ChatOptions } from '@/types/chat';
 import { Button } from '@/components/ui/button';
-import { Send, BookOpen, Plus, Trash2, Sidebar } from 'lucide-react';
+import { Send, Clock, Plus, Trash2, Sidebar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 // Import all the new and refactored components
@@ -66,11 +66,11 @@ export default function ChatPage() {
         <Button
             onClick={() => setView(view === 'history' ? 'welcome' : 'history')}
             className={cn(
-              "absolute top-5 right-5 h-8 px-4 text-xs gap-2",
+              "absolute top-5 right-5 h-8 px-4 text-xs gap-2 hover:text-white", // Added hover:text-white
               view === 'history' ? 'bg-cta text-white' : 'bg-[#F7F8FA] text-black'
             )}
         >
-            <BookOpen size={14} />
+            <Clock size={14} />
             {t('chat.historyButton')}
         </Button>
 
@@ -96,7 +96,7 @@ export default function ChatPage() {
                 dir="rtl"
               />
               <Button
-                className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 p-0"
+                className="absolute bg-cta border-primary-dark left-2 top-1/2 -translate-y-1/2 w-10 h-10 p-0"
                 onClick={(e) => {
                     const input = (e.currentTarget.previousSibling as HTMLInputElement);
                     if (input && input.value.trim()) {
@@ -104,7 +104,7 @@ export default function ChatPage() {
                     }
                 }}
               >
-                <Send size={20} />
+                <Send size={20} className="w-5 h-5 text-text-on-dark" fill="currentColor"  />
               </Button>
             </div>
           </div>

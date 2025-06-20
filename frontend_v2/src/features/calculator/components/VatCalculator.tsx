@@ -31,15 +31,15 @@ type VatOperation = 'total' | 'extract' | 'amount'; // From your original Calcul
 
 export const VatCalculator: React.FC<VatCalculatorProps> = ({ designConfig }) => {
   const { t, direction } = useLanguage();
-  const [vatAmountInput, setVatAmountInput] = useState(''); // Renamed to avoid conflict
+  const [vatAmountInput, setVatAmountInput] = useState('');
   const [vatRate, setVatRate] = useState('15');
-  const [vatResult, setVatResult] = useState<Partial<VATResult>>({}); // Use Partial as not all fields always present
+  const [vatResult, setVatResult] = useState<Partial<VATResult>>({});
   const [vatOperation, setVatOperation] = useState<VatOperation>('total');
 
   const operationOptions = [
-    { value: 'total', labelKey: 'calculator.vat.operation.total' }, // "حساب المبلغ مع الضريبة"
-    { value: 'extract', labelKey: 'calculator.vat.operation.extract' }, // "استخراج المبلغ الأصلي من مبلغ الضريبة"
-    { value: 'amount', labelKey: 'calculator.vat.operation.amount' },  // "حساب مبلغ الضريبة"
+    { value: 'total', labelKey: 'calculator.vat.operation.total' },
+    { value: 'extract', labelKey: 'calculator.vat.operation.extract' },
+    { value: 'amount', labelKey: 'calculator.vat.operation.amount' },
   ];
 
   const handleCalculateVat = () => {
@@ -52,7 +52,7 @@ export const VatCalculator: React.FC<VatCalculatorProps> = ({ designConfig }) =>
     let result: Partial<VATResult> = {};
 
     switch (vatOperation) {
-      case 'total': // User inputs amount WITHOUT VAT, we calculate total WITH VAT
+      case 'total':
         const netForTotal = amount;
         const vatForTotal = (netForTotal * rate) / 100;
         result = {
@@ -61,20 +61,19 @@ export const VatCalculator: React.FC<VatCalculatorProps> = ({ designConfig }) =>
           totalAmount: netForTotal + vatForTotal,
         };
         break;
-      case 'extract': // User inputs amount WITH VAT, we extract original and VAT amount
+      case 'extract':
         const totalForExtract = amount;
         const originalAmount = totalForExtract / (1 + rate / 100);
         const vatExtracted = totalForExtract - originalAmount;
         result = {
-          netAmount: originalAmount, // Original amount is net
+          netAmount: originalAmount,
           vatAmount: vatExtracted,
           totalAmount: totalForExtract,
         };
         break;
-      case 'amount': // User inputs amount (could be net or total depending on interpretation, design is ambiguous)
-                     // Let's assume user inputs TOTAL amount, and we calculate VAT portion and Net.
+      case 'amount':
         const totalForAmountCalc = amount;
-        const vatPortion = (totalForAmountCalc * rate) / (100 + rate); // VAT from total
+        const vatPortion = (totalForAmountCalc * rate) / (100 + rate);
         const netFromTotal = totalForAmountCalc - vatPortion;
         result = {
           netAmount: netFromTotal,
@@ -88,47 +87,45 @@ export const VatCalculator: React.FC<VatCalculatorProps> = ({ designConfig }) =>
   
   const handleResetVat = () => {
     setVatAmountInput('');
-    // setVatRate('15'); // Optionally reset rate
     setVatResult({});
-    // setVatOperation('total'); // Optionally reset operation
   };
-
 
   return (
     <div className="grid md:grid-cols-2 gap-6 md:gap-8 items-start" dir={direction}>
-      {/* Left Column (Result Display for VAT) */}
-      <div className={`${designConfig.resultDisplayContainerClass} ${direction === 'rtl' ? 'md:order-2' : 'md:order-1'}`}>
+      {/* Result Display Column (Styled Card) */}
+      <div className={`${designConfig.resultDisplayContainerClass} ${direction === 'rtl' ? 'md:order-2' : 'md:order-1'} bg-[#ECFFEA] rounded-lg p-6 min-h-[333px] flex flex-col justify-center`}>
         {Object.keys(vatResult).length > 0 && !vatResult.error ? (
-          <div className="w-full px-4">
+          <div className="w-full space-y-3">
             {vatResult.netAmount !== undefined && (
-              <div className={designConfig.resultSubValueRowClass}>
-                <span className={designConfig.resultSubValueAmountClass} style={{fontFamily: 'var(--font-primary-arabic)', direction: 'ltr'}}>{vatResult.netAmount.toFixed(2)}</span>
-                <span className={designConfig.resultSubValueLabelClass} style={{fontFamily: 'var(--font-primary-arabic)'}}>{t('calculator.vat.results.netAmountLabel')}</span> {/* القيمة */}
+              <div className={`${designConfig.resultSubValueRowClass} flex justify-between items-center`}>
+                <span className={`${designConfig.resultSubValueLabelClass} text-black`} style={{fontFamily: 'var(--font-primary-arabic)'}}>{t('calculator.vat.results.netAmountLabel')}</span>
+                <span className={`${designConfig.resultSubValueAmountClass} text-[#51B749]`} style={{fontFamily: 'var(--font-primary-arabic)', direction: 'ltr'}}>{vatResult.netAmount.toFixed(2)}</span>
               </div>
             )}
             {vatResult.vatAmount !== undefined && (
-              <div className={`${designConfig.resultSubValueRowClass} my-3 py-3 border-y ${vatResult.netAmount === undefined ? 'border-t-0' : 'border-resultTheme-divider'}`}>
-                <span className={designConfig.resultSubValueAmountClass} style={{fontFamily: 'var(--font-primary-arabic)', direction: 'ltr'}}>{vatResult.vatAmount.toFixed(2)}</span>
-                <span className={designConfig.resultSubValueLabelClass} style={{fontFamily: 'var(--font-primary-arabic)'}}>{t('calculator.vat.results.vatAmountLabel')}</span> {/* قيمة الضريبة */}
+              // Removed border classes for a cleaner look within the card, can be added back if needed
+              <div className={`${designConfig.resultSubValueRowClass} flex justify-between items-center py-3 my-3 border-y border-green-200`}>
+                <span className={`${designConfig.resultSubValueLabelClass} text-black`} style={{fontFamily: 'var(--font-primary-arabic)'}}>{t('calculator.vat.results.vatAmountLabel')}</span>
+                <span className={`${designConfig.resultSubValueAmountClass} text-[#51B749]`} style={{fontFamily: 'var(--font-primary-arabic)', direction: 'ltr'}}>{vatResult.vatAmount.toFixed(2)}</span>
               </div>
             )}
             {vatResult.totalAmount !== undefined && (
-              <div className={designConfig.resultSubValueRowClass}>
-                <span className={designConfig.resultSubValueAmountClass} style={{fontFamily: 'var(--font-primary-arabic)', direction: 'ltr'}}>{vatResult.totalAmount.toFixed(2)}</span>
-                <span className={designConfig.resultSubValueLabelClass} style={{fontFamily: 'var(--font-primary-arabic)'}}>{t('calculator.vat.results.totalAmountLabel')}</span> {/* المبلغ الكلي */}
+              <div className={`${designConfig.resultSubValueRowClass} flex justify-between items-center`}>
+                <span className={`${designConfig.resultSubValueLabelClass} text-black`} style={{fontFamily: 'var(--font-primary-arabic)'}}>{t('calculator.vat.results.totalAmountLabel')}</span>
+                <span className={`${designConfig.resultSubValueAmountClass} text-[#51B749]`} style={{fontFamily: 'var(--font-primary-arabic)', direction: 'ltr'}}>{vatResult.totalAmount.toFixed(2)}</span>
               </div>
             )}
           </div>
         ) : (
-          <>
-            <span className={designConfig.resultLabelClass}>{t('calculator.common.noResultYet')}</span>
-            {vatResult.error && <p className="text-sm text-red-500 mt-2">{vatResult.error}</p>}
-          </>
+          <div className="flex flex-col items-center justify-center text-center h-full">
+            <span className={`${designConfig.resultLabelClass} text-gray-600`} style={{fontFamily: 'var(--font-primary-arabic)'}}>{t('calculator.common.noResultYet')}</span>
+            {vatResult.error && <p className="text-sm text-red-500 mt-2" style={{fontFamily: 'var(--font-primary-arabic)'}}>{vatResult.error}</p>}
+          </div>
         )}
       </div>
 
-      {/* Right Column (Inputs for VAT) */}
-      <div className={`space-y-5 ${direction === 'rtl' ? 'md:order-1' : 'md:order-2'}`}>
+      {/* Inputs Column for VAT */}
+      <div className={`space-y-5 ${direction === 'rtl' ? 'md:order-1' : 'md:order-2'} flex flex-col`}>
         <div className={designConfig.fieldGroupClass}>
           <Label htmlFor="vatOperation" className={designConfig.labelClass} style={{fontFamily: 'var(--font-primary-arabic)'}}>
             {t('calculator.vat.operation.label')}
@@ -177,11 +174,12 @@ export const VatCalculator: React.FC<VatCalculatorProps> = ({ designConfig }) =>
           />
         </div>
 
-        <div className="flex gap-4 mt-6">
+        <div className="flex gap-4 mt-auto pt-4">
             <Button onClick={handleResetVat} variant="outline" className="w-full h-[42px] rounded-lg text-sm font-medium">
                 {t('calculator.common.reset')}
             </Button>
-            <Button onClick={handleCalculateVat} disabled={!vatAmountInput} className={designConfig.buttonClass}>
+            {/* Corrected Button syntax */}
+            <Button onClick={handleCalculateVat} disabled={!vatAmountInput} className={`${designConfig.buttonClass} w-full`}>
                 {t('calculator.vat.calculate')}
             </Button>
         </div>

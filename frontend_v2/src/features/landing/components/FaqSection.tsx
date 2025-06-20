@@ -26,8 +26,11 @@ const FaqToggleIcon = ({ isOpen }: { isOpen: boolean }) => {
   );
 };
 
+interface FaqSectionProps {
+  id?: string;
+}
 
-export const FaqSection = () => {
+export const FaqSection: React.FC<FaqSectionProps> = ({ id }) => {
   const { t, direction } = useLanguage();
   const [openIndex, setOpenIndex] = React.useState<number | null>(null);
 
@@ -69,7 +72,7 @@ export const FaqSection = () => {
   };
 
   return (
-    <section className="py-16 md:py-24 bg-background-body">
+    <section id={id} className="py-16 md:py-24 bg-background-body">
       <div className="max-w-7xl mx-auto px-6">
         <h2
           className="text-design-48-tight font-normal text-text-on-light-strong text-center mb-12 md:mb-16"

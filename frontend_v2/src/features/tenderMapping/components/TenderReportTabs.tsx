@@ -41,7 +41,7 @@ export const TenderReportTabs: React.FC<TenderReportTabsProps> = ({ result, onRe
 
   return (
     <div className="w-full">
-      <div className="text-center mb-6">
+      <div className={`text-center mb-6 ${direction === 'rtl' ? 'text-right' : 'text-left'}`} >
         <h2 className="text-2xl font-medium text-text-on-light-strong" style={{ fontFamily: 'var(--font-primary-arabic)' }}>
           {t('tenderMapping.results.title')}
         </h2>
@@ -51,7 +51,7 @@ export const TenderReportTabs: React.FC<TenderReportTabsProps> = ({ result, onRe
       </div>
       
       <Tabs defaultValue="details" dir={direction} className="w-full">
-        <TabsList className="w-full max-w-2xl mx-auto grid grid-cols-3">
+        <TabsList className="w-full grid grid-cols-3">
           {tabsData.map(tab => (
             <TabsTrigger key={tab.value} value={tab.value}>
               {t(tab.labelKey)}

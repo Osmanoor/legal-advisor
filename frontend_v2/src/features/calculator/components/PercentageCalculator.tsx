@@ -25,7 +25,7 @@ export const PercentageCalculator: React.FC<PercentageCalculatorProps> = ({ desi
   const handleCalculate = () => {
     setCalcResult({});
     if (!baseAmount || !newAmount || isNaN(Number(baseAmount)) || isNaN(Number(newAmount)) || Number(baseAmount) === 0) {
-      setCalcResult({ error: t('calculator.common.validation.invalidNumber') });
+      setCalcResult({ error: t('calculator.common.validation.invalidNumberOrZeroBase') });
       return;
     }
     const resultValue = ProcurementCalculator.calculatePercentageChange(
@@ -41,14 +41,13 @@ export const PercentageCalculator: React.FC<PercentageCalculatorProps> = ({ desi
     setCalcResult({});
   };
 
-  // Specific styles for Percentage Calculator based on the new design image
-  const labelStyle = "block mb-1.5 text-[14px] font-semibold text-text-on-light-strong text-right"; // Montserrat-Arabic, 14px, weight 400 (but design looks bolder like 500/600) -> using font-semibold
+  const labelStyle = "block mb-1.5 text-[14px] font-semibold text-text-on-light-strong text-right";
   const inputStyle = "h-[40px] rounded-lg border border-inputTheme-border bg-white shadow-input-shadow px-3 py-2 text-sm placeholder:text-inputTheme-placeholder focus:border-cta focus:ring-cta text-right placeholder:text-right";
-  const calculateButtonStyle = "w-full h-[42px] bg-cta text-white rounded-lg hover:bg-cta-hover text-[14px] font-normal"; // font-weight 400
-  const resetButtonStyle = "w-full h-[42px] rounded-lg text-sm font-normal border-cta text-cta hover:bg-cta/10 hover:text-cta-dark"; // Ensure cta-dark is defined or adjust hover
+  const calculateButtonStyle = "w-full h-[42px] bg-cta text-white rounded-lg hover:bg-cta-hover text-[14px] font-normal";
+  const resetButtonStyle = "w-full h-[42px] rounded-lg text-sm font-normal border-cta text-cta hover:bg-cta/10 hover:text-cta-dark";
 
   return (
-    <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-x-8 items-stretch`}>
+    <div className={`grid md:grid-cols-2 gap-6 md:gap-x-8 items-stretch`} dir={direction}>
       
       {/* Input Fields Area (Right column in RTL, Left in LTR) */}
       <div className={`flex flex-col justify-between space-y-5 ${direction === 'rtl' ? 'md:order-1' : 'md:order-2'}`}>
@@ -115,26 +114,29 @@ export const PercentageCalculator: React.FC<PercentageCalculatorProps> = ({ desi
         </div>
       </div>
 
-      {/* Result Display Area (Left column in RTL, Right in LTR) */}
+      {/* Result Display Area (Left column in RTL, Right in LTR) - Styled Card */}
       <div 
-        className={`bg-resultTheme-background rounded-lg min-h-[250px] md:h-full md:min-h-[333px] flex flex-col items-center justify-center text-center p-6 ${direction === 'rtl' ? 'md:order-2' : 'md:order-1'}`}
-        // CSS: background: #ECFFEA; border-radius: 8px; width: 367px; height: 333px;
+        className={`bg-[#ECFFEA] rounded-lg min-h-[333px] flex flex-col items-center justify-center text-center p-6 ${direction === 'rtl' ? 'md:order-2' : 'md:order-1'}`}
       >
-        <span 
-          className="text-[14px] font-normal text-text-on-light-strong mb-1" // القيمة: 14px, normal weight (400), black
-          style={{fontFamily: 'var(--font-primary-arabic)', fontWeight: 400, lineHeight: '20px'}}
-        >
-          {t('calculator.percentage.resultLabel')}
-        </span>
-        <span 
-          className="text-design-52 font-bold text-resultTheme-valueText leading-none mt-2" // 10.00%: 52px, bold, green #51B749
-          style={{fontFamily: 'var(--font-primary-arabic)', fontWeight: 'bold', direction: 'ltr' }}
-        >
-          {calcResult.percentage || "0.00%"}
-        </span>
-        {calcResult.error && <p className="text-sm text-red-500 mt-2">{calcResult.error}</p>}
+        {calcResult.error ? (
+          <p className="text-sm text-red-500 mt-2" style={{fontFamily: 'var(--font-primary-arabic)'}}>{calcResult.error}</p>
+        ) : (
+          <>
+            <span 
+              className="text-[14px] font-normal text-black mb-1" 
+              style={{fontFamily: 'var(--font-primary-arabic)', fontWeight: 400, lineHeight: '20px'}}
+            >
+              {t('calculator.percentage.resultLabel')}
+            </span>
+            <span 
+              className="text-5xl font-bold text-[#51B749] leading-none mt-2" 
+              style={{fontFamily: 'var(--font-primary-arabic)', fontWeight: 'bold', direction: 'ltr' }}
+            >
+              {calcResult.percentage !== undefined ? calcResult.percentage : "0.00%"}
+            </span>
+          </>
+        )}
       </div>
-
     </div>
   );
 };

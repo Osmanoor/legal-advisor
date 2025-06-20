@@ -5,28 +5,41 @@ import { useNavigate } from 'react-router-dom';
 import { Send } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import Slider from "react-slick"; // Import Slider from react-slick
 
 // Import your SVG vectors - ensure these paths are correct
 // Assuming you've edited the SVGs to remove top-level width/height attributes
 import HeroVectorLeft from '@/assets/vectors/hero-vector-left.svg';
 import HeroVectorRight from '@/assets/vectors/hero-vector-right.svg';
 
+// Import company logos
+import databricksLogo from '@/assets/company-logos/databricks.svg';
+import linearLogo from '@/assets/company-logos/linear.svg';
+import circusLogo from '@/assets/company-logos/circus.svg';
+import mercuryLogo from '@/assets/company-logos/mercury.svg';
+import remoteoLogo from '@/assets/company-logos/remoteo.svg';
+import bbLogo from '@/assets/company-logos/bb.svg';
+import otherLogo from '@/assets/company-logos/other.svg';
+
 const companyLogosData = [
-  // ... (company logos data remains the same)
-  { name: "DATABRICKS", src: "/src/assets/company-logos/databricks.svg" },
-  { name: "LINEAR", src: "/src/assets/company-logos/linear.svg" },
-  { name: "CIRCUS", src: "/src/assets/company-logos/circus.svg" },
-  { name: "MERCURY", src: "/src/assets/company-logos/mercury.svg" },
-  { name: "REMOTEO", src: "/src/assets/company-logos/remoteo.svg" },
-  { name: "BB", src: "/src/assets/company-logos/bb.svg" },
-  { name: "OTHER_LOGO", src: "/src/assets/company-logos/other.svg" },
+  { name: "DATABRICKS", src: databricksLogo },
+  { name: "LINEAR", src: linearLogo },
+  { name: "CIRCUS", src: circusLogo },
+  { name: "MERCURY", src: mercuryLogo },
+  { name: "REMOTEO", src: remoteoLogo },
+  { name: "BB", src: bbLogo },
+  { name: "OTHER_LOGO", src: otherLogo },
 ];
 
-export const NewHeroSection = () => {
+interface NewHeroSectionProps {
+  id?: string;
+}
+
+export const NewHeroSection: React.FC<NewHeroSectionProps> = ({ id }) => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [prompt, setPrompt] = React.useState('');
-  const headerHeight = 76;
+  const headerHeight = 6;
 
   const handleSubmit = () => {
     if (prompt.trim()) {
@@ -34,10 +47,24 @@ export const NewHeroSection = () => {
     }
   };
 
-  const duplicatedLogos = [...companyLogosData, ...companyLogosData, ...companyLogosData];
+  const sliderSettings = {
+    dots: false,
+    arrows: false,
+    infinite: true,
+    speed: 4000, // Adjust for desired scroll speed (higher value = slower)
+    autoplay: true,
+    autoplaySpeed: 0, // For continuous scroll with cssEase: 'linear'
+    cssEase: 'linear',
+    variableWidth: true, // Allows logos to have their natural width
+    slidesToScroll: 1,
+    pauseOnHover: true,
+    swipeToSlide: true, // Allows dragging
+    // No slidesToShow needed when variableWidth is true, as it's determined by content width
+  };
 
   return (
     <div
+      id={id} // Apply the id prop here
       className="relative w-full h-[900px] bg-primary-600 flex flex-col items-center text-center overflow-hidden"
       style={{
         paddingTop: `${headerHeight}px`,
@@ -96,16 +123,15 @@ export const NewHeroSection = () => {
             >
               {t('landingPage.hero.aiAssistantTitle')}
             </p>
-            <div className="relative w-full h-[58px] bg-white border border-border-input shadow-md rounded-2xl flex items-center 
-                            pl-2 pr-4 ">
+            {/* Simplified container div, Input component now carries most styles */}
+            <div className="relative w-full">
               <Input
                 type="text"
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 onKeyPress={(e) => { if (e.key === 'Enter') { handleSubmit(); } }}
                 placeholder={t('landingPage.hero.aiAssistantPlaceholder')}
-                className="w-full h-full bg-transparent border-none focus:ring-0
-                           text-right placeholder-text-on-light-placeholder text-[14px] leading-[21px]"
+                className="w-full h-[58px] bg-white border border-border-input rounded-2xl shadow-md pr-5 pl-16 text-right text-sm placeholder:text-text-on-light-placeholder focus:ring-0 leading-[21px]"
                 dir="rtl"
                 style={{ fontFamily: 'var(--font-primary-arabic)', fontWeight: 300 }}
               />
@@ -117,7 +143,7 @@ export const NewHeroSection = () => {
                            flex items-center justify-center 
                            border border-primary-dark shadow-md"
               >
-                <Send className="w-5 h-5 text-text-on-dark" />
+                <Send className="w-5 h-5 text-text-on-dark" fill="currentColor" />
               </Button>
             </div>
           </div>
@@ -126,25 +152,28 @@ export const NewHeroSection = () => {
 
       {/* Company Logos Scroller */}
       <div className="absolute bottom-0 left-0 w-full py-5 z-10 overflow-hidden">
-        {/* ... (logo scroller code remains the same as the previous version) ... */}
         <p
-          className="text-xl md:text-[22px] text-white/65 mb-4 text-center"
+          className="text-xl md:text-[22px] text-white/65 py-6 mb-4 text-center"
           style={{ fontFamily: 'var(--font-primary-arabic)', fontWeight: 300, letterSpacing: '-0.44px', lineHeight: '26px' }}
         >
           {t('landingPage.hero.trustedBy')}
         </p>
-        <div className="relative w-full max-w-[1200px] mx-auto h-[48px] overflow-hidden px-10 md:px-16">
-          <div className="animate-continuous-marquee flex whitespace-nowrap h-full">
-            {duplicatedLogos.map((logo, index) => (
-              <div key={`logo-set-${index}-${logo.name}`} className="inline-flex items-center justify-center mx-8 h-full flex-shrink-0">
+        {/* Container for the react-slick slider */}
+        <div className="relative w-full max-w-[1200px] mx-auto h-[48px] px-2 sm:px-4"> {/* Adjusted padding for slider */}
+          <Slider {...sliderSettings}>
+            {companyLogosData.map((logo, index) => (
+              // Each child of Slider should be a div for proper styling by react-slick
+              <div key={`${logo.name}-${index}`} style={{  }}> {/* Added padding for spacing between logos */}
                 <img
                   src={logo.src}
                   alt={logo.name}
-                  className="h-6 md:h-8 max-w-[150px] object-contain brightness-0 invert"
+                  className="h-6 md:h-8 max-w-[150px] object-contain brightness-0 invert mx-8"
+                  // Ensure image is vertically centered if slide div is taller
+                  style={{ display: 'inline-block', verticalAlign: 'middle' }} 
                 />
               </div>
             ))}
-          </div>
+          </Slider>
         </div>
       </div>
     </div>

@@ -6,35 +6,35 @@
 /* --- MONTSERRAT ARABIC --- */
 @font-face {
   font-family: 'Montserrat-Arabic';
-  src: url('/fonts/MontserratArabic-Light.woff2') format('woff2'); /* Adjust filename if different */
+  src: url('/fonts/Montserrat-Arabic-Light.woff2') format('woff2'); /* Adjust filename if different */
   font-weight: 300;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'Montserrat-Arabic';
-  src: url('/fonts/MontserratArabic-Regular.woff2') format('woff2'); /* Adjust filename if different */
+  src: url('/fonts/Montserrat-Arabic-Regular.woff2') format('woff2'); /* Adjust filename if different */
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'Montserrat-Arabic';
-  src: url('/fonts/MontserratArabic-Medium.woff2') format('woff2'); /* Adjust filename if different */
+  src: url('/fonts/Montserrat-Arabic-Medium.woff2') format('woff2'); /* Adjust filename if different */
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'Montserrat-Arabic';
-  src: url('/fonts/MontserratArabic-SemiBold.woff2') format('woff2'); /* Adjust filename if different */
+  src: url('/fonts/Montserrat-Arabic-SemiBold.woff2') format('woff2'); /* Adjust filename if different */
   font-weight: 600;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'Montserrat-Arabic';
-  src: url('/fonts/MontserratArabic-Bold.woff2') format('woff2'); /* Adjust filename if different */
+  src: url('/fonts/Montserrat-Arabic-Bold.woff2') format('woff2'); /* Adjust filename if different */
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -179,12 +179,5 @@
   }
   .filter-blur-10-5 {
     filter: blur(10.5px);
-  }
-  .animate-continuous-marquee {
-    animation: continuousMarquee 30s linear infinite; /* Adjust duration */
-  }
-  @keyframes continuousMarquee {
-    0% { transform: translateX(0%); }
-    100% { transform: translateX(-50%); } /* This assumes the content inside is doubled */
   }
 }

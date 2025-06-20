@@ -48,44 +48,9 @@ export const AmountPercentageCalculator: React.FC<AmountPercentageCalculatorProp
   };
 
   return (
-    <div className="grid md:grid-cols-2 gap-6 md:gap-8 items-start" dir={direction}>
-      {/* Left Column (Result Display) */}
-      <div className={`${designConfig.resultDisplayContainerClass} ${direction === 'rtl' ? 'md:order-2' : 'md:order-1'}`}>
-        {Object.keys(calcResult).length > 0 && !calcResult.error ? (
-          <div className="w-full px-4">
-            {calcResult.originalAmount !== undefined && (
-              <div className={designConfig.resultSubValueRowClass}>
-                <span className={designConfig.resultSubValueAmountClass} style={{fontFamily: 'var(--font-primary-arabic)', direction: 'ltr'}}>{calcResult.originalAmount.toFixed(2)}</span>
-                <span className={designConfig.resultSubValueLabelClass} style={{fontFamily: 'var(--font-primary-arabic)'}}>{t('calculator.amountPercentage.results.originalAmountLabel')}</span> {/* القيمة */}
-              </div>
-            )}
-            {calcResult.adjustmentAmount !== undefined && (
-              <div className={`${designConfig.resultSubValueRowClass} my-3 py-3 border-y ${calcResult.originalAmount === undefined ? 'border-t-0' : 'border-resultTheme-divider'}`}>
-                <span className={designConfig.resultSubValueAmountClass} style={{fontFamily: 'var(--font-primary-arabic)', direction: 'ltr'}}>
-                  {calcResult.adjustmentAmount.toFixed(2)} 
-                  {/* Display percentage used for adjustment if available and makes sense */}
-                  {percentage ? ` (${percentage}%)` : ''}
-                </span>
-                <span className={designConfig.resultSubValueLabelClass} style={{fontFamily: 'var(--font-primary-arabic)'}}>{t('calculator.amountPercentage.results.adjustmentAmountLabel')}</span> {/* قيمة التعديل */}
-              </div>
-            )}
-            {calcResult.finalAmount !== undefined && (
-              <div className={designConfig.resultSubValueRowClass}>
-                <span className={designConfig.resultSubValueAmountClass} style={{fontFamily: 'var(--font-primary-arabic)', direction: 'ltr'}}>{calcResult.finalAmount.toFixed(2)}</span>
-                <span className={designConfig.resultSubValueLabelClass} style={{fontFamily: 'var(--font-primary-arabic)'}}>{t('calculator.amountPercentage.results.finalAmountLabel')}</span> {/* القيمة النهائية */}
-              </div>
-            )}
-          </div>
-        ) : (
-           <>
-            <span className={designConfig.resultLabelClass}>{t('calculator.common.noResultYet')}</span>
-            {calcResult.error && <p className="text-sm text-red-500 mt-2">{calcResult.error}</p>}
-          </>
-        )}
-      </div>
-
-      {/* Right Column (Inputs) */}
-      <div className={`space-y-6 ${direction === 'rtl' ? 'md:order-1' : 'md:order-2'}`}>
+    <div className="grid md:grid-cols-2 gap-6 md:gap-8 items-stretch" dir={direction}>
+      {/* Column 1: Inputs and Buttons */}
+      <div className="space-y-6 flex flex-col">
         <div className={designConfig.fieldGroupClass}>
           <Label htmlFor="amountPercAmount" className={designConfig.labelClass} style={{fontFamily: 'var(--font-primary-arabic)'}}>
             {t('calculator.amountPercentage.amountLabel')}
@@ -116,14 +81,49 @@ export const AmountPercentageCalculator: React.FC<AmountPercentageCalculatorProp
           />
         </div>
 
-        <div className="flex gap-4 mt-6">
+        <div className="flex gap-4 mt-auto pt-4"> {/* mt-auto to push buttons to bottom if column is taller */}
             <Button onClick={handleReset} variant="outline" className="w-full h-[42px] rounded-lg text-sm font-medium">
                 {t('calculator.common.reset')}
             </Button>
-            <Button onClick={handleCalculate} disabled={!amount || !percentage} className={designConfig.buttonClass}>
+            <Button onClick={handleCalculate} disabled={!amount || !percentage} className={`${designConfig.buttonClass} w-full`}>
                 {t('calculator.amountPercentage.calculate')}
             </Button>
         </div>
+      </div>
+
+      {/* Column 2: Result Card */}
+      <div className="bg-[#ECFFEA] rounded-lg p-6 flex flex-col items-center justify-center min-h-[333px]">
+        {calcResult.error ? (
+          <p className="text-sm text-red-500 text-center" style={{fontFamily: 'var(--font-primary-arabic)'}}>
+            {calcResult.error}
+          </p>
+        ) : Object.keys(calcResult).length > 0 && calcResult.finalAmount !== undefined ? (
+          <>
+            <span 
+              className="text-black text-sm text-center mb-3" 
+              style={{fontFamily: 'var(--font-primary-arabic)', fontWeight: 400, lineHeight: '20px'}}
+            >
+              {t('calculator.amountPercentage.results.finalAmountLabel')} {/* Using existing label, or a new one like "النتيجة" */}
+            </span>
+            <span 
+              className="text-[#51B749] text-5xl text-center font-normal" 
+              style={{fontFamily: 'var(--font-primary-arabic)', fontWeight: 400, lineHeight: '1.2'}} /* Adjusted line height for readability */
+            >
+              {calcResult.finalAmount.toFixed(2)}
+            </span>
+            {/* Optionally, display original amount and adjustment if needed, though the design implies one main result */}
+            {/* 
+            <div className="text-xs text-gray-600 mt-4 text-center">
+              <p>{t('calculator.amountPercentage.results.originalAmountLabel')}: {calcResult.originalAmount?.toFixed(2)}</p>
+              <p>{t('calculator.amountPercentage.results.adjustmentAmountLabel')}: {calcResult.adjustmentAmount?.toFixed(2)} ({percentage}%)</p>
+            </div>
+            */}
+          </>
+        ) : (
+          <span className="text-gray-500 text-center" style={{fontFamily: 'var(--font-primary-arabic)'}}>
+            {t('calculator.common.noResultYet')}
+          </span>
+        )}
       </div>
     </div>
   );

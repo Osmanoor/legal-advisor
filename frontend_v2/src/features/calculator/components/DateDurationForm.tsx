@@ -25,30 +25,34 @@ export const DateDurationForm: React.FC<DateDurationFormProps> = ({ designConfig
   const [durationDays, setDurationDays] = useState('');
   const [durationMonths, setDurationMonths] = useState('');
   const [durationYears, setDurationYears] = useState('');
-  const [calculatedEndDate, setCalculatedEndDate] = useState('');
+  // Updated state for separate dates
+  const [calculatedGregorianDate, setCalculatedGregorianDate] = useState<string | null>(null);
+  const [calculatedHijriDate, setCalculatedHijriDate] = useState<string | null>(null);
   const [durationError, setDurationError] = useState<string | null>(null);
 
   const handleCalculateEndDate = () => {
     setDurationError(null);
-    setCalculatedEndDate('');
+    setCalculatedGregorianDate(null); // Reset dates
+    setCalculatedHijriDate(null);
+
     if (!startDate) {
       setDurationError(t('calculator.common.validation.enterStartDate'));
       return;
     }
-    // Ensure at least one duration field is a valid number or empty, but not just text
     const dDays = durationDays ? parseInt(durationDays) : 0;
     const dMonths = durationMonths ? parseInt(durationMonths) : 0;
     const dYears = durationYears ? parseInt(durationYears) : 0;
 
-    if (isNaN(dDays) || isNaN(dMonths) || isNaN(dYears) ) {
+    if (isNaN(dDays) || isNaN(dMonths) || isNaN(dYears)) {
         setDurationError(t('calculator.common.validation.invalidNumber'));
         return;
     }
-     if (dDays === 0 && dMonths === 0 && dYears === 0 && (!durationDays && !durationMonths && !durationYears) ) {
+    // Check if all duration fields are effectively zero or empty
+    if (dDays === 0 && dMonths === 0 && dYears === 0 && 
+        durationDays.trim() === '' && durationMonths.trim() === '' && durationYears.trim() === '') {
          setDurationError(t('calculator.date.duration.validation.required'));
          return;
      }
-
 
     try {
       const start = DateTime.fromISO(startDate);
@@ -67,15 +71,18 @@ export const DateDurationForm: React.FC<DateDurationFormProps> = ({ designConfig
       const gregorianResult = DateTime.fromJSDate(result).toISODate();
       const hijriResult = DateConverter.gregorianToHijri(result);
       
-      if (gregorianResult && hijriResult) {
-        setCalculatedEndDate(t('calculator.date.duration.resultFormat', { gregorian: gregorianResult, hijri: hijriResult }));
-      } else {
-        setCalculatedEndDate(t('calculator.common.error'));
+      if (gregorianResult) {
+        setCalculatedGregorianDate(gregorianResult);
+      }
+      if (hijriResult) {
+        setCalculatedHijriDate(hijriResult);
+      }
+      if (!gregorianResult && !hijriResult) {
+        setDurationError(t('calculator.common.error'));
       }
 
     } catch (e) {
       setDurationError(t('calculator.common.error'));
-      setCalculatedEndDate('');
       console.error("Date duration error:", e);
     }
   };
@@ -85,28 +92,66 @@ export const DateDurationForm: React.FC<DateDurationFormProps> = ({ designConfig
     setDurationDays('');
     setDurationMonths('');
     setDurationYears('');
-    setCalculatedEndDate('');
+    setCalculatedGregorianDate(null);
+    setCalculatedHijriDate(null);
     setDurationError(null);
   };
 
   return (
-    <div className="grid md:grid-cols-2 gap-6 md:gap-8 items-start" dir={direction}>
-      {/* Left Column (Result Display) */}
-      <div className={`${designConfig.resultDisplayContainerClass} ${direction === 'rtl' ? 'md:order-2' : 'md:order-1'}`}>
-        <span className={designConfig.resultLabelClass} style={{fontFamily: 'var(--font-primary-arabic)'}}>
-          {t('calculator.date.duration.resultLabel')}
-        </span>
-        <span 
-            className={`${designConfig.resultValueClass} text-xl sm:text-2xl md:text-3xl break-all`} // Smaller font, break-all for long string
-            style={{fontFamily: 'var(--font-primary-arabic)', direction: 'ltr', lineHeight: '1.4'}}
-        >
-          {calculatedEndDate || t('calculator.date.duration.resultPlaceholder')}
-        </span>
-        {durationError && <p className="text-sm text-red-500 mt-2">{durationError}</p>}
+    <div className="grid md:grid-cols-2 gap-6 md:gap-8 items-stretch" dir={direction}> {/* items-stretch */}
+      {/* Result Display Column (Styled Card) */}
+      <div 
+        className={`bg-[#ECFFEA] rounded-lg p-6 min-h-[333px] flex flex-col items-center justify-center text-center ${direction === 'rtl' ? 'md:order-2' : 'md:order-1'}`}
+      >
+        {durationError ? (
+          <p className="text-sm text-red-500" style={{fontFamily: 'var(--font-primary-arabic)'}}>{durationError}</p>
+        ) : calculatedGregorianDate || calculatedHijriDate ? (
+          <div className="space-y-4">
+            {calculatedGregorianDate && (
+              <div>
+                <span className="block text-black text-sm font-medium" style={{fontFamily: 'var(--font-primary-arabic)'}}>
+                  {t('calculator.date.duration.gregorianResultLabel')}
+                </span>
+                <span className="block text-[#51B749] text-3xl font-bold" style={{fontFamily: 'var(--font-primary-arabic)', direction: 'ltr'}}>
+                  {calculatedGregorianDate}
+                </span>
+              </div>
+            )}
+            {calculatedHijriDate && (
+              <div>
+                <span className="block text-black text-sm font-medium" style={{fontFamily: 'var(--font-primary-arabic)'}}>
+                  {t('calculator.date.duration.hijriResultLabel')}
+                </span>
+                <span className="block text-[#51B749] text-3xl font-bold" style={{fontFamily: 'var(--font-primary-arabic)', direction: 'rtl'}}>
+                  {calculatedHijriDate}
+                </span>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div>
+              <span className="block text-gray-600 text-sm font-medium" style={{fontFamily: 'var(--font-primary-arabic)'}}>
+                {t('calculator.date.duration.gregorianResultLabel')}
+              </span>
+              <span className="block text-gray-400 text-3xl font-bold" style={{fontFamily: 'var(--font-primary-arabic)', direction: 'ltr'}}>
+                {t('calculator.date.placeholder.gregorian')}
+              </span>
+            </div>
+            <div>
+              <span className="block text-gray-600 text-sm font-medium" style={{fontFamily: 'var(--font-primary-arabic)'}}>
+                {t('calculator.date.duration.hijriResultLabel')}
+              </span>
+              <span className="block text-gray-400 text-3xl font-bold" style={{fontFamily: 'var(--font-primary-arabic)', direction: 'rtl'}}>
+                {t('calculator.date.placeholder.hijri')}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Right Column (Inputs) */}
-      <div className={`space-y-6 ${direction === 'rtl' ? 'md:order-1' : 'md:order-2'}`}>
+      {/* Inputs Column */}
+      <div className={`space-y-6 ${direction === 'rtl' ? 'md:order-1' : 'md:order-2'} flex flex-col`}>
         <div className={designConfig.fieldGroupClass}>
           <Label htmlFor="duration-start-date" className={designConfig.labelClass} style={{fontFamily: 'var(--font-primary-arabic)'}}>
             {t('calculator.date.duration.start')}
@@ -118,7 +163,6 @@ export const DateDurationForm: React.FC<DateDurationFormProps> = ({ designConfig
             <Label className={designConfig.labelClass} style={{fontFamily: 'var(--font-primary-arabic)'}}>
                 {t('calculator.date.duration.duration.label')}
             </Label>
-            {/* Inputs for years, months, days aligned to the right due to parent's text-right */}
             <div className={`grid grid-cols-3 gap-3 ${direction === 'rtl' ? '' : 'text-left'}`}>
                 <div>
                     <Input type="number" min="0" value={durationYears} onChange={(e) => setDurationYears(e.target.value)} placeholder={t('calculator.date.duration.duration.years')} className={`${designConfig.inputClass} text-center`} dir="rtl"/>
@@ -131,11 +175,11 @@ export const DateDurationForm: React.FC<DateDurationFormProps> = ({ designConfig
                 </div>
             </div>
         </div>
-        <div className="flex gap-4 mt-6">
+        <div className="flex gap-4 mt-auto pt-4"> {/* mt-auto to push buttons to bottom */}
             <Button onClick={handleReset} variant="outline" className="w-full h-[42px] rounded-lg text-sm font-medium">
                 {t('calculator.common.reset')}
             </Button>
-            <Button onClick={handleCalculateEndDate} disabled={!startDate || (!durationDays && !durationMonths && !durationYears)} className={designConfig.buttonClass}>
+            <Button onClick={handleCalculateEndDate} disabled={!startDate || (durationDays.trim() === '' && durationMonths.trim() === '' && durationYears.trim() === '')} className={`${designConfig.buttonClass} w-full`}>
                 {t('calculator.date.duration.calculate')}
             </Button>
         </div>

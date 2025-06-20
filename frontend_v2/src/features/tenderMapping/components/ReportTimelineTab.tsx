@@ -97,7 +97,7 @@ export const ReportTimelineTab: React.FC<ReportTimelineTabProps> = ({ stages: in
                   <div className="w-0.5 h-24 bg-gray-300 -mt-1"></div>
                 )}
               </div>
-              <div className="flex-grow pb-12 -mt-1">
+              <div className="flex-grow pb-12 -mt-1 px-4">
                 <EditableTimelineStage
                   stage={stage}
                   isEditing={editingStageId === stage.id}

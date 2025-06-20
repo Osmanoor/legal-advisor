@@ -10,7 +10,11 @@ interface StickySectionDetail {
   altTextKey: string; // Still good for accessibility
 }
 
-export const StickyCardsSection = () => {
+interface StickyCardsSectionProps {
+  id?: string;
+}
+
+export const StickyCardsSection: React.FC<StickyCardsSectionProps> = ({ id }) => {
   const { t, direction } = useLanguage();
 
   const sections: StickySectionDetail[] = [
@@ -35,7 +39,7 @@ export const StickyCardsSection = () => {
   ];
 
   return (
-    <section className="py-16 md:py-24 bg-background-body">
+    <section id={id} className="py-16 md:py-24 bg-background-body">
       <div className="max-w-7xl mx-auto px-6">
         {/* Main flex container for the two columns */}
         <div className={`flex flex-col md:flex-row ${direction === 'rtl' ? 'md:flex-row' : ''} gap-12 md:gap-20 lg:gap-32`}>

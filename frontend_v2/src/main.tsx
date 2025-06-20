@@ -4,6 +4,8 @@ import { createRoot } from 'react-dom/client';
 import ReactGA from 'react-ga4'; // Import ReactGA
 import './index.css';
 import App from './App.tsx';
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 // --- Google Analytics Initialization ---
 const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;

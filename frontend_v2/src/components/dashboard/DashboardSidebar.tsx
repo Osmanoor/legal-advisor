@@ -20,7 +20,7 @@ export const DashboardSidebar = () => {
     { path: '/chat', labelKey: 'navigation.chat', textAr: 'المساعد الذكي', iconName: 'chat' },
     { path: '/calculator', labelKey: 'navigation.calculator', textAr: 'الالة الحاسبة', iconName: 'calculator' },
     { path: '/correction', labelKey: 'navigation.correction', textAr: 'معالج النصوص', iconName: 'correction' },
-    { path: '/templates', labelKey: 'navigation.templates', textAr: 'نظام الطرح', iconName: 'templates' },
+    { path: '/tender-mapping', labelKey: 'navigation.templates', textAr: 'نظام الطرح', iconName: 'templates' },
   ];
 
   const secondaryNavItems = [

@@ -5,30 +5,68 @@ import { useLanguage } from '@/hooks/useLanguage';
 import NewLogoLight from '@/assets/logo-new-light.svg'; // Assuming light logo for hero
 // No dark logo needed here as this header is only for landing page hero
 
-const LANDING_HEADER_SCROLL_THRESHOLD_SOLID = 850; // When to make header solid with hero bg
+const LANDING_HEADER_SCROLL_THRESHOLD_SOLID = 50; // When to make header solid with hero bg
 
 export const LandingPageHeader = () => {
   const { t, language, direction } = useLanguage();
-  const location = useLocation(); // To confirm it's landing page, though this comp is specific
+  const location = useLocation(); // Provides the current location object
   const [useSolidHeroBg, setUseSolidHeroBg] = useState(false);
 
   const headerNavigationItems = [
-    { path: '/user-reviews', labelKey: 'navigation.userReviews', textAr: 'أراء المستخدمين', textEn: 'Reviews' },
-    { path: '/faq', labelKey: 'navigation.faq', textAr: 'الأسئلة الشائعة', textEn: 'FAQ' },
-    { path: '/what-sets-us-apart', labelKey: 'navigation.whatSetsUsApart', textAr: 'ما يميزنا', textEn: 'Features' },
-    { path: '/solutions', labelKey: 'navigation.solutions', textAr: 'حلولنا', textEn: 'Solutions' },
-    { path: '/', labelKey: 'navigation.home', textAr: 'الرئيسية', textEn: 'Home', isBold: true },
+    { id: 'faq', path: '#faq', labelKey: 'navigation.faq', textAr: 'الأسئلة الشائعة', textEn: 'FAQ' },
+    { id: 'reviews', path: '#reviews', labelKey: 'navigation.userReviews', textAr: 'أراء المستخدمين', textEn: 'Reviews' },
+    { id: 'features', path: '#features', labelKey: 'navigation.whatSetsUsApart', textAr: 'ما يميزنا', textEn: 'Features' },
+    { id: 'solutions', path: '#solutions', labelKey: 'navigation.solutions', textAr: 'حلولنا', textEn: 'Solutions' },
+    { id: 'home', path: '#home', labelKey: 'navigation.home', textAr: 'الرئيسية', textEn: 'Home', isBold: true },
   ];
-  const isActive = (path: string) => location.pathname === path;
+
+  const isActive = (itemPath: string) => {
+    const currentHash = location.hash;
+    if (itemPath === '#home') {
+      return currentHash === '' || currentHash === '#home';
+    }
+    return currentHash === itemPath;
+  };
 
   useEffect(() => {
-    const handleScroll = () => {
+    const handleScrollListener = () => {
       setUseSolidHeroBg(window.scrollY > LANDING_HEADER_SCROLL_THRESHOLD_SOLID);
     };
-    window.addEventListener('scroll', handleScroll);
-    handleScroll(); // Initial check
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScrollListener);
+    handleScrollListener(); // Initial check
+    return () => {
+      window.removeEventListener('scroll', handleScrollListener);
+    };
   }, []);
+
+  const handleNavClick = (event: React.MouseEvent<HTMLAnchorElement>, path: string) => {
+    event.preventDefault();
+    const targetId = path.substring(1); // Remove #
+    const targetElement = document.getElementById(targetId);
+
+    console.log('Attempting to scroll to:', targetId, 'Found element:', targetElement); // DEBUGGING LINE
+
+    if (targetElement) {
+      const headerElement = document.querySelector('header'); // Assuming this is your fixed header
+      const headerOffset = headerElement ? headerElement.offsetHeight : 0;
+      
+      // Calculate position of target element relative to the document
+      const elementPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
+      const offsetPosition = elementPosition - headerOffset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+
+      // Update the URL hash. This should trigger useLocation to update.
+      if (location.hash !== path) {
+        window.location.hash = path;
+      }
+    } else {
+      console.warn(`Element with ID "${targetId}" not found. Please ensure the ID exists on the target section in LandingPage.tsx and that the component is rendered.`);
+    }
+  };
 
   const headerDynamicStyles: React.CSSProperties = useSolidHeroBg ? {
     backgroundImage: "url('/images/hero-background.jpg')",
@@ -42,15 +80,15 @@ export const LandingPageHeader = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 py-3.5 transition-all duration-300 ${headerExtraClasses}`}
+      className={`fixed top-0 left-0 right-0 z-50 py-3.5 transition-shadow duration-300 ${headerExtraClasses}`}
       style={headerDynamicStyles}
     >
       <div className="max-w-7xl mx-auto px-10 sm:px-6 lg:px-16">
         <div className="flex justify-between items-center h-[45px]">
           <div className={`${direction === 'rtl' ? 'order-3' : 'order-1'}`}>
             <Link
-              to="/start-now" // This should lead to the dashboard, e.g., /chat or /dashboard
-              className="bg-cta hover:bg-cta-hover text-text-on-dark font-bold text-[15px] leading-[18px] px-10 py-3 rounded-lg transition-colors"
+              to="/chat" // This should lead to the dashboard, e.g., /chat or /dashboard
+              className="bg-cta text-text-on-dark hover:bg-primary-light hover:text-primary font-bold text-[15px] leading-[18px] px-10 py-3 rounded-lg transition-colors"
               style={{ fontFamily: language === 'ar' ? 'var(--font-primary-arabic)' : 'var(--font-primary-latin)' }}
             >
               {t('landingPage.hero.startNowButton')}
@@ -60,7 +98,8 @@ export const LandingPageHeader = () => {
             {headerNavigationItems.map((item) => (
               <Link
                 key={item.path}
-                to={item.path}
+                to={item.path} // Keep for semantics, onClick handles actual navigation
+                onClick={(e) => handleNavClick(e, item.path)}
                 className={`text-[15px] leading-[18px] transition-colors text-gray-200 hover:text-white
                             ${isActive(item.path) ? 'text-white font-bold' : ''}
                             ${item.isBold ? 'font-bold text-[18px] leading-[22px]' : ''}`}

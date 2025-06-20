@@ -53,9 +53,9 @@ export const EditableTimelineStage: React.FC<EditableTimelineStageProps> = ({
           <p className="text-sm font-medium text-text-on-light-strong" style={{ fontFamily: 'var(--font-primary-arabic)' }}>
             {stage.name}
           </p>
-          <div className="flex items-center justify-end gap-2 mt-1 text-xs text-text-on-light-muted">
+          <div className="flex items-center flex-row-reverse justify-end gap-2 mt-1 text-xs text-text-on-light-muted">
             <span>{`${stage.start_date} إلى ${stage.end_date} (${stage.duration} أيام)`}</span>
-            <Calendar size={14} />
+            <Calendar size={14} className='text-cta'/>
           </div>
         </div>
         

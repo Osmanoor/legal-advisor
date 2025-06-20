@@ -104,7 +104,7 @@ export const CorrectionEditor: React.FC<CorrectionEditorProps> = ({
         )}
 
         {state === 'corrected' && (
-          <div className="relative flex-grow bg-resultTheme-background p-4 h-full min-h-[350px]" dir="rtl">
+          <div className="relative flex-grow bg-[#ECFFEA] p-4 h-full min-h-[350px]" dir="rtl">
             <Button
               variant="ghost"
               size="icon"

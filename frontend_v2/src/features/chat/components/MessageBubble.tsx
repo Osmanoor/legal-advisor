@@ -25,26 +25,28 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
   };
 
   const actionButtons = [
-    { Icon: RotateCw, label: t('chat.actions.regenerate') },
-    { Icon: Copy, label: t('chat.actions.copy') },
-    { Icon: Share2, label: t('chat.actions.share') },
-    { Icon: Bookmark, label: t('chat.actions.bookmark') },
     { Icon: MoreVertical, label: 'More' },
+    { Icon: Bookmark, label: t('chat.actions.bookmark') },
+    { Icon: Share2, label: t('chat.actions.share') },
+    { Icon: Copy, label: t('chat.actions.copy') },
+    { Icon: RotateCw, label: t('chat.actions.regenerate') },
   ];
 
   if (isUser) {
     return (
-      <div className="flex items-start gap-3 justify-end">
-        <div className="flex flex-col items-end max-w-[80%]">
+      <div className="flex items-start gap-3 justify-start">
+        <img src={UserAvatar} alt="User Avatar" className="w-6 h-6 rounded-full mt-8" />
+        <div className="flex flex-col items-start max-w-[80%]">
           <div className="flex items-center gap-3 mb-2">
-            <span className="text-xs text-text-on-light-muted">{formatTimestamp(message.timestamp)}</span>
             <span className="text-sm font-medium text-text-on-light-strong">Masy Hathore</span>
+            <span className="inline-block w-px h-4 bg-gray-300 mx-2"></span> {/* Added vertical line */}
+            <span className="text-xs text-text-on-light-muted">{formatTimestamp(message.timestamp)}</span>
           </div>
           <p className="bg-white border border-border-default rounded-xl rounded-br-none p-4 text-sm text-text-on-light-muted text-right">
             {message.content}
           </p>
         </div>
-        <img src={UserAvatar} alt="User Avatar" className="w-6 h-6 rounded-full mt-8" />
+        
       </div>
     );
   }
@@ -54,10 +56,11 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
     <div className="flex items-start gap-3">
       <img src={AssistantAvatar} alt="Assistant Avatar" className="w-6 h-6 rounded-full mt-8" />
       <div className="flex-1 max-w-[80%] bg-white border border-border-default rounded-xl rounded-bl-none p-4 md:p-6">
-        <div className="flex flex-col items-end">
-          <div className="flex items-center gap-3 mb-2 w-full justify-end">
+        <div className="flex flex-col items-start">
+          <div className="flex items-center gap-3 mb-2 w-full justify-start">
+            <span className="text-sm font-medium text-text-on-light-strong">{t('landingPage.solutions.aiAssistant.title')}</span>
+            <span className="inline-block w-px h-4 bg-gray-300 mx-2"></span> {/* Added vertical line */}
             <span className="text-xs text-text-on-light-muted">{formatTimestamp(message.timestamp)}</span>
-            <span className="text-sm font-medium text-text-on-light-strong">{t('chat.welcome.title')}</span>
           </div>
           <p className="w-full text-sm text-text-on-light-muted text-right whitespace-pre-wrap">
             {message.content}
@@ -71,7 +74,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
             </div>
           )}
           
-          <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border-default w-full justify-end">
+          <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border-default w-full justify-start">
             {actionButtons.map(({ Icon, label }) => (
               <Button key={label} variant="ghost" size="icon" className="text-text-on-light-muted h-7 w-7" aria-label={label}>
                 <Icon size={14} />

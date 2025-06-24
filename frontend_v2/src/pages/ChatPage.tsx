@@ -84,7 +84,7 @@ export default function ChatPage() {
               {t('chat.welcome.description')}
             </p>
             <div className="w-full max-w-md relative">
-              <input
+             <input
                 type="text"
                 placeholder={t('chat.placeholder')}
                 onKeyDown={(e) => {
@@ -92,7 +92,7 @@ export default function ChatPage() {
                     handleStartNewChat(e.currentTarget.value, { saudiAccent: false, reasoning: false });
                   }
                 }}
-                className="w-full h-[58px] bg-white border border-border-input rounded-2xl shadow-md pr-5 pl-16 text-right text-sm placeholder:text-text-on-light-placeholder"
+                className="w-full h-[58px] bg-white border border-border-input rounded-2xl shadow-md pr-5 pl-12 text-right text-sm placeholder:text-text-on-light-placeholder"
                 dir="rtl"
               />
               <Button
@@ -136,25 +136,30 @@ export default function ChatPage() {
         );
       case 'activeChat':
         return (
-          <div className="flex flex-col h-full w-full">
+          <div className="flex flex-col h-full w-full relative overflow-hidden"> {/* Ensure relative positioning and add overflow-hidden */}
             <div className="flex justify-between items-center p-4 border-b border-border-default">
+              <p className="text-base font-medium text-text-on-light-body">
+                    {sessionsQuery.data?.find(s => s.id === activeSessionId)?.title || t('chat.chatTitlePlaceholder')}
+                </p>
                 <div className="flex items-center gap-4">
-                    <Button variant="default" size="sm" className="h-8 gap-1 px-4 text-xs" onClick={() => setActiveSessionId(null)}>
+                    <Button variant="default" size="sm" className="bg-cta h-8 gap-1 px-4 text-xs" onClick={() => setActiveSessionId(null)}>
                         <Plus size={12}/>
                         {t('chat.newChat')}
                     </Button>
                     <Button variant="ghost" size="icon" className="text-text-on-light-muted h-8 w-8"><Trash2 size={16}/></Button>
                     <Button variant="ghost" size="icon" className="text-text-on-light-muted h-8 w-8" onClick={() => setIsHistoryPanelOpen(!isHistoryPanelOpen)}><Sidebar size={16}/></Button>
                 </div>
-                <p className="text-base font-medium text-text-on-light-body">
-                    {sessionsQuery.data?.find(s => s.id === activeSessionId)?.title || t('chat.chatTitlePlaceholder')}
-                </p>
+                
             </div>
-            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
+            {/* Added min-h-0 to help flexbox correctly calculate height for scrolling */}
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 min-h-0">
                 {activeChatMessages.isLoading && <div className="flex justify-center py-10"><LoadingSpinner /></div>}
                 {activeChatMessages.data?.map(msg => <MessageBubble key={msg.id} message={msg} />)}
                 {sendMessage.isPending && <div className="flex justify-start"><LoadingSpinner /></div>}
+                <div style={{ height: '200px' }} /> {/* Simplified spacer div */}
             </div>
+            {/* Moved blur effect to be a direct child of activeChat container, positioned at the bottom */}
+            <div className="absolute z-0 w-[70%] h-[80%] left-1/2 -translate-x-1/2 bottom-[-70%] bg-cta/100 rounded-full filter blur-[100px] pointer-events-none opacity-100"></div>
             <ChatInputBar onSendMessage={handleSendMessage} isLoading={sendMessage.isPending} />
           </div>
         );
@@ -165,6 +170,10 @@ export default function ChatPage() {
 
   return (
     <div className="h-full bg-background-body flex" dir={direction}>
+      {/* Removed overflow-y-auto from main to simplify nested scrolling contexts */}
+      <main className="flex-1 h-full flex flex-col">
+            {renderContent()}
+        </main>
         {view === 'activeChat' && isHistoryPanelOpen && (
             <aside className="w-full max-w-xs border-l border-border-default h-full flex flex-col bg-white">
                 <div className="p-4 border-b border-border-default">
@@ -183,9 +192,7 @@ export default function ChatPage() {
                 </div>
             </aside>
         )}
-        <main className="flex-1 h-full flex flex-col overflow-y-auto">
-            {renderContent()}
-        </main>
+        
     </div>
   );
 }

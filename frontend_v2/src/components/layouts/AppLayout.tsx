@@ -22,7 +22,7 @@ export function AppLayout({ children }: AppLayoutProps) {
            // Adjust margin to account for fixed sidebar width (277px)
       >
         <DashboardHeader />
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-white p-6"> {/* Main content scrolls */}
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-white px-6"> {/* Main content scrolls */}
           {/* The content for each specific page (Calculator, Chat, etc.) will be rendered here */}
           {children}
         </main>

@@ -75,11 +75,11 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({ onSendMessage, isLoa
                 {t('chat.saudiAccent')}
               </Label>
             </div>
-              {attachmentButtons.map(({ Icon, label }) => (
+              {/* {attachmentButtons.map(({ Icon, label }) => (
                 <Button key={label} type="button" variant="ghost" size="icon" className="text-[#666F8D] hover:bg-gray-100 h-8 w-8" aria-label={label}>
                   <Icon size={16} />
                 </Button>
-              ))}
+              ))} */}
             </div>
           </div>
           <div className={`flex items-center`}>

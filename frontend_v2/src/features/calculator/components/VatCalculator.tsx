@@ -92,38 +92,6 @@ export const VatCalculator: React.FC<VatCalculatorProps> = ({ designConfig }) =>
 
   return (
     <div className="grid md:grid-cols-2 gap-6 md:gap-8 items-start" dir={direction}>
-      {/* Result Display Column (Styled Card) */}
-      <div className={`${designConfig.resultDisplayContainerClass} ${direction === 'rtl' ? 'md:order-2' : 'md:order-1'} bg-[#ECFFEA] rounded-lg p-6 min-h-[333px] flex flex-col justify-center`}>
-        {Object.keys(vatResult).length > 0 && !vatResult.error ? (
-          <div className="w-full space-y-3">
-            {vatResult.netAmount !== undefined && (
-              <div className={`${designConfig.resultSubValueRowClass} flex justify-between items-center`}>
-                <span className={`${designConfig.resultSubValueLabelClass} text-black`} style={{fontFamily: 'var(--font-primary-arabic)'}}>{t('calculator.vat.results.netAmountLabel')}</span>
-                <span className={`${designConfig.resultSubValueAmountClass} text-[#51B749]`} style={{fontFamily: 'var(--font-primary-arabic)', direction: 'ltr'}}>{vatResult.netAmount.toFixed(2)}</span>
-              </div>
-            )}
-            {vatResult.vatAmount !== undefined && (
-              // Removed border classes for a cleaner look within the card, can be added back if needed
-              <div className={`${designConfig.resultSubValueRowClass} flex justify-between items-center py-3 my-3 border-y border-green-200`}>
-                <span className={`${designConfig.resultSubValueLabelClass} text-black`} style={{fontFamily: 'var(--font-primary-arabic)'}}>{t('calculator.vat.results.vatAmountLabel')}</span>
-                <span className={`${designConfig.resultSubValueAmountClass} text-[#51B749]`} style={{fontFamily: 'var(--font-primary-arabic)', direction: 'ltr'}}>{vatResult.vatAmount.toFixed(2)}</span>
-              </div>
-            )}
-            {vatResult.totalAmount !== undefined && (
-              <div className={`${designConfig.resultSubValueRowClass} flex justify-between items-center`}>
-                <span className={`${designConfig.resultSubValueLabelClass} text-black`} style={{fontFamily: 'var(--font-primary-arabic)'}}>{t('calculator.vat.results.totalAmountLabel')}</span>
-                <span className={`${designConfig.resultSubValueAmountClass} text-[#51B749]`} style={{fontFamily: 'var(--font-primary-arabic)', direction: 'ltr'}}>{vatResult.totalAmount.toFixed(2)}</span>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center text-center h-full">
-            <span className={`${designConfig.resultLabelClass} text-gray-600`} style={{fontFamily: 'var(--font-primary-arabic)'}}>{t('calculator.common.noResultYet')}</span>
-            {vatResult.error && <p className="text-sm text-red-500 mt-2" style={{fontFamily: 'var(--font-primary-arabic)'}}>{vatResult.error}</p>}
-          </div>
-        )}
-      </div>
-
       {/* Inputs Column for VAT */}
       <div className={`space-y-5 ${direction === 'rtl' ? 'md:order-1' : 'md:order-2'} flex flex-col`}>
         <div className={designConfig.fieldGroupClass}>
@@ -184,6 +152,39 @@ export const VatCalculator: React.FC<VatCalculatorProps> = ({ designConfig }) =>
             </Button>
         </div>
       </div>
+      {/* Result Display Column (Styled Card) */}
+      <div className={`${designConfig.resultDisplayContainerClass} ${direction === 'rtl' ? 'md:order-2' : 'md:order-1'} bg-[#ECFFEA] rounded-lg p-6 min-h-[333px] flex flex-col justify-center`}>
+        {Object.keys(vatResult).length > 0 && !vatResult.error ? (
+          <div className="w-full space-y-3">
+            {vatResult.netAmount !== undefined && (
+              <div className={`${designConfig.resultSubValueRowClass} flex justify-between items-center`}>
+                <span className={`${designConfig.resultSubValueLabelClass} text-black`} style={{fontFamily: 'var(--font-primary-arabic)'}}>{t('calculator.vat.results.netAmountLabel')}</span>
+                <span className={`${designConfig.resultSubValueAmountClass} text-[#51B749]`} style={{fontFamily: 'var(--font-primary-arabic)', direction: 'ltr'}}>{vatResult.netAmount.toFixed(2)}</span>
+              </div>
+            )}
+            {vatResult.vatAmount !== undefined && (
+              // Removed border classes for a cleaner look within the card, can be added back if needed
+              <div className={`${designConfig.resultSubValueRowClass} flex justify-between items-center py-3 my-3 border-y border-green-200`}>
+                <span className={`${designConfig.resultSubValueLabelClass} text-black`} style={{fontFamily: 'var(--font-primary-arabic)'}}>{t('calculator.vat.results.vatAmountLabel')}</span>
+                <span className={`${designConfig.resultSubValueAmountClass} text-[#51B749]`} style={{fontFamily: 'var(--font-primary-arabic)', direction: 'ltr'}}>{vatResult.vatAmount.toFixed(2)}</span>
+              </div>
+            )}
+            {vatResult.totalAmount !== undefined && (
+              <div className={`${designConfig.resultSubValueRowClass} flex justify-between items-center`}>
+                <span className={`${designConfig.resultSubValueLabelClass} text-black`} style={{fontFamily: 'var(--font-primary-arabic)'}}>{t('calculator.vat.results.totalAmountLabel')}</span>
+                <span className={`${designConfig.resultSubValueAmountClass} text-[#51B749]`} style={{fontFamily: 'var(--font-primary-arabic)', direction: 'ltr'}}>{vatResult.totalAmount.toFixed(2)}</span>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center text-center h-full">
+            <span className={`${designConfig.resultLabelClass} text-gray-600`} style={{fontFamily: 'var(--font-primary-arabic)'}}>{t('calculator.common.noResultYet')}</span>
+            {vatResult.error && <p className="text-sm text-red-500 mt-2" style={{fontFamily: 'var(--font-primary-arabic)'}}>{vatResult.error}</p>}
+          </div>
+        )}
+      </div>
+
+      
     </div>
   );
 };

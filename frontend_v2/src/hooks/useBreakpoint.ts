@@ -1,4 +1,5 @@
-// src/hooks/useBreakpoint.ts
+// File: src/hooks/useBreakpoint.ts
+
 import { useState, useEffect } from 'react';
 import { breakpoints, Breakpoint } from '../config/responsive';
 

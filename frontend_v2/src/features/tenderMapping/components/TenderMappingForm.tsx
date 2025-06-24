@@ -1,4 +1,5 @@
-// src/features/tenderMapping/components/TenderMappingForm.tsx
+// File: src/features/tenderMapping/components/TenderMappingForm.tsx
+
 import React, { useState } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { Button } from '@/components/ui/button';
@@ -66,8 +67,19 @@ export function TenderMappingForm({ workTypes, isLoading, onSubmit, onReset }: T
             <div className="space-y-2 text-right">
               <Label htmlFor="work_type">{t('tenderMapping.inputs.workType')}</Label>
               <Select dir={direction} value={formValues.work_type} onValueChange={(val) => handleValueChange('work_type', val)}>
-                <SelectTrigger id="work_type" className="h-10"><SelectValue placeholder={t('tenderMapping.inputs.workTypePlaceholder')} /></SelectTrigger>
-                <SelectContent>{workTypes.map(type => <SelectItem key={type.id} value={type.name}>{type.name}</SelectItem>)}</SelectContent>
+                <SelectTrigger id="work_type" className="h-10 text-right"><SelectValue placeholder={t('tenderMapping.inputs.workTypePlaceholder')} /></SelectTrigger>
+                <SelectContent>
+                  {workTypes.map(type => (
+                    // MODIFICATION: Added 'whitespace-normal' to allow text wrapping inside the option item.
+                    <SelectItem 
+                      key={type.id} 
+                      value={type.name} 
+                      className="whitespace-normal text-right"
+                    >
+                      {type.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
               </Select>
             </div>
             <div className="space-y-2 text-right">

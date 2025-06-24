@@ -99,6 +99,40 @@ export const DateDurationForm: React.FC<DateDurationFormProps> = ({ designConfig
 
   return (
     <div className="grid md:grid-cols-2 gap-6 md:gap-8 items-stretch" dir={direction}> {/* items-stretch */}
+    {/* Inputs Column */}
+      <div className={`space-y-6 ${direction === 'rtl' ? 'md:order-1' : 'md:order-2'} flex flex-col`}>
+        <div className={designConfig.fieldGroupClass}>
+          <Label htmlFor="duration-start-date" className={designConfig.labelClass} style={{fontFamily: 'var(--font-primary-arabic)'}}>
+            {t('calculator.date.duration.start')}
+          </Label>
+          <Input type="date" id="duration-start-date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className={`${designConfig.inputClass} text-left`} dir="ltr"/>
+        </div>
+        
+        <div className={designConfig.fieldGroupClass}>
+            <Label className={designConfig.labelClass} style={{fontFamily: 'var(--font-primary-arabic)'}}>
+                {t('calculator.date.duration.duration.label')}
+            </Label>
+            <div className={`grid grid-cols-3 gap-3 ${direction === 'rtl' ? '' : 'text-left'}`}>
+                <div>
+                    <Input type="number" min="0" value={durationYears} onChange={(e) => setDurationYears(e.target.value)} placeholder={t('calculator.date.duration.duration.years')} className={`${designConfig.inputClass} text-center`} dir="rtl"/>
+                </div>
+                 <div>
+                    <Input type="number" min="0" value={durationMonths} onChange={(e) => setDurationMonths(e.target.value)} placeholder={t('calculator.date.duration.duration.months')} className={`${designConfig.inputClass} text-center`} dir="rtl"/>
+                </div>
+                <div>
+                    <Input type="number" min="0" value={durationDays} onChange={(e) => setDurationDays(e.target.value)} placeholder={t('calculator.date.duration.duration.days')} className={`${designConfig.inputClass} text-center`} dir="rtl"/>
+                </div>
+            </div>
+        </div>
+        <div className="flex gap-4 mt-auto pt-4"> {/* mt-auto to push buttons to bottom */}
+            <Button onClick={handleReset} variant="outline" className="w-full h-[42px] rounded-lg text-sm font-medium">
+                {t('calculator.common.reset')}
+            </Button>
+            <Button onClick={handleCalculateEndDate} disabled={!startDate || (durationDays.trim() === '' && durationMonths.trim() === '' && durationYears.trim() === '')} className={`${designConfig.buttonClass} w-full`}>
+                {t('calculator.date.duration.calculate')}
+            </Button>
+        </div>
+      </div>
       {/* Result Display Column (Styled Card) */}
       <div 
         className={`bg-[#ECFFEA] rounded-lg p-6 min-h-[333px] flex flex-col items-center justify-center text-center ${direction === 'rtl' ? 'md:order-2' : 'md:order-1'}`}
@@ -148,41 +182,6 @@ export const DateDurationForm: React.FC<DateDurationFormProps> = ({ designConfig
             </div>
           </div>
         )}
-      </div>
-
-      {/* Inputs Column */}
-      <div className={`space-y-6 ${direction === 'rtl' ? 'md:order-1' : 'md:order-2'} flex flex-col`}>
-        <div className={designConfig.fieldGroupClass}>
-          <Label htmlFor="duration-start-date" className={designConfig.labelClass} style={{fontFamily: 'var(--font-primary-arabic)'}}>
-            {t('calculator.date.duration.start')}
-          </Label>
-          <Input type="date" id="duration-start-date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className={`${designConfig.inputClass} text-left`} dir="ltr"/>
-        </div>
-        
-        <div className={designConfig.fieldGroupClass}>
-            <Label className={designConfig.labelClass} style={{fontFamily: 'var(--font-primary-arabic)'}}>
-                {t('calculator.date.duration.duration.label')}
-            </Label>
-            <div className={`grid grid-cols-3 gap-3 ${direction === 'rtl' ? '' : 'text-left'}`}>
-                <div>
-                    <Input type="number" min="0" value={durationYears} onChange={(e) => setDurationYears(e.target.value)} placeholder={t('calculator.date.duration.duration.years')} className={`${designConfig.inputClass} text-center`} dir="rtl"/>
-                </div>
-                 <div>
-                    <Input type="number" min="0" value={durationMonths} onChange={(e) => setDurationMonths(e.target.value)} placeholder={t('calculator.date.duration.duration.months')} className={`${designConfig.inputClass} text-center`} dir="rtl"/>
-                </div>
-                <div>
-                    <Input type="number" min="0" value={durationDays} onChange={(e) => setDurationDays(e.target.value)} placeholder={t('calculator.date.duration.duration.days')} className={`${designConfig.inputClass} text-center`} dir="rtl"/>
-                </div>
-            </div>
-        </div>
-        <div className="flex gap-4 mt-auto pt-4"> {/* mt-auto to push buttons to bottom */}
-            <Button onClick={handleReset} variant="outline" className="w-full h-[42px] rounded-lg text-sm font-medium">
-                {t('calculator.common.reset')}
-            </Button>
-            <Button onClick={handleCalculateEndDate} disabled={!startDate || (durationDays.trim() === '' && durationMonths.trim() === '' && durationYears.trim() === '')} className={`${designConfig.buttonClass} w-full`}>
-                {t('calculator.date.duration.calculate')}
-            </Button>
-        </div>
       </div>
     </div>
   );

@@ -83,21 +83,21 @@ export const ReportTimelineTab: React.FC<ReportTimelineTabProps> = ({ stages: in
   };
   
   return (
-    <div className="bg-white border border-inputTheme-border rounded-2xl p-6 md:p-8">
+    <div className="bg-white border border-inputTheme-border rounded-2xl p-4 md:p-8">
       <div className="flex justify-center">
         <div className="relative flex flex-col items-center w-full max-w-lg">
           {/* --- FIX: Added unique key prop --- */}
           {localStages.map((stage, index) => (
             <div key={stage.id} className="flex w-full items-start">
-              <div className="flex flex-col items-center mr-6">
+              <div className="flex flex-col items-center md:mr-6">
                 <div className="w-8 h-8 rounded-full bg-background-body border-2 border-gray-300 flex items-center justify-center font-medium text-sm z-10">
                   {String(index + 1).padStart(2, '0')}
                 </div>
                 {index < localStages.length - 1 && (
-                  <div className="w-0.5 h-24 bg-gray-300 -mt-1"></div>
+                  <div className="w-0.5 h-36 md:h-24 bg-gray-300 -mt-1"></div>
                 )}
               </div>
-              <div className="flex-grow pb-12 -mt-1 px-4">
+              <div className="flex-grow pb-6 md:pb-12 -mt-1 px-4">
                 <EditableTimelineStage
                   stage={stage}
                   isEditing={editingStageId === stage.id}

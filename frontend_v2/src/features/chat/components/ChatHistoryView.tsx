@@ -1,4 +1,5 @@
-// src/features/chat/components/ChatHistoryView.tsx
+// File: src/features/chat/components/ChatHistoryView.tsx
+
 import React, { useState } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { ChatSession } from '@/types/chat';
@@ -33,29 +34,32 @@ export const ChatHistoryView: React.FC<ChatHistoryViewProps> = ({ sessions, isLo
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6">
+    // MODIFIED: This container is now responsive.
+    // It has horizontal padding on all screen sizes to prevent touching the edges.
+    // The `max-w-4xl` only applies on medium screens and up.
+    <div className="w-full md:max-w-4xl mx-auto space-y-6 px-4">
       {/* Controls Container */}
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
         <h3 className="text-base font-medium text-text-on-light-muted" style={{ fontFamily: 'var(--font-primary-arabic)' }}>
           {`${t('chat.historyTitle')} (${sessions.length})`}
         </h3>
         {/* Right-aligned controls wrapper */}
-        <div className="flex items-center gap-3">
-          {/* Search Box - First on the right */}
-          <div className="relative">
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          {/* Search Box */}
+          <div className="relative flex-grow sm:flex-grow-0">
             <Input
               type="text"
               placeholder={t('chat.searchHistoryPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="h-10 w-[266px] bg-white border-border-default shadow-sm pr-10"
+              className="h-10 w-full sm:w-[266px] bg-white border-border-default shadow-sm pr-10"
               dir="rtl"
             />
             <Search size={13} className="absolute right-4 top-1/2 -translate-y-1/2 text-text-on-light-muted" />
           </div>
-          {/* Sort By Dropdown - To the left of search */}
+          {/* Sort By Dropdown */}
           <Select dir={direction} value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="h-10 w-[146px] bg-white border-border-default shadow-sm">
+            <SelectTrigger className="h-10 w-auto sm:w-[146px] bg-white border-border-default shadow-sm">
               <ListFilter size={12} className="mx-2 text-text-on-light-muted"/>
               <SelectValue placeholder={t('chat.sortBy')} />
             </SelectTrigger>

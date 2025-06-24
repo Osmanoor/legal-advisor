@@ -54,7 +54,10 @@ export const TenderReportTabs: React.FC<TenderReportTabsProps> = ({ result, onRe
         <TabsList className="w-full grid grid-cols-3">
           {tabsData.map(tab => (
             <TabsTrigger key={tab.value} value={tab.value}>
-              {t(tab.labelKey)}
+              <h2 className="text-10px" >
+          {t(tab.labelKey)}
+        </h2>
+              
             </TabsTrigger>
           ))}
         </TabsList>

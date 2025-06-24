@@ -139,7 +139,7 @@ export const DateConversionForm: React.FC<DateConversionFormProps> = ({ designCo
             className="w-14 h-14 md:w-[54px] md:h-[54px] bg-cta text-white rounded-full p-0 flex items-center justify-center shadow-md hover:bg-cta-hover"
             aria-label={t('calculator.date.conversion.convertActionLabel')}
           >
-            <ArrowLeftRight className="w-6 h-6" />
+            <ArrowLeftRight className="w-6 h-6 md:transform-none transform rotate-90" />
           </Button>
         </div>
 

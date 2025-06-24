@@ -111,7 +111,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ id }) 
 
       <div className="relative z-0 max-w-7xl mx-auto px-6"> {/* z-0 to be behind the fade */}
         <h2
-          className="text-design-48-tight font-normal text-text-on-light-strong text-center mb-12 md:mb-16"
+          className="text-design-48-tight leading-snug font-normal text-text-on-light-strong text-center mb-12 md:mb-16"
           style={{ fontFamily: 'var(--font-primary-arabic)', fontWeight: 400 }} // fontWeight 400 from CSS
         >
           {t('landingPage.testimonialsTitle')}

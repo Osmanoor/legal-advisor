@@ -46,7 +46,7 @@ export const StickyCardsSection: React.FC<StickyCardsSectionProps> = ({ id }) =>
 
           {/* Text Column (Right for RTL, Left for LTR) - This will be sticky */}
           <div className={`md:w-1/3 ${direction === 'rtl' ? 'md:text-right' : 'md:text-left'} 
-                           md:sticky md:top-28 self-start h-fit`}>
+                           md:sticky md:top-28 self-start h-fit text-center`}>
             <h2
               className="text-design-48-tight font-normal text-text-on-light-strong mb-6"
               style={{ fontFamily: 'var(--font-primary-arabic)', fontWeight: 400 }}

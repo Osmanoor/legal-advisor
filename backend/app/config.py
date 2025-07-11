@@ -1,16 +1,32 @@
 # app/config.py
+
 import os
-from typing import Dict, Any
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+basedir = os.path.abspath(os.path.dirname(__file__))
+load_dotenv(os.path.join(basedir, '..', '.env'))
 
 class Config:
     """Application configuration"""
+
+    # --- Security Configurations ---
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or 'a-default-fallback-secret-key'
+    JWT_TOKEN_LOCATION = ["cookies"]
+    # JWT_COOKIE_CSRF_PROTECT = False
+
+    # --- Database Configurations ---
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    # --- Existing Configurations ---
     CONTACTS_FILE = os.path.join('data', 'contacts.csv')
     EMAILS_FILE = os.path.join('data', 'emails.csv')
     ADMIN_USERNAME = 'admin'
     ADMIN_PASSWORD = '123'
 
     # Add any chat-specific configurations here
-    CHAT_CONFIG: Dict[str, Any] = {
+    CHAT_CONFIG = {
         'default_language': 'ar',
         'max_history_length': 100
     }

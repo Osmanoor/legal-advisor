@@ -1,11 +1,13 @@
 # api/correction.py
 from flask import Blueprint, request, jsonify
 from app.services.correction_service import CorrectionService
+from app.utils.auth_decorators import permission_required
 
 correction_bp = Blueprint('correction', __name__)
 correction_service = CorrectionService()
 
 @correction_bp.route('', methods=['POST'])
+@permission_required('access_text_corrector')
 def correct_text():
     """Handle text correction requests"""
     try:

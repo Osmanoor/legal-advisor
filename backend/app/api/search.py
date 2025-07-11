@@ -2,11 +2,13 @@
 from flask import Blueprint, request, jsonify
 from app.services.search_service import SearchService
 from app.utils.validators import validate_search_params
+from app.utils.auth_decorators import permission_required
 
 search_bp = Blueprint('search', __name__)
 search_service = SearchService()
 
 @search_bp.route('', methods=['GET'])
+@permission_required('access_search_tool')
 def search():
     """
     Handle search requests with query parameters.

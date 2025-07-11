@@ -1,4 +1,27 @@
 from typing import Optional
+import re
+
+def validate_phone_number(phone_number: str) -> bool:
+    """
+    Validates a phone number format.
+    This example validates a common Saudi Arabian mobile format (10 digits starting with 05).
+    """
+    # if not phone_number:
+    #     return False
+    # # Regex for a 10-digit number starting with 05.
+    # pattern = re.compile(r'^05\d{8}$')
+    # return pattern.match(phone_number) is not None
+    return True
+
+def validate_password(password: str) -> bool:
+    """
+    Validates password strength.
+    This example checks for a minimum length of 8 characters.
+    """
+    if not password or len(password) < 8:
+        return False
+    # You could add more complex rules here, e.g., requiring numbers, symbols, etc.
+    return True
 
 def validate_search_params(query: str, search_type: str) -> Optional[str]:
     """

@@ -1,89 +1,130 @@
 # app/services/admin_service.py
 
-import csv
 import os
-from datetime import datetime
-from typing import Dict, List
-from flask import jsonify
-from app.config import Config
+import json
+from app.models import Role, Permission, ContactSubmission
+from app.extensions import db
+
+SETTINGS_FILE_PATH = 'global_settings.json'
 
 class AdminService:
-    def __init__(self):
-        """Initialize admin service"""
-        os.makedirs(os.path.dirname(Config.CONTACTS_FILE), exist_ok=True)
-        os.makedirs(os.path.dirname(Config.EMAILS_FILE), exist_ok=True)
+    # --- Settings and Roles Management ---
 
-    def save_contact(self, data: Dict) -> tuple:
+    def get_all_settings(self):
         """
-        Save contact form submission
+        Retrieves global settings, roles with their permissions, and all available permissions.
+        """
+        # 1. Read global settings from file
+        try:
+            with open(SETTINGS_FILE_PATH, 'r') as f:
+                global_settings = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            # Return a default structure if file is missing or corrupt
+            global_settings = {}
         
-        Args:
-            data: Dictionary containing name, email, and message
+        # 2. Get all roles and their assigned permission IDs
+        roles = Role.query.all()
+        roles_data = [
+            {
+                "id": role.id,
+                "name": role.name,
+                "permission_ids": [p.id for p in role.permissions]
+            } for role in roles
+        ]
+
+        # 3. Get all available permissions
+        permissions = Permission.query.all()
+        permissions_data = [
+            {
+                "id": p.id,
+                "name": p.name,
+                "description": p.description
+            } for p in permissions
+        ]
+
+        return {
+            "global_settings": global_settings,
+            "roles": roles_data,
+            "all_permissions": permissions_data
+        }, 200
+
+    def update_all_settings(self, data):
+        """
+        Updates global settings file and role-permission mappings.
+        """
+        try:
+            # 1. Update global settings file if provided
+            if 'global_settings' in data:
+                with open(SETTINGS_FILE_PATH, 'w') as f:
+                    json.dump(data['global_settings'], f, indent=2)
             
-        Returns:
-            tuple: (response_dict, status_code)
-        """
-        name = data.get('Name')
-        email = data.get('Email')
-        message = data.get('Message')
-
-        if not all([name, email, message]):
-            return jsonify({'error': 'All fields are required'}), 400
-
-        try:
-            file_exists = os.path.isfile(Config.CONTACTS_FILE)
-            with open(Config.CONTACTS_FILE, 'a', newline='', encoding='utf-8') as file:
-                writer = csv.writer(file)
-                if not file_exists:
-                    writer.writerow(['Date', 'Name', 'Email', 'Message'])
-                writer.writerow([
-                    datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                    name,
-                    email,
-                    message
-                ])
-
-            return jsonify({'message': 'Contact form submitted successfully'}), 200
-        except Exception as e:
-            print(f"Error saving contact: {str(e)}")
-            return jsonify({'error': 'Failed to save contact form'}), 500
-
-    def get_all_contacts(self) -> tuple:
-        """
-        Get all contact form submissions
-        
-        Returns:
-            tuple: (response_dict, status_code)
-        """
-        if not os.path.exists(Config.CONTACTS_FILE):
-            return jsonify([]), 200
-
-        try:
-            contacts = []
-            with open(Config.CONTACTS_FILE, 'r', encoding='utf-8') as file:
-                reader = csv.DictReader(file)
-                contacts = list(reader)
-            return jsonify(contacts), 200
-        except Exception as e:
-            print(f"Error reading contacts: {str(e)}")
-            return jsonify({'error': 'Failed to read contacts'}), 500
+            # 2. Update role-permission mappings if provided
+            if 'role_permissions' in data:
+                role_permission_map = data['role_permissions']
+                for item in role_permission_map:
+                    role = Role.query.get(item['role_id'])
+                    if role:
+                        # Fetch all permission objects for the given IDs
+                        permissions = Permission.query.filter(Permission.id.in_(item['permission_ids'])).all()
+                        # Assign the new set of permissions to the role
+                        role.permissions = permissions
             
-    def get_all_emails(self) -> tuple:
-        """
-        Get all sent email records
-        
-        Returns:
-            tuple: (response_dict, status_code)
-        """
-        if not os.path.exists(Config.EMAILS_FILE):
-            return jsonify([]), 200
+            db.session.commit()
+            return {"message": "Settings updated successfully"}, 200
 
-        try:
-            emails = []
-            with open(Config.EMAILS_FILE, 'r', encoding='utf-8') as file:
-                reader = csv.DictReader(file)
-                emails = list(reader)
-            return jsonify(emails), 200
         except Exception as e:
-            print(f"Error reading emails: {str(e)}")
-            return jsonify({'error': 'Failed to read emails'}), 500
+            db.session.rollback()
+            print(f"Error updating settings: {e}")
+            return {"error": "An internal error occurred while updating settings."}, 500
+
+    # --- Dashboard Stats ---
+
+    def get_dashboard_stats(self):
+        """Returns dummy statistics for the admin dashboard."""
+        # This can be replaced with real queries later
+        dummy_stats = {
+            "total_users": 150,
+            "new_messages": 12,
+            "pending_reviews": 5
+        }
+        return dummy_stats, 200
+
+    # --- Contact Submissions Management ---
+
+    def get_contact_submissions(self):
+        """Retrieves all contact submissions."""
+        submissions = ContactSubmission.query.order_by(ContactSubmission.submitted_at.desc()).all()
+        submissions_data = [
+            {
+                "id": s.id,
+                "name": s.name,
+                "email": s.email,
+                "message": s.message,
+                "status": s.status,
+                "submitted_at": s.submitted_at.isoformat()
+            } for s in submissions
+        ]
+        return submissions_data, 200
+
+    def update_contact_submission_status(self, submission_id, new_status):
+        """Updates the status of a contact submission."""
+        submission = ContactSubmission.query.get(submission_id)
+        if not submission:
+            return {"error": "Submission not found"}, 404
+        
+        allowed_statuses = ['new', 'read', 'archived']
+        if new_status not in allowed_statuses:
+            return {"error": f"Invalid status. Must be one of: {allowed_statuses}"}, 400
+
+        submission.status = new_status
+        db.session.commit()
+
+        updated_submission = {
+            "id": submission.id,
+            "name": submission.name,
+            "email": submission.email,
+            "message": submission.message,
+            "status": submission.status,
+            "submitted_at": submission.submitted_at.isoformat()
+        }
+        return updated_submission, 200

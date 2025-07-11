@@ -17,3 +17,11 @@ gunicorn==21.2.0  # or your preferred version
 docx2pdf
 python-docx
 google-cloud-storage
+Flask-SQLAlchemy
+Flask-Migrate
+psycopg2-binary
+Flask-Bcrypt
+PyJWT
+blinker
+Flask-JWT-Extended
+twilio

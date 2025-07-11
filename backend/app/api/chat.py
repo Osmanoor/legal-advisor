@@ -1,11 +1,13 @@
 # app/api/chat.py
 from flask import Blueprint, request, jsonify
 from app.services.chat_service import ChatService
+from app.utils.auth_decorators import permission_required
 
 chat_bp = Blueprint('chat', __name__)
 chat_service = ChatService()
 
 @chat_bp.route('', methods=['POST'])
+@permission_required('access_ai_assistant')
 def chat():
     """Handle chat requests"""
     try:

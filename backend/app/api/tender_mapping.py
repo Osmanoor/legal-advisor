@@ -2,6 +2,7 @@
 
 from flask import Blueprint, request, jsonify
 from app.services.tender_mapping_service import TenderMappingService
+from app.utils.auth_decorators import permission_required
 
 tender_mapping_bp = Blueprint('tender_mapping', __name__)
 tender_mapping_service = TenderMappingService()
@@ -17,6 +18,7 @@ def get_work_types():
         return jsonify({"error": str(e)}), 500
 
 @tender_mapping_bp.route('/calculate', methods=['POST'])
+@permission_required('access_report_generator')
 def calculate_procurement():
     """Calculate procurement details based on inputs"""
     try:

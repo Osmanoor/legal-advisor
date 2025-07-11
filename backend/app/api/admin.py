@@ -1,54 +1,50 @@
 # app/api/admin.py
 
-from functools import wraps
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, jsonify
+from app.utils.auth_decorators import permission_required
 from app.services.admin_service import AdminService
-from app.utils.auth import require_auth
 
 admin_bp = Blueprint('admin', __name__)
 admin_service = AdminService()
 
-def require_auth(f):
-    """
-    Decorator for routes that require basic authentication
-    """
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        auth = request.authorization
-        if not auth or not check_auth(auth.username, auth.password):
-            return jsonify({'error': 'Unauthorized access'}), 401
-        return f(*args, **kwargs)
-    return decorated
+# --- Dashboard Stats Endpoint ---
+@admin_bp.route('/dashboard-stats', methods=['GET'])
+@permission_required('access_admin_dashboard')
+def get_dashboard_stats():
+    result, status_code = admin_service.get_dashboard_stats()
+    return jsonify(result), status_code
 
-def check_auth(username: str, password: str) -> bool:
-    """
-    Check if username and password are valid
-    """
-    return username == 'admin' and password == '123'
+# --- Settings & Role Management Endpoints ---
+@admin_bp.route('/settings', methods=['GET'])
+@permission_required('access_global_settings')
+def get_settings():
+    result, status_code = admin_service.get_all_settings()
+    return jsonify(result), status_code
 
-@admin_bp.route('/contact', methods=['POST'])
-def submit_contact():
-    """Submit a contact form"""
-    try:
-        data = request.get_json()
-        return admin_service.save_contact(data)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+@admin_bp.route('/settings', methods=['PUT'])
+@permission_required('access_global_settings')
+def update_settings():
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Request body cannot be empty"}), 400
+    
+    result, status_code = admin_service.update_all_settings(data)
+    return jsonify(result), status_code
 
-@admin_bp.route('/contacts', methods=['GET'])
-@require_auth
-def get_contacts():
-    """Get all contact form submissions (admin only)"""
-    try:
-        return admin_service.get_all_contacts()
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+# --- Contact Submissions Endpoints ---
+@admin_bp.route('/contact-submissions', methods=['GET'])
+@permission_required('access_contact_us')
+def get_contact_submissions():
+    result, status_code = admin_service.get_contact_submissions()
+    return jsonify(result), status_code
 
-@admin_bp.route('/emails', methods=['GET'])
-@require_auth
-def get_emails():
-    """Get all sent email records (admin only)"""
-    try:
-        return admin_service.get_all_emails()
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+@admin_bp.route('/contact-submissions/<int:submission_id>/status', methods=['PUT'])
+@permission_required('access_contact_us')
+def update_contact_submission_status(submission_id):
+    data = request.get_json()
+    new_status = data.get('status')
+    if not new_status:
+        return jsonify({"error": "Status is required"}), 400
+
+    result, status_code = admin_service.update_contact_submission_status(submission_id, new_status)
+    return jsonify(result), status_code

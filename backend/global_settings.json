@@ -1,0 +1,14 @@
+{
+  "usage_limits": {
+    "Guest": {
+      "ai_assistant_queries_per_day": 5,
+      "text_corrections_per_day": 5,
+      "report_generations_per_day": 1
+    },
+    "Registered User": {
+      "ai_assistant_queries_per_day": 50,
+      "text_corrections_per_day": 50,
+      "report_generations_per_day": 10
+    }
+  }
+}

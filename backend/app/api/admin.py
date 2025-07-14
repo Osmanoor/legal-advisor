@@ -3,9 +3,31 @@
 from flask import Blueprint, request, jsonify
 from app.utils.auth_decorators import permission_required
 from app.services.admin_service import AdminService
+from app.models import Role, Permission
 
 admin_bp = Blueprint('admin', __name__)
 admin_service = AdminService()
+
+@admin_bp.route('/roles-and-permissions', methods=['GET'])
+@permission_required('manage_admins') # Protect with appropriate permission
+def get_roles_and_permissions():
+    """Returns a list of all available roles and permissions in the system."""
+    try:
+        roles = Role.query.order_by(Role.name).all()
+        permissions = Permission.query.order_by(Permission.name).all()
+
+        roles_data = [{"id": role.id, "name": role.name} for role in roles]
+        permissions_data = [
+            {"id": p.id, "name": p.name, "description": p.description} for p in permissions
+        ]
+
+        return jsonify({
+            "roles": roles_data,
+            "permissions": permissions_data
+        }), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 # --- Dashboard Stats Endpoint ---
 @admin_bp.route('/dashboard-stats', methods=['GET'])

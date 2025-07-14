@@ -1,67 +1,66 @@
-// File: src/hooks/api/useAdminUsers.ts
-// @new
-// Mock API hook for fetching and managing admin/user data.
+// src/hooks/api/useAdminUsers.ts
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { User, Role } from '@/types/user'; // Using the existing User type
+import { api } from '@/lib/axios';
+import { User } from '@/types/user';
 
-// --- Mock Data ---
-const createMockUsers = (): User[] => [
-  { id: 'usr_001', name: 'Amjed Mohammed', email: 'Amjed.mohammed@gmail.com', role: 'admin', permissions: ['manage:users', 'read:analytics'] },
-  { id: 'usr_002', name: 'Ali Hassan', email: 'ali.hassan@example.com', role: 'user', permissions: [] },
-  { id: 'usr_003', name: 'Fatima Al-Salem', email: 'fatima.salem@example.com', role: 'user', permissions: [] },
-  { id: 'usr_004', name: 'Khalid Ibrahim', email: 'khalid.ibrahim@example.com', role: 'admin', permissions: ['read:analytics'] },
-  { id: 'usr_005', name: 'Noura Abdullah', email: 'noura.abdullah@example.com', role: 'user', permissions: [] },
-  { id: 'usr_006', name: 'Saad Al-Mutairi', email: 'saad.mutairi@example.com', role: 'user', permissions: [] },
-  { id: 'usr_007', name: 'Layla Al-Qahtani', email: 'layla.qahtani@example.com', role: 'user', permissions: [] },
-];
+// The payload now includes permission_overrides
+export interface UserUpdatePayload {
+  fullName?: string;
+  email?: string;
+  jobTitle?: string;
+  role_ids?: number[];
+  permission_overrides?: {
+      permission_id: number;
+      override_type: 'ALLOW' | 'DENY';
+  }[];
+}
 
-let mockUsersDB = createMockUsers();
+interface PaginatedUsersResponse {
+  users: User[];
+  total: number;
+  pages: number;
+  current_page: number;
+}
 
-// --- Mock API Functions ---
-const fetchUsers = async (): Promise<User[]> => {
-  console.log("Fetching mock users...");
-  await new Promise(res => setTimeout(res, 500));
-  return [...mockUsersDB];
-};
-
-const updateUser = async (updatedUser: Partial<User> & { id: string }): Promise<User> => {
-  console.log("Updating mock user:", updatedUser);
-  await new Promise(res => setTimeout(res, 800));
-  
-  const userIndex = mockUsersDB.findIndex(u => u.id === updatedUser.id);
-  if (userIndex === -1) {
-    throw new Error("User not found");
-  }
-
-  // Merge the existing user data with the updates
-  const newUser = { ...mockUsersDB[userIndex], ...updatedUser };
-  mockUsersDB[userIndex] = newUser;
-  return newUser;
-};
-
-
-// --- React Query Hooks ---
-export function useAdminUsers() {
+export function useAdminUsers(page: number = 1, perPage: number = 10) {
   const queryClient = useQueryClient();
 
-  // Query to get all users
-  const usersQuery = useQuery<User[], Error>({
-    queryKey: ['admin', 'users'],
-    queryFn: fetchUsers,
+  const usersQuery = useQuery<PaginatedUsersResponse, Error>({
+    queryKey: ['admin', 'users', { page, perPage }],
+    queryFn: async () => {
+      const response = await api.get('/admin/users', {
+        params: { page, per_page: perPage },
+      });
+      return response.data;
+    },
   });
 
-  // Mutation to update a user
   const updateUserMutation = useMutation({
-    mutationFn: updateUser,
+    mutationFn: async (variables: { userId: string; payload: UserUpdatePayload }): Promise<User> => {
+      const { userId, payload } = variables;
+      const response = await api.put(`/admin/users/${userId}`, payload);
+      return response.data;
+    },
     onSuccess: () => {
-      // When an update is successful, invalidate the users query to refetch the fresh list
       queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
     },
+  });
+
+  // --- NEW DELETE MUTATION ---
+  const deleteUserMutation = useMutation({
+    mutationFn: async (userId: string): Promise<{ message: string }> => {
+        const response = await api.delete(`/admin/users/${userId}`);
+        return response.data;
+    },
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
+    }
   });
 
   return {
     usersQuery,
     updateUserMutation,
+    deleteUserMutation, // Expose the new mutation
   };
 }

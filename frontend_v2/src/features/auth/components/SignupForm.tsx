@@ -1,6 +1,4 @@
-// File: src/features/auth/components/SignupForm.tsx
-// @new
-// The form handling user registration.
+// src/features/auth/components/SignupForm.tsx
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { SocialLogins } from './SocialLogins';
+import { AxiosError } from 'axios';
 
 export function SignupForm() {
   const { t } = useLanguage();
@@ -19,8 +18,8 @@ export function SignupForm() {
   const { register, isLoading } = useAuthStore();
   const { showToast } = useToast();
 
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -32,15 +31,13 @@ export function SignupForm() {
     }
 
     try {
-      await register({ name, email, password });
-      // On success, redirect to the confirmation page
-      navigate('/confirm-account', { state: { email } });
+      await register({ fullName, phoneNumber, password });
+      // On success, redirect to the confirmation page, passing the phone number.
+      navigate('/confirm-account', { state: { phoneNumber } });
     } catch (error) {
-      if (error instanceof Error) {
-        showToast(error.message, 'error');
-      } else {
-        showToast(t('auth.errorGeneric'), 'error');
-      }
+      const axiosError = error as AxiosError<{ error?: string }>;
+      const errorMessage = axiosError.response?.data?.error || t('auth.errorGeneric');
+      showToast(errorMessage, 'error');
     }
   };
 
@@ -56,21 +53,24 @@ export function SignupForm() {
           <Input
             id="name"
             type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
             placeholder={t('auth.fullNamePlaceholder')}
             required
+            autoComplete="name"
           />
         </div>
         <div>
-          <Label htmlFor="signup-email">{t('auth.email')}</Label>
+          <Label htmlFor="signup-phone">رقم الهاتف</Label>
           <Input
-            id="signup-email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder={t('auth.emailPlaceholder')}
+            id="signup-phone"
+            type="tel"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            placeholder="أدخل رقم الهاتف"
             required
+            dir="ltr"
+            autoComplete="tel"
           />
         </div>
         <div>
@@ -82,6 +82,7 @@ export function SignupForm() {
             onChange={(e) => setPassword(e.target.value)}
             placeholder={t('auth.passwordPlaceholder')}
             required
+            autoComplete="new-password"
           />
         </div>
         <div>
@@ -93,6 +94,7 @@ export function SignupForm() {
             onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder={t('auth.confirmPasswordPlaceholder')}
             required
+            autoComplete="new-password"
           />
         </div>
 
@@ -100,7 +102,8 @@ export function SignupForm() {
           {isLoading ? <LoadingSpinner size="sm" /> : t('auth.signup')}
         </Button>
       </form>
-
+      
+      {/* Social Logins can be re-enabled if needed */}
       <SocialLogins />
     </div>
   );

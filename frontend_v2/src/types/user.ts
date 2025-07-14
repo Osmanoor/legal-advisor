@@ -1,36 +1,54 @@
-// File: src/types/user.ts
-// @checked
-// This new file defines the core data structures for users and authentication.
+// src/types/user.ts
 
-export type Role = 'user' | 'admin';
+// The Role type is now a generic string, as it's fetched dynamically.
+export type Role = string;
 
-export type Permission = 
-  | 'read:analytics'
-  | 'manage:users'
-  | 'manage:roles'
-  | 'manage:feedback'
-  | 'manage:content';
+// The permissions as defined in the backend's seeding script
+export type Permission =
+  | 'access_ai_assistant'
+  | 'access_calculator'
+  | 'access_text_corrector'
+  | 'access_report_generator'
+  | 'access_search_tool'
+  | 'access_admin_dashboard'
+  | 'access_ratings_management'
+  | 'access_contact_us'
+  | 'view_users_list'
+  | 'delete_user'
+  | 'manage_admins'
+  | 'access_global_settings';
 
+// Updated User interface to match the backend's /me response
 export interface User {
   id: string;
-  name: string;
-  email: string;
-  role: Role;
+  fullName: string;
+  email: string | null;
+  phoneNumber: string;
+  jobTitle: string | null;
+  roles: Role[]; // This is now string[]
   permissions: Permission[];
 }
 
+// Login credentials
 export interface LoginCredentials {
-  email: string;
+  phoneNumber: string;
   password: string;
 }
 
+// Register data
 export interface RegisterData {
-  name: string;
-  email: string;
+  fullName: string;
+  phoneNumber: string;
   password: string;
 }
 
-// The state shape for our authentication store
+// Phone verification payload
+export interface VerificationData {
+  phoneNumber: string;
+  code: string;
+}
+
+// Auth store state shape
 export interface AuthState {
   isAuthenticated: boolean;
   user: User | null;
@@ -38,5 +56,6 @@ export interface AuthState {
   login: (credentials: LoginCredentials) => Promise<void>;
   logout: () => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
+  verifyPhone: (data: VerificationData) => Promise<void>;
   checkAuthStatus: () => Promise<void>;
 }

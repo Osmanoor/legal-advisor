@@ -1,6 +1,4 @@
-// File: src/pages/admin/UserManagementPage.tsx
-// @updated
-// Fetches and displays users, and manages the state for the edit dialog.
+// src/pages/admin/UserManagementPage.tsx
 
 import React, { useState, useMemo } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -13,12 +11,14 @@ import { Badge } from '@/components/ui/badge';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { UserEditDialog } from '@/features/admin/components/Users/UserEditDialog';
-import { Search, MoreVertical, Filter, ArrowDownUp } from 'lucide-react';
+import { Search, MoreVertical, Filter, ArrowDownUp, UserPlus, AlertCircle } from 'lucide-react';
 import UserAvatar from '/public/images/avatars/avatar1.png'; // Placeholder
 
 export default function UserManagementPage() {
   const { t } = useLanguage();
-  const { usersQuery } = useAdminUsers();
+  const [currentPage, setCurrentPage] = useState(1);
+  const { usersQuery } = useAdminUsers(currentPage); // Use the hook to fetch data
+
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -27,30 +27,30 @@ export default function UserManagementPage() {
     setSelectedUser(user);
     setIsEditDialogOpen(true);
   };
-
+  
+  // Note: Local search will only work on the current page of data.
+  // A full server-side search would require passing the search term to the useAdminUsers hook.
   const filteredUsers = useMemo(() => {
-    if (!usersQuery.data) return [];
-    return usersQuery.data.filter(user => 
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    if (!usersQuery.data?.users) return [];
+    return usersQuery.data.users.filter(user => 
+      user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (user.email && user.email.toLowerCase().includes(searchTerm.toLowerCase()))
     );
   }, [usersQuery.data, searchTerm]);
-
-  const renderStatusBadge = (status: 'active' | 'suspended') => {
-      if (status === 'suspended') {
-          return <Badge variant="destructive" className="bg-red-100 text-red-700 border-red-200">Suspended</Badge>;
-      }
+  
+  // A simple status badge for display, can be expanded later
+  const renderStatusBadge = () => {
       return <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-200">Active</Badge>;
   }
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-        <h1 className="text-2xl font-bold">المستخدمين ({usersQuery.data?.length || 0})</h1>
+        <h1 className="text-2xl font-bold">المستخدمين ({usersQuery.data?.total || 0})</h1>
         <div className="flex items-center gap-2 w-full md:w-auto">
             <div className="relative flex-grow">
                  <Input 
-                    placeholder="Search..." 
+                    placeholder="Search by name or email..." 
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10"
@@ -59,53 +59,67 @@ export default function UserManagementPage() {
             </div>
             <Button variant="outline" size="icon"><Filter className="w-4 h-4" /></Button>
             <Button variant="outline" size="icon"><ArrowDownUp className="w-4 h-4" /></Button>
+             <Button><UserPlus className="mr-2 h-4 w-4"/> إضافة مستخدم</Button>
         </div>
       </div>
       
       {usersQuery.isLoading && (
-          <div className="flex justify-center p-12"><LoadingSpinner size="lg" /></div>
+          <div className="flex justify-center items-center py-20"><LoadingSpinner size="lg" /></div>
       )}
 
-      {usersQuery.error && (
-          <Alert variant="destructive"><AlertDescription>{usersQuery.error.message}</AlertDescription></Alert>
+      {usersQuery.isError && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{usersQuery.error.message}</AlertDescription>
+          </Alert>
       )}
 
       {usersQuery.data && (
-        <div className="border rounded-lg overflow-hidden">
-          <Table>
-            <TableHeader className="bg-gray-50">
-              <TableRow>
-                <TableHead className="text-right">الأسم</TableHead>
-                <TableHead className="text-right">الحالة</TableHead>
-                <TableHead className="text-right">البريد الألكتروني</TableHead>
-                <TableHead className="text-right">الدور</TableHead>
-                <TableHead></TableHead> {/* For actions */}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredUsers.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <img src={UserAvatar} alt={user.name} className="w-8 h-8 rounded-full" />
-                      <span className="font-medium">{user.name}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>{renderStatusBadge('active')}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.role}</TableCell>
-                  <TableCell>
-                    <Button variant="ghost" size="icon" onClick={() => handleEditClick(user)}>
-                      <MoreVertical className="w-4 h-4" />
-                    </Button>
-                  </TableCell>
+        <>
+          <div className="border rounded-lg overflow-hidden bg-white">
+            <Table>
+              <TableHeader className="bg-gray-50">
+                <TableRow>
+                  <TableHead className="text-right">الأسم</TableHead>
+                  <TableHead className="text-right">الحالة</TableHead>
+                  <TableHead className="text-right">البريد الألكتروني</TableHead>
+                  <TableHead className="text-right">الدور</TableHead>
+                  <TableHead></TableHead> {/* For actions */}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>  
+              </TableHeader>
+              <TableBody>
+                {filteredUsers.length > 0 ? filteredUsers.map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <img src={UserAvatar} alt={user.fullName} className="w-8 h-8 rounded-full" />
+                        <span className="font-medium">{user.fullName}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>{renderStatusBadge()}</TableCell>
+                    <TableCell>{user.email || 'N/A'}</TableCell>
+                    <TableCell>{user.roles.join(', ')}</TableCell>
+                    <TableCell>
+                      <Button variant="ghost" size="icon" onClick={() => handleEditClick(user)}>
+                        <MoreVertical className="w-4 h-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                )) : (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-10 text-gray-500">
+                      No users found.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          {/* Pagination controls can be added here */}
+        </>
       )}
 
+      {/* The dialog for editing will be connected in Phase 4 */}
       <UserEditDialog
         user={selectedUser}
         isOpen={isEditDialogOpen}

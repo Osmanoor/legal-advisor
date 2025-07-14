@@ -274,12 +274,13 @@ class AuthService:
             body = f"Your verification code is: {code}. Welcome!"
             
             formatted_phone = f"{phone_number.lstrip('0')}"
-            success, error = self._send_sms(formatted_phone, body)
+            print(f"Sending verification SMS to {formatted_phone}: {body}")
+            # success, error = self._send_sms(formatted_phone, body)
 
-            if not success:
-                # In a real app, you might want to handle this more gracefully,
-                # but for now, we'll return an error.
-                return {"error": "User created, but failed to send verification SMS."}, 500
+            # if not success:
+            #     # In a real app, you might want to handle this more gracefully,
+            #     # but for now, we'll return an error.
+            #     return {"error": "User created, but failed to send verification SMS."}, 500
 
             # Prepare a success response, but DO NOT return a token yet.
             user_data = {

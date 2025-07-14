@@ -2,12 +2,42 @@
 
 import os
 from flask import Blueprint, request, jsonify, redirect
-from flask_jwt_extended import set_access_cookies, unset_jwt_cookies, jwt_required
+from flask_jwt_extended import set_access_cookies, unset_jwt_cookies, jwt_required, get_jwt_identity
 from app.services.auth_service import AuthService
 from app.utils.auth_decorators import permission_required
+from app.models import User # Import the User model
 
 auth_bp = Blueprint('auth', __name__)
 auth_service = AuthService()
+
+# --- New Endpoint to Get Current User ---
+@auth_bp.route('/me', methods=['GET'])
+@jwt_required()
+def get_current_user():
+    """Gets the profile of the currently authenticated user."""
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Serialize the user's data. This can be moved to a helper function if reused.
+    role_permissions = {perm.name for role in user.roles for perm in role.permissions}
+    user_specific_perms = {override.permission.name for override in user.permission_overrides if override.override_type == 'ALLOW'}
+    denied_perms = {override.permission.name for override in user.permission_overrides if override.override_type == 'DENY'}
+    
+    # Final permissions are (role perms UNION user allow perms) MINUS user deny perms
+    all_permissions = list((role_permissions.union(user_specific_perms)) - denied_perms)
+
+    user_data = {
+        "id": str(user.id),
+        "fullName": user.full_name,
+        "email": user.email,
+        "phoneNumber": user.phone_number,
+        "jobTitle": user.job_title,
+        "roles": [role.name for role in user.roles],
+        "permissions": all_permissions
+    }
+    return jsonify(user_data), 200
 
 # --- Password Reset Flow ---
 

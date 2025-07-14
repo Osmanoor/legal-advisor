@@ -1,7 +1,8 @@
-// File: src/components/dashboard/DashboardHeader.tsx
+// src/components/dashboard/DashboardHeader.tsx
 
 import React, { useState } from 'react';
-import { Search, ChevronDown, Menu, X } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Search, ChevronDown, Menu, X, User as UserIcon, LogOut, Shield } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useLanguage } from '@/hooks/useLanguage';
 import UserAvatar from '/public/images/avatars/avatar1.png';
@@ -9,34 +10,76 @@ import { useUIStore } from '@/stores/uiStore';
 import { Button } from '@/components/ui/button';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
 import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/stores/authStore'; // Import the auth store
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'; // Import Popover
 
 export const DashboardHeader = () => {
   const { t, direction } = useLanguage();
+  const navigate = useNavigate();
   const { toggleSidebar } = useUIStore();
   const { isDesktop } = useBreakpoint();
   const [isMobileSearchVisible, setMobileSearchVisible] = useState(false);
 
-  // Flags for cleaner conditional rendering
+  // Get user and logout function from the auth store
+  const { user, logout } = useAuthStore();
+  const canAccessAdmin = user?.permissions.includes('access_admin_dashboard');
+
+  const handleLogout = async () => {
+    await logout();
+    // No need to navigate, the protected route guard will handle it.
+  };
+
   const showDefaultMobileHeader = !isDesktop && !isMobileSearchVisible;
   const showActiveMobileSearch = !isDesktop && isMobileSearchVisible;
+
+  const UserProfileDropdown = () => (
+    <Popover>
+      <PopoverTrigger asChild>
+        <div className="flex items-center gap-1 cursor-pointer" role="button">
+          <img src={UserAvatar} alt={user?.fullName || "User Avatar"} className="w-10 h-10 rounded-full" />
+          <ChevronDown className="w-4 h-4 text-gray-800" />
+        </div>
+      </PopoverTrigger>
+      <PopoverContent className="w-56" align={direction === 'rtl' ? 'start' : 'end'}>
+        <div className="p-2">
+          <div className="mb-2 border-b pb-2">
+            <p className="font-semibold text-sm">{user?.fullName}</p>
+            <p className="text-xs text-gray-500">{user?.email || user?.phoneNumber}</p>
+          </div>
+          <div className="space-y-1">
+            <Link to="/profile" className="flex items-center gap-2 w-full p-2 rounded-md text-sm hover:bg-gray-100">
+              <UserIcon className="w-4 h-4" />
+              <span>Profile</span>
+            </Link>
+            
+            {/* CONDITIONAL ADMIN LINK */}
+            {canAccessAdmin && (
+              <Link to="/admin" className="flex items-center gap-2 w-full p-2 rounded-md text-sm hover:bg-gray-100 text-cta font-medium">
+                <Shield className="w-4 h-4" />
+                <span>Admin Dashboard</span>
+              </Link>
+            )}
+
+            <button onClick={handleLogout} className="flex items-center gap-2 w-full p-2 rounded-md text-sm hover:bg-red-50 text-red-600">
+              <LogOut className="w-4 h-4" />
+              <span>Logout</span>
+            </button>
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
 
   return (
     <header className="h-[86px] bg-white flex items-center px-4 sm:px-6 lg:px-[58px] border-b border-border-default">
       <div className="flex justify-between items-center w-full gap-4">
 
-        {/* Hamburger Menu (Mobile default view) */}
         {showDefaultMobileHeader && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="lg:hidden text-gray-600"
-            onClick={toggleSidebar}
-          >
+          <Button variant="ghost" size="icon" className="lg:hidden text-gray-600" onClick={toggleSidebar}>
             <Menu className="w-6 h-6" />
           </Button>
         )}
 
-        {/* Active Mobile Search Bar (takes up most of the space) */}
         {showActiveMobileSearch && (
           <div className="flex items-center gap-2 w-full">
             <Button variant="ghost" size="icon" onClick={() => setMobileSearchVisible(false)}>
@@ -53,19 +96,12 @@ export const DashboardHeader = () => {
           </div>
         )}
 
-        {/* Spacer for Desktop view to align right-side content correctly */}
         {isDesktop && <div className="flex-grow"></div>}
 
-        {/* Right-side content (Profile/Search) */}
         <div className={cn("flex items-center gap-3", direction === 'rtl' ? 'mr-auto' : 'ml-auto')}>
-
-          {/* DESKTOP VIEW: Always show full search and profile */}
           {isDesktop && (
             <div className={`flex items-center gap-3 ${direction === 'rtl' ? 'flex-row-reverse' : ''}`}>
-              <div className={`flex items-center gap-1`}>
-                <img src={UserAvatar} alt={t('user.avatarAlt') || "User Avatar"} className="w-10 h-10 rounded-full" />
-                <ChevronDown className="w-4 h-4 text-gray-800" />
-              </div>
+              <UserProfileDropdown />
               <div className={`flex items-center border border-gray-300 rounded-md px-3 h-[34px] w-[240px]`}>
                 <Search className={`w-5 h-5 text-gray-500 ${direction === 'rtl' ? 'ml-3' : 'mr-3'}`} />
                 <Input
@@ -79,16 +115,12 @@ export const DashboardHeader = () => {
             </div>
           )}
 
-          {/* MOBILE/TABLET VIEW (Default): Show search icon and profile */}
           {showDefaultMobileHeader && (
              <div className="flex items-center gap-2">
                 <Button variant="ghost" size="icon" onClick={() => setMobileSearchVisible(true)}>
                   <Search className="w-5 h-5 text-gray-600" />
                 </Button>
-                <div className={`flex items-center gap-1`}>
-                  <img src={UserAvatar} alt={t('user.avatarAlt') || "User Avatar"} className="w-10 h-10 rounded-full" />
-                  <ChevronDown className="w-4 h-4 text-gray-800" />
-                </div>
+                <UserProfileDropdown />
               </div>
           )}
         </div>

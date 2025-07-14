@@ -1,7 +1,6 @@
 // File: src/App.tsx
-// @updated
-// Final update for Phase 2: Adding protected admin routes.
 
+import React, { useEffect } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ThemeProvider } from './providers/ThemeProvider';
@@ -31,23 +30,24 @@ import TenderMappingPage from './pages/TenderMappingPage';
 import LoginPage from './pages/LoginPage';
 import ConfirmAccountPage from './pages/ConfirmAccountPage';
 import AdditionalInfoPage from './pages/AdditionalInfoPage';
-// import PasswordResetPage from './pages/PasswordResetPage';
 
 // Admin Pages
 import AnalyticsPage from './pages/admin/AnalyticsPage';
 import UserManagementPage from './pages/admin/UserManagementPage';
 import FeedbackManagementPage from './pages/admin/FeedbackManagementPage';
+import ContactManagementPage from './pages/admin/ContactManagementPage';
 
 import './styles/base.css';
+import LoadingSpinner from './components/ui/loading-spinner';
 
 function GaPageTracker() {
   usePageTracking();
   return null;
 }
 
+// This component correctly protects general authenticated routes. No changes needed.
 const ProtectedRoutes = () => {
-  const { isAuthenticated, isLoading } = useAuthStore();
-  if (isLoading) return <div>Loading...</div>;
+  const { isAuthenticated } = useAuthStore();
   return isAuthenticated ? <AppLayout><Outlet /></AppLayout> : <Navigate to="/login" replace />;
 };
 
@@ -57,6 +57,20 @@ const AuthRoutes = () => {
 };
 
 function App() {
+  const { isLoading, checkAuthStatus } = useAuthStore();
+
+  useEffect(() => {
+    checkAuthStatus();
+  }, [checkAuthStatus]);
+
+  if (isLoading) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center bg-background-body">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
@@ -68,14 +82,13 @@ function App() {
               {/* Public Landing Page */}
               <Route path="/" element={<LandingPage />} />
               
-              {/* Authentication Routes */}
+              {/* Authentication Routes (for logged-out users) */}
               <Route element={<AuthRoutes />}>
                 <Route path="/login" element={<LoginPage />} />
-                {/* <Route path="/password-reset" element={<PasswordResetPage />} /> */}
+                <Route path="/confirm-account" element={<ConfirmAccountPage />} />
+                <Route path="/additional-info" element={<AdditionalInfoPage />} />
               </Route>
-              <Route path="/confirm-account" element={<ConfirmAccountPage />} />
-              <Route path="/additional-info" element={<AdditionalInfoPage />} />
-
+              
               {/* Protected User Dashboard Routes */}
               <Route element={<ProtectedRoutes />}>
                 <Route path="/chat" element={<ChatPage />} />
@@ -94,7 +107,7 @@ function App() {
                 <Route path="analytics" element={<AnalyticsPage />} />
                 <Route path="users" element={<UserManagementPage />} />
                 <Route path="feedback" element={<FeedbackManagementPage />} />
-                {/* Redirect /admin to /admin/analytics by default */}
+                <Route path="contacts" element={<ContactManagementPage />} />
                 <Route index element={<Navigate to="analytics" replace />} />
               </Route>
 

@@ -1,6 +1,4 @@
-// File: src/features/auth/components/LoginForm.tsx
-// @new
-// The form handling user login.
+// src/features/auth/components/LoginForm.tsx
 
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
@@ -13,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { SocialLogins } from './SocialLogins';
+import { AxiosError } from 'axios';
 
 interface LoginFormProps {
   onSwitchToSignup: () => void;
@@ -24,17 +23,20 @@ export function LoginForm({ onSwitchToSignup }: LoginFormProps) {
   const { login, isLoading } = useAuthStore();
   const { showToast } = useToast();
 
-  const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await login({ email, password });
-      navigate('/chat'); // Redirect to dashboard after successful login
+      await login({ phoneNumber, password });
+      navigate('/chat'); // Redirect on success
     } catch (error) {
-      showToast(t('auth.errorInvalidCredentials'), 'error');
+      // Handle specific error messages from the backend
+      const axiosError = error as AxiosError<{ error?: string }>;
+      const errorMessage = axiosError.response?.data?.error || t('auth.errorInvalidCredentials');
+      showToast(errorMessage, 'error');
     }
   };
 
@@ -46,14 +48,16 @@ export function LoginForm({ onSwitchToSignup }: LoginFormProps) {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <Label htmlFor="email">{t('auth.email')}</Label>
+          <Label htmlFor="phone-number">رقم الهاتف</Label>
           <Input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder={t('auth.emailPlaceholder')}
+            id="phone-number"
+            type="tel"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            placeholder="أدخل رقم الهاتف"
             required
+            dir="ltr"
+            autoComplete="tel"
           />
         </div>
         <div>
@@ -65,6 +69,7 @@ export function LoginForm({ onSwitchToSignup }: LoginFormProps) {
             onChange={(e) => setPassword(e.target.value)}
             placeholder={t('auth.passwordPlaceholder')}
             required
+            autoComplete="current-password"
           />
         </div>
         
@@ -89,7 +94,8 @@ export function LoginForm({ onSwitchToSignup }: LoginFormProps) {
         </Button>
       </form>
 
-      <SocialLogins />
+      {/* SocialLogins component can be added back if needed */}
+      {/* <SocialLogins /> */}
     </div>
   );
 }

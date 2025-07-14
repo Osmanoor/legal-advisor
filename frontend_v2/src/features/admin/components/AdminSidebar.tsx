@@ -1,10 +1,8 @@
-// File: src/features/admin/components/AdminSidebar.tsx
-// @new
-// Sidebar for the admin dashboard with admin-specific navigation links.
+// src/features/admin/components/AdminSidebar.tsx
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { BarChart2, Users, MessageSquare, Settings, HelpCircle, LogOut } from 'lucide-react';
+import { BarChart2, Users, MessageSquare, Settings, HelpCircle, LogOut, Mail } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
 import NewLogoDark from '@/assets/logo-new-dash.svg';
 import { useUIStore } from '@/stores/uiStore';
@@ -16,19 +14,21 @@ const iconMap: { [key: string]: React.ElementType } = {
   analytics: BarChart2,
   users: Users,
   feedback: MessageSquare,
+  contacts: Mail,
 };
 
 export const AdminSidebar = () => {
   const { t } = useLanguage();
   const location = useLocation();
-  const { logout } = useAuthStore();
+  const { logout } = useAuthStore(); // This now calls the live API function
   const { isSidebarOpen, setSidebarOpen } = useUIStore();
   const { isDesktop } = useBreakpoint();
 
   const mainNavItems = [
     { path: '/admin/analytics', textAr: 'الأحصائيات', iconName: 'analytics' },
     { path: '/admin/users', textAr: 'إدارة المستخدمين', iconName: 'users' },
-    { path: '/admin/feedback', textAr: 'إدارة التواصل', iconName: 'feedback' },
+    { path: '/admin/feedback', textAr: 'إدارة التقييم', iconName: 'feedback' },
+    { path: '/admin/contacts', textAr: 'رسائل التواصل', iconName: 'contacts' },
   ];
 
   const secondaryNavItems = [
@@ -46,7 +46,8 @@ export const AdminSidebar = () => {
 
   const handleLogout = async () => {
     await logout();
-    // No navigate needed, the protected route will handle the redirect.
+    // No navigation is needed here. The protected route component will automatically
+    // detect the change in authentication state and redirect the user to the login page.
   };
 
   return (

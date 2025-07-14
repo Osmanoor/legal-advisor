@@ -1,4 +1,4 @@
-// File: src/components/dashboard/DashboardSidebar.tsx
+// src/components/dashboard/DashboardSidebar.tsx
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -7,7 +7,8 @@ import { useLanguage } from '@/hooks/useLanguage';
 import NewLogoDark from '@/assets/logo-new-dash.svg';
 import { useUIStore } from '@/stores/uiStore';
 import { cn } from '@/lib/utils';
-import { useBreakpoint } from '@/hooks/useBreakpoint'; // Import the breakpoint hook
+import { useBreakpoint } from '@/hooks/useBreakpoint';
+import { useAuthStore } from '@/stores/authStore'; // Import the auth store
 
 const iconMap: { [key: string]: React.ElementType } = {
   chat: MessageSquare,
@@ -19,8 +20,9 @@ const iconMap: { [key: string]: React.ElementType } = {
 export const DashboardSidebar = () => {
   const { t } = useLanguage();
   const location = useLocation();
-  const { isSidebarOpen, setSidebarOpen } = useUIStore(); // Get state and the setter
-  const { isDesktop } = useBreakpoint(); // Get the breakpoint info
+  const { logout } = useAuthStore(); // Get the logout function from the store
+  const { isSidebarOpen, setSidebarOpen } = useUIStore();
+  const { isDesktop } = useBreakpoint();
 
   const mainNavItems = [
     { path: '/chat', labelKey: 'navigation.chat', textAr: 'المساعد الذكي', iconName: 'chat' },
@@ -37,12 +39,17 @@ export const DashboardSidebar = () => {
 
   const isActive = (path: string) => location.pathname.startsWith(path);
 
-  // New function to handle link clicks
   const handleLinkClick = () => {
-    // Only close the sidebar if we are not on a desktop screen
     if (!isDesktop) {
       setSidebarOpen(false);
     }
+  };
+  
+  // Handler for the logout action
+  const handleLogout = async () => {
+    handleLinkClick(); // Close sidebar on mobile
+    await logout();
+    // The AppLayout's protected route logic will handle the redirect to /login
   };
 
   return (
@@ -62,7 +69,7 @@ export const DashboardSidebar = () => {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-grow pt-8 px-6">
+      <nav className="flex-grow pt-8 px-6 flex flex-col">
         {/* Main Navigation */}
         <ul className="space-y-4 mb-8">
           {mainNavItems.map(item => {
@@ -72,7 +79,7 @@ export const DashboardSidebar = () => {
               <li key={item.path} className="relative">
                 <Link
                   to={item.path}
-                  onClick={handleLinkClick} // Add the click handler here
+                  onClick={handleLinkClick}
                   className={`flex items-center justify-end gap-3 p-3 h-[40px] font-bold rounded-md transition-colors group
                               ${active ? 'bg-[#F5F8FE] text-cta' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'}`}
                 >
@@ -91,21 +98,39 @@ export const DashboardSidebar = () => {
         </ul>
 
         <hr className="border-gray-200 my-8" />
-
+        
+        {/* Secondary Navigation (including Logout) */}
         <ul className="space-y-4">
           {secondaryNavItems.map(item => {
             const IconComponent = item.icon;
+            // If the item is the logout link, render a button instead
+            if (item.path === '/logout') {
+              return (
+                <li key={item.path}>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center justify-end gap-3 p-3 h-[40px] w-full rounded-md text-gray-500 hover:bg-red-50 hover:text-red-600 group transition-colors"
+                  >
+                    <span className="font-normal text-lg text-right" style={{ fontFamily: 'var(--font-primary-arabic)' }}>
+                      {item.textAr}
+                    </span>
+                    <IconComponent className="w-5 h-5 text-gray-400 group-hover:text-red-500" />
+                  </button>
+                </li>
+              );
+            }
+            // Otherwise, render a normal Link
             return (
               <li key={item.path}>
                 <Link
                   to={item.path}
-                  onClick={handleLinkClick} // And also add it here
+                  onClick={handleLinkClick}
                   className="flex items-center justify-end gap-3 p-3 h-[40px] rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-700 group transition-colors"
                 >
                   <span className="font-normal text-lg text-right" style={{ fontFamily: 'var(--font-primary-arabic)' }}>
                     {item.textAr}
                   </span>
-                  {IconComponent && <IconComponent className="w-5 h-5 text-gray-400 group-hover:text-gray-500" />}
+                  <IconComponent className="w-5 h-5 text-gray-400 group-hover:text-gray-500" />
                 </Link>
               </li>
             );

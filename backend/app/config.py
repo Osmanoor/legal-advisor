@@ -3,21 +3,44 @@
 import os
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
 basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basedir, '..', '.env'))
 
 class Config:
     """Application configuration"""
 
-    # --- Security Configurations ---
-    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or 'a-default-fallback-secret-key'
-    JWT_TOKEN_LOCATION = ["cookies"]
-    # JWT_COOKIE_CSRF_PROTECT = False
-
     # --- Database Configurations ---
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    # --- Security & JWT Configurations ---
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or 'a-default-fallback-secret-key'
+    
+    # --- THIS IS THE CRITICAL FIX ---
+    # Explicitly tell JWT to look for the token in cookies.
+    JWT_TOKEN_LOCATION = ["cookies"]
+
+    # Use 'Lax' for development on HTTP. 'Lax' is the default for modern browsers
+    # and works for top-level navigations, which is what our login redirect is.
+    # This does NOT require the 'Secure' flag.
+    # JWT_COOKIE_SAMESITE = 'Lax' 
+    
+    # # This MUST be False for development over HTTP.
+    # JWT_COOKIE_SECURE = False
+    
+    # Explicitly name the cookie.
+    JWT_ACCESS_COOKIE_NAME = "access_token_cookie"
+
+    # Set the cookie path to the root of the domain. This is important.
+    JWT_COOKIE_PATH = "/"
+    
+    # Turn off CSRF protection for now to isolate the issue. We can re-enable later.
+    # In a cross-domain setup (e.g., localhost:5173 to localhost:8080), CSRF can
+    # cause issues if not configured perfectly.
+    JWT_COOKIE_CSRF_PROTECT = False
+    
+    # Ensure the cookie is not accessible via JavaScript.
+    JWT_COOKIE_HTTPONLY = True
 
     # --- Existing Configurations ---
     CONTACTS_FILE = os.path.join('data', 'contacts.csv')
@@ -25,37 +48,29 @@ class Config:
     ADMIN_USERNAME = 'admin'
     ADMIN_PASSWORD = '123'
 
-    # Add any chat-specific configurations here
+    # ... (rest of your config file remains unchanged) ...
     CHAT_CONFIG = {
         'default_language': 'ar',
         'max_history_length': 100
     }
-
-    # Search configurations
     SEARCH_CONFIG = {
         'default_page_size': 10,
         'max_page_size': 100,
         'min_query_length': 2,
         'valid_doc_types': ['System', 'Regulation', 'Both']
     }
-
-    # Library configurations
     LIBRARY_ROOT_FOLDER = "backend/library"
     LIBRARY_CONFIG = {
         'allowed_file_types': ['pdf', 'doc', 'docx', 'txt'],
-        'max_file_size': 50 * 1024 * 1024,  # 50MB
+        'max_file_size': 50 * 1024 * 1024,
         'default_sort_by': 'name',
         'default_sort_order': 'asc'
     }
-
-    CONTACTS_FILE = os.path.join('data', 'contacts.csv')
     ADMIN_CONFIG = {
-        'allowed_email_domains': ['*'],  # Allow all domains
+        'allowed_email_domains': ['*'],
         'max_message_length': 1000,
         'required_fields': ['name', 'email', 'message']
     }
-
-    # Templates & Email configurations
     TEMPLATES_DIR = 'backend/app/templates/docs'
     SMTP_CONFIG = {
         'server': 'smtp.gmail.com',
@@ -63,9 +78,5 @@ class Config:
         'username': 'osmanoor2018@gmail.com',
         'password': 'kjpq qqgc moju mqhe'
     }
-
-    #Journey
     Journey_DIR = os.path.join('backend','data', 'journey')
-
-    #Tender Mapping
     TENDER_MAPPING_DIR = os.path.join('backend','data', 'tender_mapping')

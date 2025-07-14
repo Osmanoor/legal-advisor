@@ -1,6 +1,6 @@
 # app/services/users_admin_service.py
 
-from app.models import User, Role, Permission, UserPermissionOverride
+from app.models import User, Role, Permission
 from app.extensions import db
 from app.utils.validators import validate_phone_number, validate_password
 

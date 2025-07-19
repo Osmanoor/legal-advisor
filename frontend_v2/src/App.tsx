@@ -1,4 +1,4 @@
-// File: src/App.tsx
+// src/App.tsx
 
 import React, { useEffect } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -13,8 +13,6 @@ import { queryClient } from './lib/Client';
 
 // Layouts
 import { AppLayout } from './components/layouts/AppLayout';
-
-// Route Guards
 import { AdminProtectedRoute } from './routes/AdminProtectedRoute';
 
 // Pages
@@ -28,8 +26,9 @@ import TemplatesPage from './pages/TemplatesPage';
 import JourneyPage from './pages/JourneyPage';
 import TenderMappingPage from './pages/TenderMappingPage';
 import LoginPage from './pages/LoginPage';
-import ConfirmAccountPage from './pages/ConfirmAccountPage';
-import AdditionalInfoPage from './pages/AdditionalInfoPage';
+import SettingsPage from './pages/SettingsPage';
+// import ConfirmAccountPage from './pages/ConfirmAccountPage'; // No longer a separate page
+// import AdditionalInfoPage from './pages/AdditionalInfoPage'; // No longer a separate page
 
 // Admin Pages
 import AnalyticsPage from './pages/admin/AnalyticsPage';
@@ -37,23 +36,26 @@ import UserManagementPage from './pages/admin/UserManagementPage';
 import FeedbackManagementPage from './pages/admin/FeedbackManagementPage';
 import ContactManagementPage from './pages/admin/ContactManagementPage';
 
+
 import './styles/base.css';
 import LoadingSpinner from './components/ui/loading-spinner';
+import PasswordResetPage from './pages/PasswordResetPage';
 
 function GaPageTracker() {
   usePageTracking();
   return null;
 }
 
-// This component correctly protects general authenticated routes. No changes needed.
 const ProtectedRoutes = () => {
   const { isAuthenticated } = useAuthStore();
   return isAuthenticated ? <AppLayout><Outlet /></AppLayout> : <Navigate to="/login" replace />;
 };
 
+// FIX: Update the AuthRoutes guard logic to check the onboarding status
 const AuthRoutes = () => {
-   const { isAuthenticated } = useAuthStore();
-   return isAuthenticated ? <Navigate to="/chat" replace /> : <Outlet />;
+   const { isAuthenticated, isOnboarding } = useAuthStore();
+   // Redirect ONLY if authenticated AND NOT in the middle of the onboarding flow.
+   return isAuthenticated && !isOnboarding ? window.location.href = '/chat' : <Outlet />;
 };
 
 function App() {
@@ -85,8 +87,7 @@ function App() {
               {/* Authentication Routes (for logged-out users) */}
               <Route element={<AuthRoutes />}>
                 <Route path="/login" element={<LoginPage />} />
-                <Route path="/confirm-account" element={<ConfirmAccountPage />} />
-                <Route path="/additional-info" element={<AdditionalInfoPage />} />
+                <Route path="/password-reset" element={<PasswordResetPage />} />
               </Route>
               
               {/* Protected User Dashboard Routes */}
@@ -100,6 +101,7 @@ function App() {
                 <Route path="/journey" element={<JourneyPage />} />
                 <Route path="/journey/:levelId" element={<JourneyPage />} />
                 <Route path="/tender-mapping" element={<TenderMappingPage />} />
+                <Route path="/settings" element={<SettingsPage />} /> 
               </Route>
               
               {/* Protected Admin Dashboard Routes */}

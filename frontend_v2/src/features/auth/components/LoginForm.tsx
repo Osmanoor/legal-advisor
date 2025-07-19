@@ -1,7 +1,7 @@
 // src/features/auth/components/LoginForm.tsx
 
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useAuthStore } from '@/stores/authStore';
 import { useToast } from '@/hooks/useToast';
@@ -20,23 +20,27 @@ interface LoginFormProps {
 export function LoginForm({ onSwitchToSignup }: LoginFormProps) {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { login, isLoading } = useAuthStore();
+  const { login } = useAuthStore();
   const { showToast } = useToast();
 
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [loginIdentifier, setLoginIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // Local loading state
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
-      await login({ phoneNumber, password });
-      navigate('/chat'); // Redirect on success
+      // Pass the rememberMe state to the login function
+      await login({ loginIdentifier, password, rememberMe });
+      navigate('/chat');
     } catch (error) {
-      // Handle specific error messages from the backend
       const axiosError = error as AxiosError<{ error?: string }>;
-      const errorMessage = axiosError.response?.data?.error || t('auth.errorInvalidCredentials');
+      const errorMessage = axiosError.response?.data?.error || 'Invalid credentials.';
       showToast(errorMessage, 'error');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -48,29 +52,12 @@ export function LoginForm({ onSwitchToSignup }: LoginFormProps) {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <Label htmlFor="phone-number">رقم الهاتف</Label>
-          <Input
-            id="phone-number"
-            type="tel"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            placeholder="أدخل رقم الهاتف"
-            required
-            dir="ltr"
-            autoComplete="tel"
-          />
+          <Label htmlFor="loginIdentifier">البريد الألكتروني او رقم الهاتف</Label>
+          <Input id="loginIdentifier" value={loginIdentifier} onChange={(e) => setLoginIdentifier(e.target.value)} required />
         </div>
         <div>
-          <Label htmlFor="password">{t('auth.password')}</Label>
-          <Input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder={t('auth.passwordPlaceholder')}
-            required
-            autoComplete="current-password"
-          />
+          <Label htmlFor="password">كلمة السر</Label>
+          <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
         </div>
         
         <div className="flex items-center justify-between">
@@ -81,21 +68,20 @@ export function LoginForm({ onSwitchToSignup }: LoginFormProps) {
               onCheckedChange={(checked) => setRememberMe(!!checked)}
             />
             <Label htmlFor="remember-me" className="font-normal text-sm text-gray-600">
-              {t('auth.rememberMe')}
+              تذكرني
             </Label>
           </div>
           <Link to="/password-reset" className="text-sm font-medium text-cta hover:underline">
-            {t('auth.forgotPassword')}
+            نسيت كلمة السر ؟
           </Link>
         </div>
 
-        <Button type="submit" className="w-full bg-cta hover:bg-cta-hover" disabled={isLoading}>
-          {isLoading ? <LoadingSpinner size="sm" /> : t('auth.login')}
+        <Button type="submit" className="w-full bg-cta hover:bg-cta-hover h-11" disabled={isLoading}>
+          {isLoading ? <LoadingSpinner size="sm" /> : "تسجيل دخول"}
         </Button>
       </form>
 
-      {/* SocialLogins component can be added back if needed */}
-      {/* <SocialLogins /> */}
+      <SocialLogins />
     </div>
   );
-}
+};

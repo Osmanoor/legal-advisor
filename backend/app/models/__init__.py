@@ -3,7 +3,8 @@
 from .user import User, TokenBlocklist
 from .role_permission import Role, Permission, user_roles, role_permissions
 from .contact import ContactSubmission
-from .review import UserReview  # <-- ADD THIS LINE
+from .review import UserReview  
+from .chat import ChatSession, ChatMessage, MessageResource
 
 __all__ = [
     'User',
@@ -11,8 +12,11 @@ __all__ = [
     'Role',
     'Permission',
     'ContactSubmission',
-    'UserReview',  # <-- AND ADD THIS LINE
+    'UserReview', 
     'user_roles',
     'role_permissions',
-    'user_permission_overrides'
+    'user_permission_overrides',
+    'ChatSession',      
+    'ChatMessage',      
+    'MessageResource',
 ]

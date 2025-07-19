@@ -4,70 +4,68 @@ import { create } from 'zustand';
 import { api } from '@/lib/axios';
 import { AuthState, LoginCredentials, RegisterData, User, VerificationData } from '@/types/user';
 
-export const useAuthStore = create<AuthState>((set) => ({
+// Add new state and actions to the AuthState type
+export interface ExtendedAuthState extends AuthState {
+  isOnboarding: boolean;
+  completeOnboarding: () => void;
+}
+
+export const useAuthStore = create<ExtendedAuthState>((set) => ({
   isAuthenticated: false,
   user: null,
-  isLoading: true, // Start with loading true for initial check
+  isLoading: true, // This is for the initial app load check
+  isOnboarding: false, // Default to false
 
   checkAuthStatus: async () => {
-    // We set isLoading to true at the beginning of the check
     set({ isLoading: true });
     try {
       const response = await api.get<User>('/auth/me');
-      if (response.data) {
-        set({ isAuthenticated: true, user: response.data, isLoading: false });
-      } else {
-        set({ isAuthenticated: false, user: null, isLoading: false });
-      }
+      set({ isAuthenticated: true, user: response.data, isLoading: false, isOnboarding: false });
     } catch (error) {
-      set({ isAuthenticated: false, user: null, isLoading: false });
+      set({ isAuthenticated: false, user: null, isLoading: false, isOnboarding: false });
     }
   },
 
   login: async (credentials) => {
-    set({ isLoading: true });
+    // On a normal login, onboarding is always false.
     try {
       const response = await api.post('/auth/login', credentials);
-      set({ isAuthenticated: true, user: response.data.user, isLoading: false });
+      set({ isAuthenticated: true, user: response.data.user, isOnboarding: false });
     } catch (error) {
-      set({ isAuthenticated: false, user: null, isLoading: false });
-      throw error;
-    }
-  },
-
-  register: async (data) => {
-    set({ isLoading: true });
-    try {
-      await api.post('/auth/register', data);
-    } finally {
-      set({ isLoading: false });
-    }
-  },
-
-  verifyPhone: async (data) => {
-    set({ isLoading: true });
-    try {
-      const response = await api.post('/auth/verify-phone', data);
-      set({ isAuthenticated: true, user: response.data.user, isLoading: false });
-    } catch (error) {
-      set({ isLoading: false });
+      set({ isAuthenticated: false, user: null });
       throw error;
     }
   },
 
   logout: async () => {
-    // No need to set isLoading here, as the UI won't typically show a loading state for logout.
-    // If it does, we can add set({ isLoading: true })
     try {
       await api.post('/auth/logout');
-    } catch (error) {
-      console.error("Logout API call failed, but clearing local state.", error);
     } finally {
-      // Always clear the local state on logout.
-      set({ isAuthenticated: false, user: null, isLoading: false });
+      set({ isAuthenticated: false, user: null, isOnboarding: false });
     }
   },
-}));
 
-// REMOVED THE PROBLEMATIC LINE FROM HERE:
-// useAuthStore.getState().checkAuthStatus();
+  register: async (data) => {
+    // This function only makes the API call. It doesn't set any state.
+    await api.post('/auth/register', data);
+  },
+  
+  // On successful verification, we set the user and flag that they are in the onboarding flow.
+  verifyPhone: async (data) => {
+    try {
+      const response = await api.post('/auth/verify', data);
+      set({ 
+        isAuthenticated: true, 
+        user: response.data.user, 
+        isOnboarding: true // The user is logged in but needs to complete the final step.
+      });
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // New action to be called when the user finishes the last step.
+  completeOnboarding: () => {
+    set({ isOnboarding: false });
+  },
+}));

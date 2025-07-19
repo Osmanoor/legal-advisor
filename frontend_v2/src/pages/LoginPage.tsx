@@ -1,32 +1,37 @@
-// File: src/pages/LoginPage.tsx
-// @new
-// This page acts as the container for both Login and Signup forms.
+// src/pages/LoginPage.tsx
 
 import React, { useState } from 'react';
 import { AuthLayout } from '@/components/layouts/AuthLayout';
 import { LoginForm } from '@/features/auth/components/LoginForm';
-import { SignupForm } from '@/features/auth/components/SignupForm';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MultiStepRegister } from '@/features/auth/components/MultiStepRegister'; // Import the new component
+import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/hooks/useLanguage';
 
 export default function LoginPage() {
   const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState('login');
+  const [view, setView] = useState<'login' | 'register'>('login');
 
   return (
     <AuthLayout>
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-[#ECFFEA] rounded-lg p-1">
-          <TabsTrigger value="signup">{t('auth.signup')}</TabsTrigger>
-          <TabsTrigger value="login">{t('auth.login')}</TabsTrigger>
-        </TabsList>
-        <TabsContent value="login" className="mt-6">
-          <LoginForm onSwitchToSignup={() => setActiveTab('signup')} />
-        </TabsContent>
-        <TabsContent value="signup" className="mt-6">
-          <SignupForm />
-        </TabsContent>
-      </Tabs>
+      {view === 'login' ? (
+        <>
+          <LoginForm onSwitchToSignup={() => setView('register')} />
+          <div className="mt-6 text-center">
+            <Button variant="link" onClick={() => setView('register')} className="text-gray-600 hover:text-cta">
+              ليس لديك حساب ؟ <span className="font-semibold text-cta mr-1">أنشئ حساب</span>
+            </Button>
+          </div>
+        </>
+      ) : (
+        <>
+          <MultiStepRegister />
+          <div className="mt-6 text-center">
+            <Button variant="link" onClick={() => setView('login')} className="text-gray-600 hover:text-cta">
+              لديك حساب بالفعل ؟ <span className="font-semibold text-cta mr-1">سجل دخول</span>
+            </Button>
+          </div>
+        </>
+      )}
     </AuthLayout>
   );
 }

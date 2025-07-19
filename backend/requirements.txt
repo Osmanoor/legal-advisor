@@ -25,3 +25,5 @@ PyJWT
 blinker
 Flask-JWT-Extended
 twilio
+google-cloud-storage
+sendgrid

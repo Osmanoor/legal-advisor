@@ -25,26 +25,36 @@ export interface User {
   email: string | null;
   phoneNumber: string;
   jobTitle: string | null;
-  roles: Role[]; // This is now string[]
+  workplace: string | null; // <-- ADDED
+  linkedin_id: string | null;
+  profile_picture_url: string | null;
+  roles: string[];
   permissions: Permission[];
+}
+
+export interface ChangePasswordData {
+    currentPassword: string;
+    newPassword: string;
 }
 
 // Login credentials
 export interface LoginCredentials {
-  phoneNumber: string;
+  loginIdentifier: string;
   password: string;
+  rememberMe?: boolean;
 }
 
 // Register data
 export interface RegisterData {
   fullName: string;
-  phoneNumber: string;
   password: string;
+  email?: string; // Optional
+  phoneNumber?: string; // Optional
 }
 
 // Phone verification payload
 export interface VerificationData {
-  phoneNumber: string;
+  identifier: string; // Can be email or phone
   code: string;
 }
 

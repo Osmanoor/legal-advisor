@@ -12,8 +12,8 @@ class LocalDriveLibrary:
     def __init__(self, root_folder_path):
         """Initialize with the path to the root folder containing all files"""
         self.root_folder_path = os.path.abspath(root_folder_path)
-        if not os.path.exists(self.root_folder_path):
-            raise ValueError(f"Root folder path does not exist: {self.root_folder_path}")
+        # if not os.path.exists(self.root_folder_path):
+        #     raise ValueError(f"Root folder path does not exist: {self.root_folder_path}")
 
     def _get_file_info(self, file_path):
         """Get file information similar to Google Drive format"""

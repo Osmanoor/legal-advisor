@@ -68,6 +68,11 @@ export const ar = {
     errorEmailExists: 'هذا البريد الإلكتروني مسجل بالفعل.',
     errorPasswordsDoNotMatch: 'كلمتا السر غير متطابقتين.',
     errorGeneric: 'حدث خطأ ما. يرجى المحاولة مرة أخرى.',
+    steps: {
+      basicInfo: 'المعلومات الأساسية',
+      verification: 'التحقق',
+      additionalInfo: 'المعلومات الإضافية'
+    },
   },
   navigation: {
     home: 'الرئيسية',

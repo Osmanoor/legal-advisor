@@ -1,0 +1,25 @@
+/* src/features/auth/components/PhoneNumberInput.css */
+.phone-input-container .PhoneInputInput {
+  /* Mimic ShadCN Input styles */
+  flex: 1;
+  height: 40px;
+  min-height: 40px;
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #E3E6EA;
+  background-color: #FFFFFF;
+  padding: 6px 12px;
+  font-size: 14px;
+  box-shadow: 0px 1px 3px rgba(25, 33, 61, 0.1);
+  transition: border-color 0.2s;
+}
+
+.phone-input-container .PhoneInputInput:focus {
+  outline: none;
+  border-color: #51B749; /* cta color */
+  box-shadow: 0 0 0 1px #51B749;
+}
+
+.phone-input-container .PhoneInputCountry {
+  margin-right: 8px;
+}

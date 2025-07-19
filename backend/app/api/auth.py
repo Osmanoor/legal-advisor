@@ -6,9 +6,111 @@ from flask_jwt_extended import set_access_cookies, unset_jwt_cookies, jwt_requir
 from app.services.auth_service import AuthService
 from app.utils.auth_decorators import permission_required
 from app.models import User # Import the User model
+from app.extensions import db
 
 auth_bp = Blueprint('auth', __name__)
 auth_service = AuthService()
+
+@auth_bp.route('/profile/avatar', methods=['POST'])
+@jwt_required()
+def upload_avatar():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+        
+    if 'avatar' not in request.files:
+        return jsonify({"error": "No file part in the request"}), 400
+        
+    file = request.files['avatar']
+    
+    result, status_code = auth_service.upload_avatar(user, file)
+    return jsonify(result), status_code
+
+
+@auth_bp.route('/password/change', methods=['POST'])
+@jwt_required()
+def change_password():
+    """Allows a logged-in user to change their password."""
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+
+    data = request.get_json()
+    current_password = data.get('currentPassword')
+    new_password = data.get('newPassword')
+
+    if not current_password or not new_password:
+        return jsonify({"error": "Current and new passwords are required."}), 400
+
+    # Verify the user's current password
+    if not user.check_password(current_password):
+        return jsonify({"error": "Incorrect current password."}), 401
+
+    # Set the new password
+    user.set_password(new_password)
+    try:
+        db.session.commit()
+        return jsonify({"message": "Password updated successfully."}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "An internal error occurred."}), 500
+
+
+@auth_bp.route('/profile', methods=['PUT'])
+@jwt_required()
+def update_profile():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Request body cannot be empty"}), 400
+    
+    if 'email' in data and user.email:
+        return jsonify({"error": "Cannot change a verified email from this endpoint."}), 400
+    if 'phoneNumber' in data and user.phone_number:
+        return jsonify({"error": "Cannot change a verified phone number from this endpoint."}), 400
+
+    # Define fields that are allowed to be updated
+    # --- ADD 'workplace' TO THE LIST ---
+    allowed_fields = ['fullName', 'email', 'jobTitle', 'linkedin', 'workplace'] 
+    updated = False
+
+    if 'fullName' in data and data['fullName']:
+        user.full_name = data['fullName']
+        updated = True
+    
+    if 'email' in data and data['email']:
+        if User.query.filter(User.email == data['email'], User.id != user.id).first():
+            return jsonify({"error": "This email is already in use by another account."}), 409
+        user.email = data['email']
+        updated = True
+        
+    if 'jobTitle' in data:
+        user.job_title = data['jobTitle']
+        updated = True
+
+    if 'linkedin' in data:
+        user.linkedin_id = data['linkedin']
+        updated = True
+    
+    # --- ADD LOGIC TO UPDATE THE WORKPLACE FIELD ---
+    if 'workplace' in data:
+        user.workplace = data['workplace']
+        updated = True
+
+    if not updated:
+        return jsonify({"message": "No updatable fields provided."}), 200
+
+    try:
+        db.session.commit()
+        user_data = auth_service.serialize_user(user) # Use a helper for serialization
+        return jsonify(user_data), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "An internal error occurred while updating the profile."}), 500
 
 # --- New Endpoint to Get Current User ---
 @auth_bp.route('/me', methods=['GET'])
@@ -20,61 +122,43 @@ def get_current_user():
     if not user:
         return jsonify({"error": "User not found"}), 404
 
-    # Serialize the user's data. This can be moved to a helper function if reused.
-    role_permissions = {perm.name for role in user.roles for perm in role.permissions}
-    user_specific_perms = {override.permission.name for override in user.permission_overrides if override.override_type == 'ALLOW'}
-    denied_perms = {override.permission.name for override in user.permission_overrides if override.override_type == 'DENY'}
-    
-    # Final permissions are (role perms UNION user allow perms) MINUS user deny perms
-    all_permissions = list((role_permissions.union(user_specific_perms)) - denied_perms)
-
-    user_data = {
-        "id": str(user.id),
-        "fullName": user.full_name,
-        "email": user.email,
-        "phoneNumber": user.phone_number,
-        "jobTitle": user.job_title,
-        "roles": [role.name for role in user.roles],
-        "permissions": all_permissions
-    }
+    user_data = auth_service.serialize_user(user)
     return jsonify(user_data), 200
 
 # --- Password Reset Flow ---
-
 @auth_bp.route('/password/forgot', methods=['POST'])
 def forgot_password():
     data = request.get_json()
-    phone_number = data.get('phoneNumber')
-    if not phone_number:
-        return jsonify({"error": "Phone number is required"}), 400
+    identifier = data.get('identifier')
+    if not identifier:
+        return jsonify({"error": "Email or phone number is required"}), 400
     
-    result, status_code = auth_service.request_password_reset(phone_number)
+    result, status_code = auth_service.request_password_reset(identifier)
     return jsonify(result), status_code
 
 @auth_bp.route('/password/verify-code', methods=['POST'])
 def verify_code():
     data = request.get_json()
-    phone_number = data.get('phoneNumber')
+    identifier = data.get('identifier')
     code = data.get('code')
-    if not phone_number or not code:
-        return jsonify({"error": "Phone number and code are required"}), 400
+    if not identifier or not code:
+        return jsonify({"error": "Identifier and code are required"}), 400
         
-    result, status_code = auth_service.verify_reset_code(phone_number, code)
+    result, status_code = auth_service.verify_reset_code(identifier, code)
     return jsonify(result), status_code
 
 @auth_bp.route('/password/reset', methods=['POST'])
 def reset_password():
     data = request.get_json()
-    phone_number = data.get('phoneNumber')
+    identifier = data.get('identifier')
     new_password = data.get('newPassword')
-    # NOTE: In a real app, you'd pass a temporary token from verify_code
-    # to prove the user completed that step. For simplicity, we omit that here.
-    if not phone_number or not new_password:
-        return jsonify({"error": "Phone number and new password are required"}), 400
+    code = data.get('code') # We now require the code for the final step for security
     
-    result, status_code = auth_service.set_new_password(phone_number, new_password)
+    if not identifier or not new_password or not code:
+        return jsonify({"error": "Identifier, new password, and verification code are required"}), 400
+    
+    result, status_code = auth_service.set_new_password(identifier, new_password, code)
     return jsonify(result), status_code
-
 # --- LinkedIn Social Login Flow ---
 
 @auth_bp.route('/linkedin', methods=['GET'])
@@ -113,50 +197,48 @@ def linkedin_callback():
 
 
 # ... (register, login, logout endpoints remain here) ...
-@auth_bp.route('/verify-phone', methods=['POST'])
-def verify_phone():
-    """Endpoint for verifying a new user's phone number."""
+@auth_bp.route('/register', methods=['POST'])
+def register():
     data = request.get_json()
-    phone_number = data.get('phoneNumber')
-    code = data.get('code')
+    # Pass all relevant fields to the service
+    result, status_code = auth_service.register_user(
+        full_name=data.get('fullName'),
+        password=data.get('password'),
+        email=data.get('email'),
+        phone_number=data.get('phoneNumber')
+    )
+    return jsonify(result), status_code
 
-    if not phone_number or not code:
-        return jsonify({"error": "Phone number and code are required"}), 400
-    
-    result, status_code = auth_service.verify_phone_number(phone_number, code)
-
-    # If verification is successful, a token is returned. We must set the cookie.
+# Rename verify-phone to verify
+@auth_bp.route('/verify', methods=['POST'])
+def verify():
+    data = request.get_json()
+    result, status_code = auth_service.verify_otp(
+        identifier=data.get('identifier'),
+        code=data.get('code')
+    )
+    # The login process is now handled inside verify_otp
     if status_code == 200:
         response = jsonify({"user": result["user"]})
         set_access_cookies(response, result["token"])
         return response, 200
-
-    return jsonify(result), status_code
-
-@auth_bp.route('/register', methods=['POST'])
-def register():
-    data = request.get_json()
-    full_name = data.get('fullName')
-    phone_number = data.get('phoneNumber')
-    password = data.get('password')
-    if not all([full_name, phone_number, password]):
-        return jsonify({"error": "Full name, phone number, and password are required"}), 400
-    result, status_code = auth_service.register_user(full_name, phone_number, password)
     return jsonify(result), status_code
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
-    phone_number = data.get('phoneNumber')
-    password = data.get('password')
-    if not phone_number or not password:
-        return jsonify({"error": "Phone number and password are required"}), 400
-    result, status_code = auth_service.login_user(phone_number, password)
+    # Use a generic identifier for login
+    result, status_code = auth_service.login_user(
+        login_identifier=data.get('loginIdentifier'),
+        password=data.get('password'),
+        remember_me=data.get('rememberMe', False),
+    )
     if status_code == 200:
         response = jsonify({"user": result["user"]})
         set_access_cookies(response, result["token"])
         return response, 200
     return jsonify(result), status_code
+
 
 @auth_bp.route('/logout', methods=['POST'])
 @jwt_required()
@@ -165,12 +247,3 @@ def logout():
     response = jsonify(result)
     unset_jwt_cookies(response)
     return response, status_code
-
-@auth_bp.route('/test-permission', methods=['GET'])
-@permission_required('access_admin_dashboard') # Protect this route
-def test_permission():
-    """
-    A test endpoint to demonstrate the permission decorator.
-    Only users with 'access_admin_dashboard' permission can access this.
-    """
-    return jsonify({"message": "Success! You have the 'access_admin_dashboard' permission."}), 200

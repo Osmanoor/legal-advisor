@@ -1,6 +1,14 @@
 from typing import Optional
 import re
 
+def validate_email(email: str) -> bool:
+    """Validates an email format."""
+    if not email:
+        return False
+    # A standard, reasonably strict regex for email validation
+    pattern = re.compile(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
+    return pattern.match(email) is not None
+
 def validate_phone_number(phone_number: str) -> bool:
     """
     Validates a phone number format.

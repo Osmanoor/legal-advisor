@@ -32,11 +32,19 @@ export const DashboardHeader = () => {
   const showDefaultMobileHeader = !isDesktop && !isMobileSearchVisible;
   const showActiveMobileSearch = !isDesktop && isMobileSearchVisible;
 
+  if (!user) {
+    return (
+        <header className="h-[86px] bg-white border-b border-border-default flex items-center px-4">
+            <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse ml-auto"></div>
+        </header>
+    );
+  }
+
   const UserProfileDropdown = () => (
     <Popover>
       <PopoverTrigger asChild>
         <div className="flex items-center gap-1 cursor-pointer" role="button">
-          <img src={UserAvatar} alt={user?.fullName || "User Avatar"} className="w-10 h-10 rounded-full" />
+          <img src={user.profile_picture_url || UserAvatar} alt={user.fullName || "User Avatar"} className="w-10 h-10 rounded-full" />
           <ChevronDown className="w-4 h-4 text-gray-800" />
         </div>
       </PopoverTrigger>
@@ -47,7 +55,7 @@ export const DashboardHeader = () => {
             <p className="text-xs text-gray-500">{user?.email || user?.phoneNumber}</p>
           </div>
           <div className="space-y-1">
-            <Link to="/profile" className="flex items-center gap-2 w-full p-2 rounded-md text-sm hover:bg-gray-100">
+            <Link to="/settings" className="flex items-center gap-2 w-full p-2 rounded-md text-sm hover:bg-gray-100">
               <UserIcon className="w-4 h-4" />
               <span>Profile</span>
             </Link>

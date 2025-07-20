@@ -1,36 +1,25 @@
 # app/services/chat_service.py
-from dataclasses import dataclass, asdict
-from typing import Optional, Dict, List, Tuple
-from flask import jsonify
+
+import uuid
 import sys
 import os
-from dotenv import load_dotenv
+from flask import jsonify
+from app.extensions import db
+from app.models import ChatSession, ChatMessage, MessageResource
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+# Correctly import the RAG system components
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from src.config import load_config
 from src.rag_system import ArabicRAGSystem
 
-load_dotenv()   
-
-@dataclass
-class ChatResponse:
-    """Structure for chat response"""
-    answer: str
-    sources: list
-    error: Optional[str] = None
-
 class ChatService:
     def __init__(self):
-        self.rag_systems: Dict[str, Dict[bool, ArabicRAGSystem]] = {}
-        self.chat_histories: Dict[str, List[Tuple[str, str]]] = {}
-        self.configs: Dict[str, Dict[bool, dict]] = {}
+        # Your existing RAG system initialization remains the same
+        self.rag_systems = {}
+        self.configs = {}
 
-    def get_system_key(self, language: str, reasoning: bool) -> str:
-        """Generate a unique key for the language-reasoning combination"""
-        return f"{language}_{reasoning}"
-
-    def get_rag_system(self, language: str, reasoning: bool = False) -> ArabicRAGSystem:
-        """Get or create RAG system for specified language and reasoning mode"""
+    def get_rag_system(self, language: str = 'ar', reasoning: bool = False):
+        """Get or create RAG system for specified language and reasoning mode."""
         if language not in self.rag_systems:
             self.rag_systems[language] = {}
             self.configs[language] = {}
@@ -41,48 +30,115 @@ class ChatService:
 
         return self.rag_systems[language][reasoning]
 
-    def process_chat(self, data: dict):
-        """Process chat message and return response"""
-        message = data.get('message')
-        session_id = data.get('sessionId', 'default')
-        language = data.get('language', 'ar')
-        reasoning = data.get('reasoning', False)
+    # --- NEW DATABASE-DRIVEN METHODS ---
 
-        if not message:
-            return jsonify({"error": "No message provided"}), 400
+    def get_sessions_for_user(self, user_id: str):
+        """Fetches all chat sessions for a given user from the database."""
+        user_uuid = uuid.UUID(user_id)
+        sessions = ChatSession.query.filter_by(user_id=user_uuid).order_by(ChatSession.updated_at.desc()).all()
+        return sessions
 
-        rag_system = self.get_rag_system(language, reasoning)
+    def get_session_by_id(self, session_id: str, user_id: str):
+        """Fetches a single chat session, ensuring it belongs to the user."""
+        session_uuid = uuid.UUID(session_id)
+        user_uuid = uuid.UUID(user_id)
+        session = ChatSession.query.filter_by(id=session_uuid, user_id=user_uuid).first()
+        return session
 
-        if session_id not in self.chat_histories:
-            self.chat_histories[session_id] = []
+    def delete_session_by_id(self, session_id: str, user_id: str) -> bool:
+        """Deletes a session from the database if it belongs to the user."""
+        session = self.get_session_by_id(session_id, user_id)
+        if session:
+            db.session.delete(session)
+            db.session.commit()
+            return True
+        return False
 
-        response = rag_system.query(
-            message,
-            self.chat_histories[session_id]
+    def _get_history_for_rag(self, session: ChatSession):
+        """Formats the chat history from the database for the RAG system."""
+        history = []
+        # The RAG system expects a list of tuples: (user_message, assistant_response)
+        user_msgs = [msg for msg in session.messages if msg.role == 'user']
+        assistant_msgs = [msg for msg in session.messages if msg.role == 'assistant']
+        
+        # Pair them up
+        for i in range(len(user_msgs)):
+            user_msg = user_msgs[i].content
+            assistant_msg = assistant_msgs[i].content if i < len(assistant_msgs) else ""
+            history.append((user_msg, assistant_msg))
+            
+        return history
+
+    def add_message_to_session(self, session_id: str, user_id: str, user_message_content: str, options: dict):
+        """Adds a user message, gets an assistant response, and saves both to the DB."""
+        session = self.get_session_by_id(session_id, user_id)
+        if not session:
+            return None, "Session not found or access denied"
+
+        # 1. Save the user's message
+        user_message = ChatMessage(session_id=session.id, role='user', content=user_message_content)
+        db.session.add(user_message)
+        db.session.flush() # We need to flush to include this message in the history query
+        
+        # 2. Prepare history for the RAG system from the database
+        history = self._get_history_for_rag(session)
+        history.append((user_message_content, '')) # Add the current question
+
+        # 3. Get the assistant's response using your existing logic
+        rag_system = self.get_rag_system(
+            language=options.get('language', 'ar'),
+            reasoning=options.get('reasoning', False)
         )
+        response_data = rag_system.query(user_message_content, history[:-1]) # Pass history without the current question
+        
+        # 4. Save the assistant's message
+        assistant_message = ChatMessage(session_id=session.id, role='assistant', content=response_data['answer'])
+        db.session.add(assistant_message)
+        db.session.flush() # Flush to get an ID for the assistant_message
 
-        self.chat_histories[session_id].append((message, response["answer"]))
+        # 5. Save resources, using the corrected column name 'resource_metadata'
+        for doc in response_data.get("source_documents", []):
+            resource = MessageResource(
+                message_id=assistant_message.id,
+                content=doc.page_content,
+                resource_metadata=doc.metadata
+            )
+            db.session.add(resource)
+            
+        db.session.commit()
+        return assistant_message, None
 
-        formatted_sources = []
-        for doc in response["source_documents"]:
-            source = {
-                "content": doc.page_content,
-                "metadata": doc.metadata
-            }
-            formatted_sources.append(source)
-
-        chat_response = ChatResponse(
-            answer=response["answer"],
-            sources=formatted_sources
+    def start_new_session(self, user_id: str, first_message_content: str, options: dict):
+        """Starts a new session, gets the first response, and saves everything to the DB."""
+        user_uuid = uuid.UUID(user_id)
+        
+        new_session = ChatSession(
+            user_id=user_uuid,
+            title=first_message_content[:120]
         )
-        return jsonify(asdict(chat_response))
+        db.session.add(new_session)
+        
+        user_message = ChatMessage(session=new_session, role='user', content=first_message_content)
+        db.session.add(user_message)
+        
+        rag_system = self.get_rag_system(
+            language=options.get('language', 'ar'),
+            reasoning=options.get('reasoning', False)
+        )
+        # There is no history for the first message
+        response_data = rag_system.query(first_message_content, [])
+        
+        assistant_message = ChatMessage(session=new_session, role='assistant', content=response_data['answer'])
+        db.session.add(assistant_message)
+        db.session.flush()
 
-    def get_history(self, session_id: str):
-        """Get chat history for a session"""
-        return jsonify(self.chat_histories.get(session_id, []))
-
-    def clear_history(self, session_id: str):
-        """Clear chat history for a session"""
-        if session_id in self.chat_histories:
-            self.chat_histories[session_id] = []
-        return jsonify({"status": "success"})
+        for doc in response_data.get("source_documents", []):
+            resource = MessageResource(
+                message_id=assistant_message.id,
+                content=doc.page_content,
+                resource_metadata=doc.metadata
+            )
+            db.session.add(resource)
+            
+        db.session.commit()
+        return new_session, None

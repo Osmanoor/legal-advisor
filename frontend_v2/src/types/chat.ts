@@ -1,11 +1,13 @@
 // src/types/chat.ts
 
-// Represents a reference or source for an assistant's answer
+// This is your existing, correct Resource interface. It will be preserved.
 export interface Resource {
   content: string;
   metadata: {
     article_number: number;
-    article_type: string;
+    // article_type is not in your screenshot, but it was in your old file, so I will keep it.
+    // If it's not in the backend response, it can be removed or made optional.
+    article_type: string; 
     chapter_name: string;
     chapter_number: number;
     section_name: string;
@@ -14,37 +16,31 @@ export interface Resource {
   };
 }
 
-// Represents a single message in a conversation
+// This is your existing, correct ChatMessage interface.
 export interface ChatMessage {
-  id: string; // Unique ID for each message
+  id: string; // Will now be a UUID from the database
   role: 'user' | 'assistant';
   content: string;
-  resources?: Resource[];
-  timestamp: string; // Using ISO string for consistency
+  resources?: Resource[]; // The key is to ensure the backend returns this structure
+  timestamp: string; // Will be `created_at` from the database
 }
 
-// Represents a single chat session in the history
+// --- NEW AND UPDATED TYPES FOR PERSISTENT CHAT ---
+
+// Updated to match the backend response for a session list item
 export interface ChatSession {
-  id: string;
+  id: string; // UUID from the database
   title: string;
-  lastUpdated: string; // ISO string
-  questionCount: number;
+  updated_at: string; // ISO string from the database
 }
 
-// Represents the full data for an active chat, including its messages
-export interface ActiveChat extends ChatSession {
-  messages: ChatMessage[];
+// The data returned when starting a new chat session
+export interface NewChatSessionResponse extends ChatSession {
+    messages: ChatMessage[];
 }
 
-// For the API response when sending a message
-export interface ChatResponse {
-  answer: string;
-  sources: Resource[];
-  error?: string | null;
-}
-
-// Options sent with a message
+// Options sent with a message to the backend
 export interface ChatOptions {
-  saudiAccent: boolean;
-  reasoning: boolean; // This can be removed if not used by the new design
+  language?: 'ar' | 'en' | 'sa';
+  reasoning?: boolean;
 }

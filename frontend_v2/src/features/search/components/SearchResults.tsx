@@ -1,8 +1,11 @@
 // src/features/search/components/SearchResults.tsx
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useToast } from "@/hooks/useToast";
 import type { SearchResource } from "@/types";
+import { RotateCw, Share2, Copy, Bookmark, MoreVertical } from 'lucide-react';
 
 interface SearchResultsProps {
   results: SearchResource[];
@@ -10,92 +13,88 @@ interface SearchResultsProps {
 }
 
 export function SearchResults({ results, searchQuery }: SearchResultsProps) {
-  const { t, direction } = useLanguage();
+  const { t } = useLanguage();
+  const { showToast } = useToast();
 
   const highlightText = (text: string, query: string) => {
     if (!query.trim()) return text;
     
-    const parts = text.split(new RegExp(`(${query})`, 'gi'));
+    // Escape special regex characters in the query
+    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const parts = text.split(new RegExp(`(${escapedQuery})`, 'gi'));
+    
     return (
       <>
         {parts.map((part, i) => (
           part.toLowerCase() === query.toLowerCase() ? (
-            <mark key={i} className="bg-yellow-200 rounded px-1">{part}</mark>
-          ) : part
+            <mark key={i} className="bg-green-100 text-green-800 rounded px-1 py-0.5">{part}</mark>
+          ) : (
+            <span key={i}>{part}</span>
+          )
         ))}
       </>
     );
   };
 
+  const handleCopy = (content: string) => {
+    navigator.clipboard.writeText(content);
+    showToast("Content copied to clipboard!", "success");
+  };
+
   return (
     <div className="space-y-6">
       {results.map((resource) => (
-        <Card key={resource.number}>
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <div>
-                <CardTitle>
-                  {t('search.article')} {resource.number}
-                </CardTitle>
-                <CardDescription>
-                  {t('search.chapter')} {resource.chapter.number}: {resource.chapter.name}
-                  <br />
-                  {t('search.section')} {resource.section.number}: {resource.section.name}
-                </CardDescription>
-              </div>
-              <Badge variant="secondary">
-                {resource.type}
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <div key={resource.number} className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+          
+          <div className="flex justify-end mb-4">
+            <Badge className="bg-cta/10 text-cta font-medium border-cta/20">
+              {resource.type === 'Regulation' ? 'اللائحة' : 'النظام'}
+            </Badge>
+          </div>
+          
+          <div className="text-right space-y-4">
+            {/* Title and Hierarchy */}
             <div>
-              <h4 className="font-medium mb-2">{t('search.content')}</h4>
-              <p className="text-gray-600 whitespace-pre-wrap">
+                <h2 className="text-xl font-bold mb-1" style={{fontFamily: 'var(--font-primary-arabic)'}}>
+                    {t('search.article')} {resource.number}
+                </h2>
+                <p className="text-sm text-gray-500" style={{fontFamily: 'var(--font-primary-arabic)'}}>
+                    {t('search.chapter')} {resource.chapter.number}: {resource.chapter.name}
+                </p>
+                <p className="text-sm text-gray-500" style={{fontFamily: 'var(--font-primary-arabic)'}}>
+                    {t('search.section')} {resource.section.number}: {resource.section.name}
+                </p>
+            </div>
+
+            {/* Content */}
+            <div>
+              <h3 className="font-bold text-md mb-2" style={{fontFamily: 'var(--font-primary-arabic)'}}>{t('search.content')}:</h3>
+              <p className="text-gray-700 leading-relaxed whitespace-pre-wrap" style={{fontFamily: 'var(--font-primary-arabic)', fontWeight: 300}}>
                 {highlightText(resource.content, searchQuery)}
               </p>
             </div>
             
+            {/* Summary */}
             <div>
-              <h4 className="font-medium mb-2">{t('search.summary')}</h4>
-              <p className="text-gray-600">
+              <h3 className="font-bold text-md mb-2" style={{fontFamily: 'var(--font-primary-arabic)'}}>{t('search.summary')}:</h3>
+              <p className="text-gray-600 leading-relaxed" style={{fontFamily: 'var(--font-primary-arabic)', fontWeight: 300}}>
                 {highlightText(resource.summary, searchQuery)}
               </p>
             </div>
-            
-            {resource.keywords.length > 0 && (
-              <div>
-                <h4 className="font-medium mb-2">{t('search.keywords')}</h4>
-                <div className="flex flex-wrap gap-2">
-                  {resource.keywords.map((keyword) => (
-                    <Badge 
-                      key={`${resource.number}-keyword-${keyword}`} 
-                      variant="outline"
-                    >
-                      {keyword}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            {resource.references.length > 0 && (
-              <div>
-                <h4 className="font-medium mb-2">{t('search.references')}</h4>
-                <div className="flex flex-wrap gap-2">
-                  {resource.references.map((ref) => (
-                    <Badge 
-                      key={`${resource.number}-ref-${ref}`} 
-                      variant="outline"
-                    >
-                      #{ref}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+          </div>
+
+          {/* Action Bar */}
+          <div className="mt-6 pt-4 border-t border-gray-100 flex justify-end">
+            <div className="flex items-center gap-2">
+                <Button variant="ghost" size="icon" className="text-gray-500 hover:bg-gray-100 h-8 w-8"><RotateCw size={16} /></Button>
+                <Button variant="ghost" size="icon" className="text-gray-500 hover:bg-gray-100 h-8 w-8" onClick={() => handleCopy(resource.content)}><Copy size={16} /></Button>
+                <Button variant="ghost" size="icon" className="text-gray-500 hover:bg-gray-100 h-8 w-8"><Share2 size={16} /></Button>
+                <Button variant="ghost" size="icon" className="text-gray-500 hover:bg-gray-100 h-8 w-8"><Bookmark size={16} /></Button>
+                <Button variant="ghost" size="icon" className="text-gray-500 hover:bg-gray-100 h-8 w-8"><MoreVertical size={16} /></Button>
+            </div>
+          </div>
+
+        </div>
       ))}
     </div>
   );

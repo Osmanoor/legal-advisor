@@ -16,14 +16,12 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onSuggestionClic
   ];
 
   return (
-    <div className="flex flex-col items-center">
-      {/* Suggestions Title */}
+    <div className="flex flex-col items-center w-full max-w-4xl mx-auto px-4">
       <p className="text-sm text-text-on-light-muted mb-4" style={{fontFamily: 'var(--font-primary-arabic)'}}>
         {t('chat.suggestions.title')}
       </p>
       
-      {/* Suggestions Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-4xl">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
         {suggestions.map((suggestion, index) => (
           <Card
             key={index}

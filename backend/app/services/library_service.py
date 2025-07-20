@@ -1,7 +1,7 @@
 # app/services/library_service.py
 from typing import Dict, Any, Tuple, Optional, BinaryIO
 from app.config import Config
-from LocalDriveLibrary import LocalDriveLibrary
+from app.LocalDriveLibrary import LocalDriveLibrary
 
 class LibraryService:
     def __init__(self):

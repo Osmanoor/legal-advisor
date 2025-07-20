@@ -16,7 +16,7 @@ class TenderMappingService:
     
     def get_work_types(self) -> List[Dict[str, str]]:
         """Get available work types for dropdown"""
-        from ProcurementCalculator import WorkType
+        from app.ProcurementCalculator import WorkType
         
         work_types = []
         for work_type in WorkType:
@@ -46,7 +46,7 @@ class TenderMappingService:
             holidays = data.get('holidays', [])
             
             # Import the necessary classes from the implementation
-            from ProcurementCalculator import ProcurementSystem
+            from app.ProcurementCalculator import ProcurementSystem
             
             # Initialize procurement system
             procurement_system = ProcurementSystem(articles_file=self.articles_file)

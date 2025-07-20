@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { MessageSquare, Calculator, Edit3, FileText, Settings, HelpCircle, LogOut } from 'lucide-react';
+import { MessageSquare, Calculator, Edit3, FileText, Settings, HelpCircle, LogOut, Search  } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
 import NewLogoDark from '@/assets/logo-new-dash.svg';
 import { useUIStore } from '@/stores/uiStore';
@@ -12,6 +12,7 @@ import { useAuthStore } from '@/stores/authStore'; // Import the auth store
 
 const iconMap: { [key: string]: React.ElementType } = {
   chat: MessageSquare,
+  search: Search,
   calculator: Calculator,
   correction: Edit3,
   templates: FileText,
@@ -26,6 +27,7 @@ export const DashboardSidebar = () => {
 
   const mainNavItems = [
     { path: '/chat', labelKey: 'navigation.chat', textAr: 'المساعد الذكي', iconName: 'chat' },
+    { path: '/search', textAr: 'البحث المتقدم', iconName: 'search' },
     { path: '/calculator', labelKey: 'navigation.calculator', textAr: 'الالة الحاسبة', iconName: 'calculator' },
     { path: '/correction', labelKey: 'navigation.correction', textAr: 'معالج النصوص', iconName: 'correction' },
     { path: '/tender-mapping', labelKey: 'navigation.templates', textAr: 'نظام الطرح', iconName: 'templates' },

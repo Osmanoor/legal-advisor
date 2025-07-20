@@ -1,107 +1,75 @@
 // src/pages/SearchPage.tsx
-import { useState, useCallback } from 'react';
+
+import { useState } from 'react';
 import { useSearch } from '@/hooks/api/useSearch';
-import { SearchBar } from '@/features/search/components/SearchBar';
-import { SearchFilters } from '@/features/search/components/SearchFilters';
 import { SearchResults } from '@/features/search/components/SearchResults';
 import { ResourceType } from '@/types';
 import { useLanguage } from '@/hooks/useLanguage';
-import { LanguageSwitch } from '@/components/common/LanguageSwitch';
-import { Link } from 'react-router-dom';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import LoadingSpinner  from '@/components/ui/loading-spinner';
-import { debounce } from '@/lib/utils';
+import { AlertCircle } from 'lucide-react';
+import LoadingSpinner from '@/components/ui/loading-spinner';
+import { SearchTopBar } from '@/features/search/components/SearchTopBar';
 
 export default function SearchPage() {
-  const { t, language } = useLanguage();
-  const [query, setQuery] = useState('');
-  const [selectedType, setSelectedType] = useState<ResourceType>();
+  const { t } = useLanguage();
+  
+  const [searchParams, setSearchParams] = useState({ query: '', type: 'Both' as ResourceType });
   
   const {
     data: results,
     isLoading,
     isError,
     error,
-    refetch
-  } = useSearch(query, selectedType);
+    refetch,
+    isFetching, // Use isFetching for the loading state to handle refetches
+  } = useSearch(searchParams.query, searchParams.type);
 
-  // Debounce the search to avoid too many API calls
-  const debouncedSearch = useCallback(
-    debounce(() => {
-      if (query.trim()) {
+  // This handler is passed to the SearchTopBar.
+  // It updates the state and triggers a refetch.
+  const handleSearch = (newQuery: string, newType: ResourceType) => {
+    // We update the state, which will be passed to the useSearch hook.
+    // The refetch is triggered because the query key of useSearch will change.
+    // However, calling refetch() explicitly ensures it runs immediately.
+    setSearchParams({ query: newQuery, type: newType });
+    
+    // We need to use a timeout to allow React to update the state before refetching
+    setTimeout(() => {
         refetch();
-      }
-    }, 500),
-    [query, refetch]
-  );
-
-  const handleSearch = () => {
-    if (query.trim()) {
-      refetch();
-    }
+    }, 0);
   };
-
-  const handleQueryChange = (newQuery: string) => {
-    setQuery(newQuery);
-    // Only search if the query is not empty
-    if (newQuery.trim()) {
-      debouncedSearch();
-    }
-  };
-
-  const handleTypeChange = (type: ResourceType) => {
-    setSelectedType(type);
-    // If we have a query, search with the new type
-    if (query.trim()) {
-      refetch();
-    }
-  };
-
 
   return (
-    <div className={`min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white ${
-      language === 'ar' ? 'text-right' : 'text-left'
-    }`}>
-      <main className="max-w-7xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 md:grid-cols-[250px_1fr] gap-8">
-          {/* Filters Sidebar */}
-          <aside className="space-y-6">
-            <SearchFilters
-              selectedType={selectedType}
-              onTypeChange={handleTypeChange}
-            />
-          </aside>
+    <div className="h-full flex flex-col bg-background-body">
+      
+      <SearchTopBar onSearch={handleSearch} isLoading={isFetching} />
 
-          {/* Main Content */}
-          <div className="space-y-6">
-            <SearchBar
-              query={query}
-              onQueryChange={handleQueryChange}
-              onSearch={handleSearch}
-              isLoading={isLoading}
+      <main className="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-6 lg:p-8">
+        <div className="max-w-4xl mx-auto">
+          {isFetching ? (
+            <div className="flex justify-center py-20">
+              <LoadingSpinner size="lg" />
+            </div>
+          ) : isError ? (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error?.message || t('common.error')}</AlertDescription>
+            </Alert>
+          ) : results?.data && results.data.length > 0 ? (
+            <SearchResults
+              results={results.data}
+              searchQuery={searchParams.query}
             />
-
-            {isLoading ? (
-              <div className="flex justify-center py-12">
-                <LoadingSpinner size="lg" />
-              </div>
-            ) : isError ? (
-              <Alert variant="destructive">
-                <AlertDescription>
-                  {error?.message || t('common.error')}
-                </AlertDescription>
-              </Alert>
-            ) : results?.data && results.data.length > 0 ? (
-              <SearchResults
-                results={results.data}
-                searchQuery={query}
-              />
-            ) : query ? (
-              <div className="text-center py-12 text-gray-400">
-                {t('search.noResults')}
-              </div>
-            ) : null}
-          </div>
+          ) : searchParams.query ? (
+            <div className="text-center py-20 text-gray-500">
+              <h3 className="text-lg font-semibold">{t('search.noResults')}</h3>
+              <p>{t('search.tryAgain')}</p>
+            </div>
+          ) : (
+            <div className="text-center py-20 text-gray-400">
+              <h3 className="text-lg font-semibold">Start a Search</h3>
+              <p>Enter a query in the bar above to find relevant articles.</p>
+            </div>
+          )}
         </div>
       </main>
     </div>

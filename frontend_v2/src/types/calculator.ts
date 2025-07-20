@@ -25,3 +25,18 @@ export interface DateDifference {
   years?: number;
   error?: string; // Added for consistency
 }
+export interface Competitor {
+  id: number; // Unique ID for React keys and state updates
+  name: string;
+  technicalScore: string; // Stored as string from input
+  financialOffer: string; // Stored as string from input
+}
+
+// --- NEW TYPES FOR WEIGHTED PERCENTAGE CALCULATOR ---
+
+export interface CalculationResult {
+  id: number;
+  name: string;
+  weightedScore: number;
+  rank: number;
+}

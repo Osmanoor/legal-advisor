@@ -4,7 +4,7 @@ import { useLanguage } from '@/hooks/useLanguage';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Percent, CalendarDays } from 'lucide-react';
+import { Percent, CalendarDays, FileText  } from 'lucide-react';
 
 // Import Sub-Calculator Components
 import { PercentageCalculator } from '@/features/calculator/components/PercentageCalculator';
@@ -13,14 +13,16 @@ import { AmountPercentageCalculator } from '@/features/calculator/components/Amo
 import { DateConversionForm } from '@/features/calculator/components/DateConversionForm';
 import { DateDifferenceForm } from '@/features/calculator/components/DateDifferenceForm';
 import { DateDurationForm } from '@/features/calculator/components/DateDurationForm';
+import { WeightedPercentageCalculator } from '@/features/calculator/components/WeightedPercentageCalculator';
 
 type NumericalCalcType = 'percentage' | 'vat' | 'amountPercentage';
 type DateCalcType = 'conversion' | 'difference' | 'duration';
+type MainCalcTab = 'numericalValues' | 'dates' | 'weightedPercentage';
 
 export default function CalculatorPage() {
   const { t, direction } = useLanguage();
   
-  const [activeMainTab, setActiveMainTab] = useState('numericalValues');
+  const [activeMainTab, setActiveMainTab] = useState<MainCalcTab>('numericalValues');
   const [selectedNumericalCalc, setSelectedNumericalCalc] = useState<NumericalCalcType>('percentage');
   const [selectedDateCalc, setSelectedDateCalc] = useState<DateCalcType>('conversion');
 
@@ -75,6 +77,7 @@ export default function CalculatorPage() {
   const tabsData = [
     { value: 'numericalValues', labelKey: 'calculator.tabs.numericalValues', Icon: Percent },
     { value: 'dates', labelKey: 'calculator.tabs.dates', Icon: CalendarDays },
+    { value: 'weightedPercentage', labelKey: 'النسبة الموزونة', Icon: FileText },
   ];
 
   return (
@@ -102,7 +105,7 @@ export default function CalculatorPage() {
 
       {/* Calculator Content Area - Max width from design for TabsList and "Main" content card */}
       <div className="w-full max-w-[854px] mx-auto">
-        <Tabs defaultValue="numericalValues" value={activeMainTab} onValueChange={setActiveMainTab} className="w-full">
+        <Tabs defaultValue="numericalValues" value={activeMainTab} onValueChange={(v) => setActiveMainTab(v as MainCalcTab)} className="w-full">
           {/* TabsList to span full width of its 854px container */}
           <TabsList className={`w-full flex mb-6 ${direction === 'rtl' ? 'md:flex-row-reverse' : ''}`}>
             {tabsData.map(tab => (
@@ -184,6 +187,9 @@ export default function CalculatorPage() {
               </Select>
             </div>
             {renderDateCalculator()}
+          </TabsContent>
+          <TabsContent value="weightedPercentage">
+            <WeightedPercentageCalculator />
           </TabsContent>
         </Tabs>
       </div>

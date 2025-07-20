@@ -1,11 +1,12 @@
 // src/features/chat/components/ChatInputBar.tsx
+
 import React, { useState } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch-rtl';
 import { Label } from '@/components/ui/label';
-import { Send, Paperclip, Mic, Image as ImageIcon } from 'lucide-react';
+import { Send } from 'lucide-react';
 import { ChatOptions } from '@/types/chat';
 
 interface ChatInputBarProps {
@@ -14,11 +15,12 @@ interface ChatInputBarProps {
 }
 
 export const ChatInputBar: React.FC<ChatInputBarProps> = ({ onSendMessage, isLoading }) => {
-  const { t, direction } = useLanguage();
+  const { t } = useLanguage();
   const [input, setInput] = useState('');
+  
   const [options, setOptions] = useState<ChatOptions>({
-    saudiAccent: false,
-    reasoning: false, // Keep for potential future use
+    language: 'ar',
+    reasoning: false,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -36,17 +38,21 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({ onSendMessage, isLoa
     }
   };
 
-  const attachmentButtons = [
-    { Icon: Paperclip, label: t('chat.actions.attachFile') || 'Attach file' }, // Added fallback for t function
-    { Icon: ImageIcon, label: t('chat.actions.attachImage') || 'Attach image' }, // Added fallback for t function
-    { Icon: Mic, label: t('chat.actions.useMicrophone') || 'Use microphone' }, // Added fallback for t function
-  ];
+  const handleAccentChange = (checked: boolean) => {
+    setOptions(prev => ({
+        ...prev,
+        language: checked ? 'sa' : 'ar'
+    }));
+  };
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 flex justify-center p-4 z-10"> {/* Changed positioning and added z-index */}
+    // This component's root div is already correctly positioned with 'absolute'
+    <div className="absolute bottom-0 left-0 right-0 flex justify-center p-4 z-10 bg-gradient-to-t from-background-body via-background-body to-transparent">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-[654px] h-[172px] bg-white border border-[#F0F2F5] shadow-lg rounded-2xl flex flex-col pt-6 px-6 pb-4 space-y-4" // Replaced custom shadow with shadow-lg
+        // FIX: Give the form a consistent height. The outer padding is 1rem (p-4), so 172px + 1rem = 188px total height.
+        // We'll use this value for the padding in the parent.
+        className="w-full max-w-[654px] h-[172px] bg-white border border-[#F0F2F5] shadow-lg rounded-2xl flex flex-col pt-6 px-6 pb-4 space-y-4"
       >
         <Textarea
           value={input}
@@ -65,8 +71,8 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({ onSendMessage, isLoa
               <div className="flex items-center gap-1 py-2 px-3 h-8 bg-[#F7F8FA] border border-[#F0F2F5] rounded-lg shadow-[0px_1px_3px_rgba(25,33,61,0.1)]">
               <Switch
                 id="saudi-accent-switch"
-                checked={options.saudiAccent}
-                onCheckedChange={(checked) => setOptions(prev => ({ ...prev, saudiAccent: !!checked }))}
+                checked={options.language === 'sa'}
+                onCheckedChange={handleAccentChange}
               />
               <Label
                 htmlFor="saudi-accent-switch"
@@ -75,11 +81,6 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({ onSendMessage, isLoa
                 {t('chat.saudiAccent')}
               </Label>
             </div>
-              {/* {attachmentButtons.map(({ Icon, label }) => (
-                <Button key={label} type="button" variant="ghost" size="icon" className="text-[#666F8D] hover:bg-gray-100 h-8 w-8" aria-label={label}>
-                  <Icon size={16} />
-                </Button>
-              ))} */}
             </div>
           </div>
           <div className={`flex items-center`}>

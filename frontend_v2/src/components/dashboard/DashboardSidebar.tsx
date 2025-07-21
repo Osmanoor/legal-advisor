@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { MessageSquare, Calculator, Edit3, FileText, Settings, HelpCircle, LogOut, Search  } from 'lucide-react';
+import { MessageSquare, Calculator, Edit3, FileText, Settings, HelpCircle, LogOut, Search, Star   } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
 import NewLogoDark from '@/assets/logo-new-dash.svg';
 import { useUIStore } from '@/stores/uiStore';
@@ -16,6 +16,7 @@ const iconMap: { [key: string]: React.ElementType } = {
   calculator: Calculator,
   correction: Edit3,
   templates: FileText,
+  feedback: Star,
 };
 
 export const DashboardSidebar = () => {
@@ -31,6 +32,7 @@ export const DashboardSidebar = () => {
     { path: '/calculator', labelKey: 'navigation.calculator', textAr: 'الالة الحاسبة', iconName: 'calculator' },
     { path: '/correction', labelKey: 'navigation.correction', textAr: 'معالج النصوص', iconName: 'correction' },
     { path: '/tender-mapping', labelKey: 'navigation.templates', textAr: 'نظام الطرح', iconName: 'templates' },
+    { path: '/feedback', textAr: 'قيمنا', iconName: 'feedback' },
   ];
 
   const secondaryNavItems = [

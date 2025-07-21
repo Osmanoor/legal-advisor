@@ -27,6 +27,7 @@ import JourneyPage from './pages/JourneyPage';
 import TenderMappingPage from './pages/TenderMappingPage';
 import LoginPage from './pages/LoginPage';
 import SettingsPage from './pages/SettingsPage';
+import FeedbackPage from './pages/FeedbackPage';
 // import ConfirmAccountPage from './pages/ConfirmAccountPage'; // No longer a separate page
 // import AdditionalInfoPage from './pages/AdditionalInfoPage'; // No longer a separate page
 
@@ -40,6 +41,7 @@ import ContactManagementPage from './pages/admin/ContactManagementPage';
 import './styles/base.css';
 import LoadingSpinner from './components/ui/loading-spinner';
 import PasswordResetPage from './pages/PasswordResetPage';
+
 
 function GaPageTracker() {
   usePageTracking();
@@ -102,6 +104,7 @@ function App() {
                 <Route path="/journey/:levelId" element={<JourneyPage />} />
                 <Route path="/tender-mapping" element={<TenderMappingPage />} />
                 <Route path="/settings" element={<SettingsPage />} /> 
+                <Route path="/feedback" element={<FeedbackPage />} />
               </Route>
               
               {/* Protected Admin Dashboard Routes */}

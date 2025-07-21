@@ -11,11 +11,10 @@ import { cn } from '@/lib/utils';
 
 interface ContactsTableProps {
   contacts: ContactSubmission[];
-  onUpdateStatus: (id: number, status: 'new' | 'read' | 'archived') => void;
-  isUpdatingId: number | null; // To show loading on a specific row
+  onViewDetails: (submission: ContactSubmission) => void; // Prop to open the dialog
 }
 
-export const ContactsTable: React.FC<ContactsTableProps> = ({ contacts, onUpdateStatus, isUpdatingId }) => {
+export const ContactsTable: React.FC<ContactsTableProps> = ({ contacts, onViewDetails }) => {
   
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -37,7 +36,7 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({ contacts, onUpdate
           <TableRow>
             <TableHead className="text-right">الاسم</TableHead>
             <TableHead className="text-right">البريد الإلكتروني</TableHead>
-            <TableHead className="text-right">الرسالة</TableHead>
+            <TableHead className="text-right">الرسالة (معاينة)</TableHead>
             <TableHead className="text-right">الحالة</TableHead>
             <TableHead className="text-right">تاريخ الإرسال</TableHead>
             <TableHead className="text-center">الإجراءات</TableHead>
@@ -45,33 +44,16 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({ contacts, onUpdate
         </TableHeader>
         <TableBody>
           {contacts.map((contact) => (
-            <TableRow key={contact.id} className={cn(isUpdatingId === contact.id && "opacity-50")}>
+            <TableRow key={contact.id}>
               <TableCell className="font-medium">{contact.name}</TableCell>
               <TableCell>{contact.email}</TableCell>
               <TableCell className="max-w-xs truncate">{contact.message}</TableCell>
               <TableCell>{getStatusBadge(contact.status)}</TableCell>
               <TableCell>{new Date(contact.submitted_at).toLocaleDateString()}</TableCell>
               <TableCell className="text-center">
-                <Popover>
-                    <PopoverTrigger asChild>
-                        <Button variant="ghost" size="icon" disabled={isUpdatingId === contact.id}>
-                            <MoreHorizontal className="w-4 h-4" />
-                        </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-40">
-                        <div className="flex flex-col space-y-1">
-                            <Button variant="ghost" className="w-full justify-start" onClick={() => onUpdateStatus(contact.id, 'read')}>
-                                <Check className="mr-2 h-4 w-4"/> Mark as Read
-                            </Button>
-                            <Button variant="ghost" className="w-full justify-start" onClick={() => onUpdateStatus(contact.id, 'archived')}>
-                                <Archive className="mr-2 h-4 w-4"/> Archive
-                            </Button>
-                             <a href={`mailto:${contact.email}`} className="inline-flex items-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 hover:bg-gray-100 hover:text-gray-900 h-9 px-4 py-2 w-full justify-start">
-                                <Mail className="mr-2 h-4 w-4"/> Reply
-                            </a>
-                        </div>
-                    </PopoverContent>
-                </Popover>
+                <Button variant="ghost" size="icon" onClick={() => onViewDetails(contact)}>
+                  <MoreHorizontal className="w-4 h-4" />
+                </Button>
               </TableCell>
             </TableRow>
           ))}

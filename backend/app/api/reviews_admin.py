@@ -11,13 +11,16 @@ reviews_admin_service = ReviewsAdminService()
 @permission_required('access_ratings_management')
 def get_reviews():
     """
-    Gets a paginated list of all user reviews.
-    Accepts 'page' and 'per_page' query parameters.
+    Gets a paginated list of user reviews.
+    Accepts 'page', 'per_page', and 'filter' query parameters.
+    Filter can be 'pending', 'approved', 'archived', or 'all'.
     """
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 20, type=int)
+    # Get the filter from the request, default to 'pending'
+    filter_by = request.args.get('filter', 'pending', type=str)
     
-    result, status_code = reviews_admin_service.get_all_reviews(page, per_page)
+    result, status_code = reviews_admin_service.get_all_reviews(page, per_page, filter_by)
     return jsonify(result), status_code
 
 @reviews_admin_bp.route('/<int:review_id>', methods=['PUT'])

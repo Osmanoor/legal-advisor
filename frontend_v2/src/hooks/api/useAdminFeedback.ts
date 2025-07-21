@@ -3,17 +3,25 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/axios';
 
+export type ReviewFilterType = 'pending' | 'approved' | 'archived' | 'all';
+
 // Type matching the backend response for a single review
 export interface Feedback {
   id: number;
   user_id: string | null;
   user_name: string;
+  user_profile_picture_url: string | null; // <-- ADD THIS FIELD
   rating: number;
   comment: string;
   is_approved: boolean;
   is_archived: boolean;
-  submitted_at: string; // ISO String
-  preview_settings: Record<string, any>;
+  submitted_at: string;
+  preview_settings: { // Make the shape explicit for clarity
+      show_name: boolean;
+      show_workplace: boolean;
+      show_job_title: boolean;
+      show_profile_picture: boolean;
+  };
 }
 
 // The shape of the data the backend expects for an update
@@ -32,14 +40,19 @@ interface PaginatedFeedbackResponse {
   current_page: number;
 }
 
-export function useAdminFeedback(page: number = 1, perPage: number = 20) {
+export function useAdminFeedback(page: number = 1, perPage: number = 20, filter: ReviewFilterType = 'pending') {
   const queryClient = useQueryClient();
 
   const feedbackQuery = useQuery<PaginatedFeedbackResponse, Error>({
-    queryKey: ['admin', 'feedback', { page, perPage }],
+    // The filter is now part of the query key, so React Query will refetch when it changes
+    queryKey: ['admin', 'feedback', { page, perPage, filter }],
     queryFn: async () => {
       const response = await api.get('/admin/reviews', {
-        params: { page, per_page: perPage },
+        params: {
+          page: page,
+          per_page: perPage,
+          filter: filter, // Pass the filter to the backend
+        },
       });
       return response.data;
     },

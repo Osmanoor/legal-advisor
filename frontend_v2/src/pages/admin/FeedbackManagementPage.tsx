@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
-import { useAdminFeedback, Feedback, FeedbackUpdatePayload } from '@/hooks/api/useAdminFeedback';
+import { useAdminFeedback, ReviewFilterType , FeedbackUpdatePayload } from '@/hooks/api/useAdminFeedback';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -12,18 +12,18 @@ import { FeedbackCard } from '@/features/admin/components/Feedback/FeedbackCard'
 import { Search, Filter, ArrowDownUp, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/useToast';
 
-type ReviewFilter = 'all' | 'approved' | 'archived';
+type ReviewFilter = ReviewFilterType;
 
 export default function FeedbackManagementPage() {
   const { showToast } = useToast();
   
   // State for pagination, filtering, and searching
   const [currentPage, setCurrentPage] = useState(1);
-  const [reviewFilter, setReviewFilter] = useState<ReviewFilter>('all');
+  const [reviewFilter, setReviewFilter] = useState<ReviewFilter>('pending');
   const [searchTerm, setSearchTerm] = useState('');
 
   // Fetch data and mutations from the dedicated hook
-  const { feedbackQuery, updateFeedbackMutation } = useAdminFeedback(currentPage);
+  const { feedbackQuery, updateFeedbackMutation } = useAdminFeedback(currentPage, 20, reviewFilter);
 
   // Memoized filtering logic based on the fetched data and UI state
   const filteredFeedback = useMemo(() => {
@@ -81,9 +81,10 @@ export default function FeedbackManagementPage() {
       {/* Sub-navigation tabs for filtering */}
       <Tabs value={reviewFilter} onValueChange={(val) => setReviewFilter(val as ReviewFilter)}>
           <TabsList>
-              <TabsTrigger value="all">الكل</TabsTrigger>
-              <TabsTrigger value="approved">الموافق عليها</TabsTrigger>
-              <TabsTrigger value="archived">المؤرشفة</TabsTrigger>
+              <TabsTrigger value="pending">Pending</TabsTrigger> {/* Changed from 'الكل' to 'Pending' */}
+              <TabsTrigger value="approved">Approved</TabsTrigger>
+              <TabsTrigger value="archived">Archived</TabsTrigger>
+              <TabsTrigger value="all">All</TabsTrigger> {/* Added an 'All' tab for completeness */}
           </TabsList>
       </Tabs>
       

@@ -1,12 +1,13 @@
 // src/pages/admin/ContactManagementPage.tsx
 
 import React, { useState, useMemo } from 'react';
-import { useAdminContacts } from '@/hooks/api/useAdminContacts';
+import { useAdminContacts, ContactSubmission  } from '@/hooks/api/useAdminContacts';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ContactsTable } from '@/features/admin/components/ContactsTable';
+import { ContactDetailDialog } from '@/features/admin/components/ContactDetailDialog';
 import { Search, Filter, ArrowDownUp, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/useToast';
 
@@ -14,6 +15,10 @@ export default function ContactManagementPage() {
   const { showToast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   
+  // --- State for the Dialog ---
+  const [selectedContact, setSelectedContact] = useState<ContactSubmission | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   const { contactsQuery, updateContactStatusMutation } = useAdminContacts();
 
   const filteredContacts = useMemo(() => {
@@ -27,14 +32,21 @@ export default function ContactManagementPage() {
     );
   }, [contactsQuery.data, searchTerm]);
 
-  const handleUpdateStatus = async (id: number, status: 'new' | 'read' | 'archived') => {
-    try {
-      await updateContactStatusMutation.mutateAsync({ id, status });
-      showToast('Contact status updated.', 'success');
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
-      showToast(`Failed to update status: ${errorMessage}`, 'error');
-    }
+  const handleUpdateStatus = (id: number, status: 'new' | 'read' | 'archived') => {
+    updateContactStatusMutation.mutate({ id, status }, {
+        onSuccess: () => {
+            showToast('Contact status updated.', 'success');
+            setIsDialogOpen(false); // Close dialog on successful update
+        },
+        onError: (error) => {
+            showToast(`Failed to update status: ${error.message}`, 'error');
+        }
+    });
+  };
+
+  const handleViewDetails = (submission: ContactSubmission) => {
+    setSelectedContact(submission);
+    setIsDialogOpen(true);
   };
 
   return (
@@ -66,10 +78,17 @@ export default function ContactManagementPage() {
       ) : (
         <ContactsTable 
           contacts={filteredContacts} 
-          onUpdateStatus={handleUpdateStatus}
-          isUpdatingId={updateContactStatusMutation.isPending ? updateContactStatusMutation.variables.id : null}
+          onViewDetails={handleViewDetails}
         />
       )}
+       {/* Render the Dialog */}
+      <ContactDetailDialog
+        submission={selectedContact}
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        onUpdateStatus={handleUpdateStatus}
+        isUpdating={updateContactStatusMutation.isPending}
+      />
     </div>
   );
 }

@@ -44,6 +44,8 @@ def create_app(config_class=Config):
     from app.api.search import search_bp
     from app.api.templates import templates_bp
     from app.api.tender_mapping import tender_mapping_bp
+    from app.api.reviews import reviews_bp
+    from app.api.contact import contact_bp
     
     app.register_blueprint(auth_bp, url_prefix='/api/auth') 
     app.register_blueprint(admin_bp, url_prefix='/api/admin')
@@ -56,6 +58,8 @@ def create_app(config_class=Config):
     app.register_blueprint(search_bp, url_prefix='/api/search')
     app.register_blueprint(templates_bp, url_prefix='/api/templates')
     app.register_blueprint(tender_mapping_bp, url_prefix='/api/tender-mapping')
+    app.register_blueprint(reviews_bp, url_prefix='/api/reviews')
+    app.register_blueprint(contact_bp, url_prefix='/api/contact')
     
     # Register custom CLI commands
     app.cli.add_command(seed_data_command)

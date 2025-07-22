@@ -1,0 +1,57 @@
+{
+  "admin_permissions": {
+    "features_enabled": {
+      "access_calculator": true,
+      "access_chat": true,
+      "access_report_generator": true,
+      "access_search_tool": true,
+      "access_text_corrector": true,
+      "delete_user": false,
+      "manage_contacts": true,
+      "manage_feedback": true,
+      "manage_global_settings": false,
+      "manage_users": true,
+      "update_admin": false,
+      "update_user": true,
+      "view_analytics": true
+    },
+    "usage_limits": {
+      "ai_assistant_queries_per_day": -1,
+      "report_generations_per_day": -1,
+      "text_corrections_per_day": -1
+    }
+  },
+  "guest_permissions": {
+    "features_enabled": {
+      "access_calculator": true,
+      "access_chat": true,
+      "access_report_generator": true,
+      "access_search_tool": true,
+      "access_text_corrector": true,
+      "access_feedback": true
+    },
+    "usage_limits": {
+      "ai_assistant_queries_per_day": 5,
+      "report_generations_per_day": 1,
+      "text_corrections_per_day": 10
+    }
+  },
+  "registered_user_permissions": {
+    "data_limits": {
+      "max_chat_sessions": 20,
+      "max_tender_reports": 10
+    },
+    "features_enabled": {
+      "access_calculator": true,
+      "access_chat": true,
+      "access_report_generator": true,
+      "access_search_tool": true,
+      "access_text_corrector": true
+    },
+    "usage_limits": {
+      "ai_assistant_queries_per_day": 50,
+      "report_generations_per_day": 10,
+      "text_corrections_per_day": 100
+    }
+  }
+}

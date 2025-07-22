@@ -5,12 +5,20 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { AdminLayout } from '@/components/layouts/AdminLayout';
 import LoadingSpinner from '@/components/ui/loading-spinner';
+import { Permission } from '@/types/user';
+
+// List of permissions that grant access to at least one admin page.
+const ADMIN_PAGE_PERMISSIONS: Permission[] = [
+  'view_analytics',
+  'manage_users',
+  'manage_feedback',
+  'manage_contacts',
+  'manage_global_settings',
+];
 
 export const AdminProtectedRoute = () => {
   const { isAuthenticated, user, isLoading } = useAuthStore();
 
-  // The isLoading check from the top-level App component handles the initial load.
-  // This check is a safeguard for any subsequent loading states if they were to occur.
   if (isLoading) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
@@ -19,27 +27,25 @@ export const AdminProtectedRoute = () => {
     );
   }
 
-  // First, check if the user is authenticated at all.
-  // If not, they should definitely go to the login page.
+  // User must be authenticated to even consider admin access.
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
   
-  // Next, check if the authenticated user has the permission to access the admin dashboard.
-  const canAccessAdmin = user?.permissions.includes('access_admin_dashboard');
+  // --- NEW LOGIC ---
+  // Check if the user has at least one permission from our list.
+  const canAccessAdminArea = user?.permissions.some(p => ADMIN_PAGE_PERMISSIONS.includes(p));
 
-  // THE FIX IS HERE:
-  // If the user is authenticated but lacks the specific permission,
-  // redirect them to their default dashboard page, NOT the login page.
-  if (!canAccessAdmin) {
-    return <Navigate to="/chat" replace />;
+  // If they have at least one permission, render the layout.
+  // The individual page links in the sidebar will be controlled by their specific permissions.
+  if (canAccessAdminArea) {
+    return (
+      <AdminLayout>
+        <Outlet />
+      </AdminLayout>
+    );
   }
 
-  // If all checks pass (user is authenticated AND has permission),
-  // render the AdminLayout with the nested admin route content.
-  return (
-    <AdminLayout>
-      <Outlet />
-    </AdminLayout>
-  );
+  // If authenticated but has no admin page permissions, redirect to the main user dashboard.
+  return <Navigate to="/chat" replace />;
 };

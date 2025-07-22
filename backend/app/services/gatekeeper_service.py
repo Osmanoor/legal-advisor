@@ -1,43 +1,43 @@
 # app/services/gatekeeper_service.py
 
 import json
+from app.models import User
 
+# Path to the settings file
 SETTINGS_FILE_PATH = 'global_settings.json'
 
-# This map links a permission name to its corresponding feature key in the settings file.
-PERMISSION_TO_FEATURE_MAP = {
-    'access_ai_assistant': 'ai_assistant',
-    'access_calculator': 'calculator',
-    'access_text_corrector': 'text_corrector',
-    'access_search_tool': 'search_tool', # Assuming search tool is another feature
-    'access_report_generator': 'report_generator' # Assuming this is the tender mapping feature
-}
-
 class GatekeeperService:
-
-    def _load_settings(self):
-        """Loads and returns the global settings from the JSON file."""
+    def __init__(self):
         try:
             with open(SETTINGS_FILE_PATH, 'r') as f:
-                return json.load(f)
+                self.settings = json.load(f)
         except (FileNotFoundError, json.JSONDecodeError):
-            # If the file doesn't exist or is invalid, return a default "disabled" state.
-            return {"feature_access": {}}
+            self.settings = {}
 
-    def is_guest_allowed(self, permission_name: str) -> bool:
+    def has_permission(self, user: User | None, permission_name: str) -> bool:
         """
-        Checks the global settings to see if a guest is allowed to access a feature.
+        Performs a three-tiered check for a user's permission.
+        1. Checks for an individual override (ALLOW/DENY).
+        2. Falls back to the role's default from global_settings.json.
+        3. Defaults to DENY if not found anywhere.
         """
-        settings = self._load_settings()
-        
-        # Find the feature key (e.g., 'ai_assistant') from the permission name
-        feature_key = PERMISSION_TO_FEATURE_MAP.get(permission_name)
-        if not feature_key:
-            # If the permission isn't a feature, guests are denied by default.
-            return False
+        # Case 1: Authenticated User
+        if user:
+            # Tier 1: Check for a specific override for this user
+            for override in user.permission_overrides:
+                if override.permission.name == permission_name:
+                    return override.override_type == 'ALLOW'
             
-        # Get the access rules for this specific feature
-        feature_access_rules = settings.get('feature_access', {}).get(feature_key, {})
-        
-        # Check the 'guests_enabled' flag
-        return feature_access_rules.get('guests_enabled', False)
+            # Tier 2: Fallback to role default from settings file
+            role_name = user.roles[0].name if user.roles else 'Registered User'
+            if role_name == 'Admin':
+                role_settings = self.settings.get('admin_permissions', {})
+            else: # Registered User
+                role_settings = self.settings.get('registered_user_permissions', {})
+
+            return role_settings.get('features_enabled', {}).get(permission_name, False)
+
+        # Case 2: Guest User
+        else:
+            guest_settings = self.settings.get('guest_permissions', {})
+            return guest_settings.get('features_enabled', {}).get(permission_name, False)

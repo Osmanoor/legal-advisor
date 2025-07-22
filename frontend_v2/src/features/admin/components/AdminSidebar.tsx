@@ -9,30 +9,38 @@ import { useUIStore } from '@/stores/uiStore';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/authStore';
+import { usePermission } from '@/hooks/usePermission';
+import { Permission } from '@/types/user';
 
 const iconMap: { [key: string]: React.ElementType } = {
   analytics: BarChart2,
   users: Users,
   feedback: MessageSquare,
   contacts: Mail,
+  settings: Settings, // <-- ADD ICON FOR SETTINGS
 };
 
 export const AdminSidebar = () => {
   const { t } = useLanguage();
   const location = useLocation();
-  const { logout } = useAuthStore(); // This now calls the live API function
+  const { user, logout } = useAuthStore(); // Get user to check permissions
   const { isSidebarOpen, setSidebarOpen } = useUIStore();
   const { isDesktop } = useBreakpoint();
+  const { canAccess } = usePermission();
+  
+  // --- NEW: Check for super admin permission ---
+  const canManageSettings = user?.permissions.includes('manage_global_settings');
 
-  const mainNavItems = [
-    { path: '/admin/analytics', textAr: 'الأحصائيات', iconName: 'analytics' },
-    { path: '/admin/users', textAr: 'إدارة المستخدمين', iconName: 'users' },
-    { path: '/admin/feedback', textAr: 'إدارة التقييم', iconName: 'feedback' },
-    { path: '/admin/contacts', textAr: 'رسائل التواصل', iconName: 'contacts' },
+  const mainNavItems: { path: string; textAr: string; iconName: string; permission: Permission }[] = [
+    { path: '/admin/analytics', textAr: 'الأحصائيات', iconName: 'analytics', permission: 'view_analytics' },
+    { path: '/admin/users', textAr: 'إدارة المستخدمين', iconName: 'users', permission: 'manage_users' },
+    { path: '/admin/feedback', textAr: 'إدارة التقييم', iconName: 'feedback', permission: 'manage_feedback' },
+    { path: '/admin/contacts', textAr: 'رسائل التواصل', iconName: 'contacts', permission: 'manage_contacts' },
   ];
-
+  
+  // --- NEW: Add settings to secondary nav, conditionally ---
   const secondaryNavItems = [
-    { path: '/settings', textAr: 'الاعدادات', icon: Settings },
+    { path: '/admin/settings', textAr: 'الإعدادات العامة', icon: Settings, permission: 'manage_global_settings' },
     { path: '/help', textAr: 'المساعدة', icon: HelpCircle },
   ];
 
@@ -46,8 +54,6 @@ export const AdminSidebar = () => {
 
   const handleLogout = async () => {
     await logout();
-    // No navigation is needed here. The protected route component will automatically
-    // detect the change in authentication state and redirect the user to the login page.
   };
 
   return (
@@ -70,6 +76,7 @@ export const AdminSidebar = () => {
           {mainNavItems.map(item => {
             const IconComponent = iconMap[item.iconName];
             const active = isActive(item.path);
+            if (!canAccess(item.permission)) return null; // Don't render the link if user lacks permission
             return (
               <li key={item.path} className="relative">
                 <Link
@@ -93,6 +100,7 @@ export const AdminSidebar = () => {
         <ul className="space-y-4">
           {secondaryNavItems.map(item => {
             const IconComponent = item.icon;
+            if (item.permission && !canAccess(item.permission as Permission)) return null; // Don't render if user lacks permission
             return (
               <li key={item.path}>
                 <Link
@@ -116,7 +124,7 @@ export const AdminSidebar = () => {
                 className="flex items-center justify-end gap-3 p-3 h-[40px] w-full rounded-md text-gray-500 hover:bg-red-50 hover:text-red-600 group transition-colors"
             >
                 <span className="font-normal text-lg text-right" style={{ fontFamily: 'var(--font-primary-arabic)' }}>
-                  {t('auth.logout')}
+                  تسجيل الخروج
                 </span>
                 <LogOut className="w-5 h-5 text-gray-400 group-hover:text-red-500" />
             </button>

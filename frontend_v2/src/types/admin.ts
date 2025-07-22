@@ -28,3 +28,36 @@ export interface ApiResponse {
 export interface ContactSubmitResponse extends ApiResponse {
   message?: string;
 }
+
+// --- Types for Global Settings ---
+export interface GlobalSettings {
+  guest_permissions: RoleSettings;
+  registered_user_permissions: RoleSettings;
+  admin_permissions: RoleSettings;
+}
+
+export interface RoleSettings {
+  features_enabled: Record<string, boolean>;
+  usage_limits: Record<string, number>;
+  data_limits?: Record<string, number>;
+}
+
+export interface AllPermissions {
+    id: number;
+    name: string;
+    description: string;
+}
+
+// --- FIX: This is the correct shape of the response ---
+export interface RolesAndPermissionsResponse {
+  roles: { id: number; name: string }[];
+  all_permissions: {
+    user: AllPermissions[];
+    admin: AllPermissions[];
+  };
+}
+
+// --- FIX: This is the correct shape for the entire settings payload ---
+export interface AllSettingsResponse extends RolesAndPermissionsResponse {
+    global_settings: GlobalSettings;
+}

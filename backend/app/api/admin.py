@@ -8,8 +8,36 @@ from app.models import Role, Permission
 admin_bp = Blueprint('admin', __name__)
 admin_service = AdminService()
 
+# --- NEW: Global Settings Endpoints ---
+
+@admin_bp.route('/settings', methods=['GET'])
+@permission_required('manage_global_settings')
+def get_settings():
+    """Retrieves the entire global_settings.json configuration."""
+    result, status_code = admin_service.get_all_settings()
+    return jsonify(result), status_code
+
+@admin_bp.route('/settings', methods=['PUT'])
+@permission_required('manage_global_settings')
+def update_settings():
+    """Updates the entire global_settings.json configuration."""
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Request body cannot be empty"}), 400
+    
+    # We only care about the global_settings part of the payload for this endpoint
+    global_settings_data = data.get('global_settings')
+    if global_settings_data is None:
+        return jsonify({"error": "'global_settings' key is required in the payload"}), 400
+
+    result, status_code = admin_service.update_all_settings(global_settings_data)
+    return jsonify(result), status_code
+
+
+# --- Existing Endpoints (Unchanged) ---
+
 @admin_bp.route('/roles-and-permissions', methods=['GET'])
-@permission_required('manage_admins') # Protect with appropriate permission
+@permission_required('manage_users') # A regular admin can see this
 def get_roles_and_permissions():
     """Returns a list of all available roles and permissions in the system."""
     try:
@@ -28,40 +56,20 @@ def get_roles_and_permissions():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-# --- Dashboard Stats Endpoint ---
 @admin_bp.route('/dashboard-stats', methods=['GET'])
-@permission_required('access_admin_dashboard')
+@permission_required('view_analytics')
 def get_dashboard_stats():
     result, status_code = admin_service.get_dashboard_stats()
     return jsonify(result), status_code
 
-# --- Settings & Role Management Endpoints ---
-@admin_bp.route('/settings', methods=['GET'])
-@permission_required('access_global_settings')
-def get_settings():
-    result, status_code = admin_service.get_all_settings()
-    return jsonify(result), status_code
-
-@admin_bp.route('/settings', methods=['PUT'])
-@permission_required('access_global_settings')
-def update_settings():
-    data = request.get_json()
-    if not data:
-        return jsonify({"error": "Request body cannot be empty"}), 400
-    
-    result, status_code = admin_service.update_all_settings(data)
-    return jsonify(result), status_code
-
-# --- Contact Submissions Endpoints ---
 @admin_bp.route('/contact-submissions', methods=['GET'])
-@permission_required('access_contact_us')
+@permission_required('manage_contacts')
 def get_contact_submissions():
     result, status_code = admin_service.get_contact_submissions()
     return jsonify(result), status_code
 
 @admin_bp.route('/contact-submissions/<int:submission_id>/status', methods=['PUT'])
-@permission_required('access_contact_us')
+@permission_required('manage_contacts')
 def update_contact_submission_status(submission_id):
     data = request.get_json()
     new_status = data.get('status')

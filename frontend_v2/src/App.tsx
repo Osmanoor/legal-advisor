@@ -14,6 +14,7 @@ import { queryClient } from './lib/Client';
 // Layouts
 import { AppLayout } from './components/layouts/AppLayout';
 import { AdminProtectedRoute } from './routes/AdminProtectedRoute';
+import { PermissionProtectedRoute } from './routes/PermissionProtectedRoute';
 
 // Pages
 import LandingPage from './pages/LandingPage';
@@ -28,19 +29,17 @@ import TenderMappingPage from './pages/TenderMappingPage';
 import LoginPage from './pages/LoginPage';
 import SettingsPage from './pages/SettingsPage';
 import FeedbackPage from './pages/FeedbackPage';
-// import ConfirmAccountPage from './pages/ConfirmAccountPage'; // No longer a separate page
-// import AdditionalInfoPage from './pages/AdditionalInfoPage'; // No longer a separate page
+import PasswordResetPage from './pages/PasswordResetPage';
 
 // Admin Pages
 import AnalyticsPage from './pages/admin/AnalyticsPage';
 import UserManagementPage from './pages/admin/UserManagementPage';
 import FeedbackManagementPage from './pages/admin/FeedbackManagementPage';
 import ContactManagementPage from './pages/admin/ContactManagementPage';
-
+import AdminSettingsPage from './pages/admin/SettingsPage'; 
 
 import './styles/base.css';
 import LoadingSpinner from './components/ui/loading-spinner';
-import PasswordResetPage from './pages/PasswordResetPage';
 
 
 function GaPageTracker() {
@@ -48,17 +47,16 @@ function GaPageTracker() {
   return null;
 }
 
-const ProtectedRoutes = () => {
-  const { isAuthenticated } = useAuthStore();
-  return isAuthenticated ? <AppLayout><Outlet /></AppLayout> : <Navigate to="/login" replace />;
-};
-
-// FIX: Update the AuthRoutes guard logic to check the onboarding status
 const AuthRoutes = () => {
    const { isAuthenticated, isOnboarding } = useAuthStore();
-   // Redirect ONLY if authenticated AND NOT in the middle of the onboarding flow.
-   return isAuthenticated && !isOnboarding ? window.location.href = '/chat' : <Outlet />;
+   return isAuthenticated && !isOnboarding ? <Navigate to="/chat" replace /> : <Outlet />;
 };
+
+// New guard specifically for routes that require authentication, like Settings.
+const AuthenticatedRoute = () => {
+  const { isAuthenticated } = useAuthStore();
+  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
+}
 
 function App() {
   const { isLoading, checkAuthStatus } = useAuthStore();
@@ -83,36 +81,60 @@ function App() {
             <GaPageTracker />
             <ToastProvider />
             <Routes>
-              {/* Public Landing Page */}
+              {/* Public & Authentication Routes */}
               <Route path="/" element={<LandingPage />} />
-              
-              {/* Authentication Routes (for logged-out users) */}
               <Route element={<AuthRoutes />}>
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/password-reset" element={<PasswordResetPage />} />
               </Route>
               
-              {/* Protected User Dashboard Routes */}
-              <Route element={<ProtectedRoutes />}>
-                <Route path="/chat" element={<ChatPage />} />
-                <Route path="/search" element={<SearchPage />} />
-                <Route path="/library" element={<LibraryPage />} />
-                <Route path="/correction" element={<CorrectionPage />} />
-                <Route path="/calculator" element={<CalculatorPage />} />
-                <Route path="/templates" element={<TemplatesPage />} />
-                <Route path="/journey" element={<JourneyPage />} />
-                <Route path="/journey/:levelId" element={<JourneyPage />} />
-                <Route path="/tender-mapping" element={<TenderMappingPage />} />
-                <Route path="/settings" element={<SettingsPage />} /> 
-                <Route path="/feedback" element={<FeedbackPage />} />
+              {/* User & Guest Dashboard Routes */}
+              <Route element={<AppLayout><Outlet /></AppLayout>}>
+                <Route element={<PermissionProtectedRoute permission="access_chat" />}>
+                  <Route path="/chat" element={<ChatPage />} />
+                </Route>
+                <Route element={<PermissionProtectedRoute permission="access_search_tool" />}>
+                  <Route path="/search" element={<SearchPage />} />
+                </Route>
+                {/* Note: Library does not have a permission yet, so it's open to all signed-in users but not guests. We'll wrap it in AuthenticatedRoute for now. */}
+                 <Route element={<AuthenticatedRoute />}>
+                    <Route path="/library" element={<LibraryPage />} />
+                </Route>
+                <Route element={<PermissionProtectedRoute permission="access_text_corrector" />}>
+                  <Route path="/correction" element={<CorrectionPage />} />
+                </Route>
+                <Route element={<PermissionProtectedRoute permission="access_calculator" />}>
+                  <Route path="/calculator" element={<CalculatorPage />} />
+                </Route>
+                {/* Note: Templates & Journey are currently open to authenticated users only. */}
+                <Route element={<AuthenticatedRoute />}>
+                    <Route path="/templates" element={<TemplatesPage />} />
+                    <Route path="/journey" element={<JourneyPage />} />
+                    <Route path="/journey/:levelId" element={<JourneyPage />} />
+                </Route>
+                <Route element={<PermissionProtectedRoute permission="access_report_generator" />}>
+                  <Route path="/tender-mapping" element={<TenderMappingPage />} />
+                </Route>
+                <Route element={<PermissionProtectedRoute permission="access_feedback" />}>
+                  <Route path="/feedback" element={<FeedbackPage />} />
+                </Route>
+                
+                {/* Settings page is always available but ONLY to logged-in users */}
+                <Route element={<AuthenticatedRoute />}>
+                  <Route path="/settings" element={<SettingsPage />} />
+                </Route>
+
+                {/* Redirect from dashboard root to chat page */}
+                <Route path="/dashboard" element={<Navigate to="/chat" replace />} />
               </Route>
               
-              {/* Protected Admin Dashboard Routes */}
+              {/* Admin Routes */}
               <Route path="/admin" element={<AdminProtectedRoute />}>
                 <Route path="analytics" element={<AnalyticsPage />} />
                 <Route path="users" element={<UserManagementPage />} />
                 <Route path="feedback" element={<FeedbackManagementPage />} />
                 <Route path="contacts" element={<ContactManagementPage />} />
+                <Route path="settings" element={<AdminSettingsPage />} /> 
                 <Route index element={<Navigate to="analytics" replace />} />
               </Route>
 

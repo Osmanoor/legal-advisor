@@ -8,7 +8,9 @@ import NewLogoDark from '@/assets/logo-new-dash.svg';
 import { useUIStore } from '@/stores/uiStore';
 import { cn } from '@/lib/utils';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
-import { useAuthStore } from '@/stores/authStore'; // Import the auth store
+import { useAuthStore } from '@/stores/authStore';
+import { usePermission } from '@/hooks/usePermission'; 
+import { Permission } from '@/types/user'; 
 
 const iconMap: { [key: string]: React.ElementType } = {
   chat: MessageSquare,
@@ -25,14 +27,15 @@ export const DashboardSidebar = () => {
   const { logout } = useAuthStore(); // Get the logout function from the store
   const { isSidebarOpen, setSidebarOpen } = useUIStore();
   const { isDesktop } = useBreakpoint();
+  const { canAccess } = usePermission();
 
-  const mainNavItems = [
-    { path: '/chat', labelKey: 'navigation.chat', textAr: 'المساعد الذكي', iconName: 'chat' },
-    { path: '/search', textAr: 'البحث المتقدم', iconName: 'search' },
-    { path: '/calculator', labelKey: 'navigation.calculator', textAr: 'الالة الحاسبة', iconName: 'calculator' },
-    { path: '/correction', labelKey: 'navigation.correction', textAr: 'معالج النصوص', iconName: 'correction' },
-    { path: '/tender-mapping', labelKey: 'navigation.templates', textAr: 'نظام الطرح', iconName: 'templates' },
-    { path: '/feedback', textAr: 'قيمنا', iconName: 'feedback' },
+  const mainNavItems: { path: string; textAr: string; iconName: string; permission: Permission }[] = [
+    { path: '/chat', textAr: 'المساعد الذكي', iconName: 'chat', permission: 'access_chat' },
+    { path: '/search', textAr: 'البحث المتقدم', iconName: 'search', permission: 'access_search_tool' },
+    { path: '/calculator', textAr: 'الالة الحاسبة', iconName: 'calculator', permission: 'access_calculator' },
+    { path: '/correction', textAr: 'معالج النصوص', iconName: 'correction', permission: 'access_text_corrector' },
+    { path: '/tender-mapping', textAr: 'نظام الطرح', iconName: 'templates', permission: 'access_report_generator' },
+    { path: '/feedback', textAr: 'قيمنا', iconName: 'feedback', permission: 'access_feedback' },
   ];
 
   const secondaryNavItems = [
@@ -79,6 +82,9 @@ export const DashboardSidebar = () => {
           {mainNavItems.map(item => {
             const IconComponent = iconMap[item.iconName];
             const active = isActive(item.path);
+            if (!canAccess(item.permission)) {
+                return null; // Don't render the link if user lacks permission
+            }
             return (
               <li key={item.path} className="relative">
                 <Link

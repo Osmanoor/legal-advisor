@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, ChevronDown, Menu, X, User as UserIcon, LogOut, Shield } from 'lucide-react';
+import { Search, ChevronDown, Menu, X, User as UserIcon, LogOut, Shield, LogIn } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useLanguage } from '@/hooks/useLanguage';
 import UserAvatar from '/public/images/avatars/avatar1.png';
@@ -10,8 +10,17 @@ import { useUIStore } from '@/stores/uiStore';
 import { Button } from '@/components/ui/button';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
 import { cn } from '@/lib/utils';
-import { useAuthStore } from '@/stores/authStore'; // Import the auth store
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'; // Import Popover
+import { useAuthStore } from '@/stores/authStore';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Permission } from '@/types/user';
+
+const ADMIN_PAGE_PERMISSIONS: Permission[] = [
+  'view_analytics',
+  'manage_users',
+  'manage_feedback',
+  'manage_contacts',
+  'manage_global_settings',
+];
 
 export const DashboardHeader = () => {
   const { t, direction } = useLanguage();
@@ -20,31 +29,24 @@ export const DashboardHeader = () => {
   const { isDesktop } = useBreakpoint();
   const [isMobileSearchVisible, setMobileSearchVisible] = useState(false);
 
-  // Get user and logout function from the auth store
-  const { user, logout } = useAuthStore();
-  const canAccessAdmin = user?.permissions.includes('access_admin_dashboard');
+  // Get authentication state
+  const { user, logout, isAuthenticated } = useAuthStore();
+  
+  const canAccessAdmin = user?.permissions.some(p => ADMIN_PAGE_PERMISSIONS.includes(p));
 
   const handleLogout = async () => {
     await logout();
-    // No need to navigate, the protected route guard will handle it.
+    navigate('/login'); // Redirect to login after logout
   };
 
   const showDefaultMobileHeader = !isDesktop && !isMobileSearchVisible;
   const showActiveMobileSearch = !isDesktop && isMobileSearchVisible;
 
-  if (!user) {
-    return (
-        <header className="h-[86px] bg-white border-b border-border-default flex items-center px-4">
-            <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse ml-auto"></div>
-        </header>
-    );
-  }
-
   const UserProfileDropdown = () => (
     <Popover>
       <PopoverTrigger asChild>
         <div className="flex items-center gap-1 cursor-pointer" role="button">
-          <img src={user.profile_picture_url || UserAvatar} alt={user.fullName || "User Avatar"} className="w-10 h-10 rounded-full" />
+          <img src={user?.profile_picture_url || UserAvatar} alt={user?.fullName || "User Avatar"} className="w-10 h-10 rounded-full" />
           <ChevronDown className="w-4 h-4 text-gray-800" />
         </div>
       </PopoverTrigger>
@@ -60,7 +62,6 @@ export const DashboardHeader = () => {
               <span>Profile</span>
             </Link>
             
-            {/* CONDITIONAL ADMIN LINK */}
             {canAccessAdmin && (
               <Link to="/admin" className="flex items-center gap-2 w-full p-2 rounded-md text-sm hover:bg-gray-100 text-cta font-medium">
                 <Shield className="w-4 h-4" />
@@ -76,6 +77,15 @@ export const DashboardHeader = () => {
         </div>
       </PopoverContent>
     </Popover>
+  );
+
+  const GuestActions = () => (
+    <Button asChild>
+      <Link to="/login">
+        <LogIn className="mr-2 h-4 w-4" />
+        Login
+      </Link>
+    </Button>
   );
 
   return (
@@ -109,7 +119,9 @@ export const DashboardHeader = () => {
         <div className={cn("flex items-center gap-3", direction === 'rtl' ? 'mr-auto' : 'ml-auto')}>
           {isDesktop && (
             <div className={`flex items-center gap-3 ${direction === 'rtl' ? 'flex-row-reverse' : ''}`}>
-              <UserProfileDropdown />
+              {/* --- CONDITIONAL RENDERING --- */}
+              {isAuthenticated ? <UserProfileDropdown /> : <GuestActions />}
+              {/* --- END CONDITIONAL RENDERING --- */}
               <div className={`flex items-center border border-gray-300 rounded-md px-3 h-[34px] w-[240px]`}>
                 <Search className={`w-5 h-5 text-gray-500 ${direction === 'rtl' ? 'ml-3' : 'mr-3'}`} />
                 <Input
@@ -128,7 +140,9 @@ export const DashboardHeader = () => {
                 <Button variant="ghost" size="icon" onClick={() => setMobileSearchVisible(true)}>
                   <Search className="w-5 h-5 text-gray-600" />
                 </Button>
-                <UserProfileDropdown />
+                {/* --- CONDITIONAL RENDERING (MOBILE) --- */}
+                {isAuthenticated ? <UserProfileDropdown /> : <GuestActions />}
+                {/* --- END CONDITIONAL RENDERING (MOBILE) --- */}
               </div>
           )}
         </div>

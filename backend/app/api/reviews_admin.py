@@ -8,7 +8,7 @@ reviews_admin_bp = Blueprint('reviews_admin', __name__)
 reviews_admin_service = ReviewsAdminService()
 
 @reviews_admin_bp.route('', methods=['GET'])
-@permission_required('access_ratings_management')
+@permission_required('manage_feedback')
 def get_reviews():
     """
     Gets a paginated list of user reviews.
@@ -24,7 +24,7 @@ def get_reviews():
     return jsonify(result), status_code
 
 @reviews_admin_bp.route('/<int:review_id>', methods=['PUT'])
-@permission_required('access_ratings_management')
+@permission_required('manage_feedback')
 def update_review(review_id):
     """
     Updates a specific review's details and status.

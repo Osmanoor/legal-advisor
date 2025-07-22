@@ -5,11 +5,13 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models import UserReview, User
 from app.extensions import db
 import uuid
+from app.utils.auth_decorators import permission_required
 
 reviews_bp = Blueprint('reviews', __name__)
 
 @reviews_bp.route('', methods=['POST'])
 @jwt_required()
+@permission_required('access_feedback')
 def submit_review():
     """
     Allows an authenticated user to submit a new review.

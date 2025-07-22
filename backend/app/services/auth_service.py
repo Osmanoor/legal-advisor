@@ -13,6 +13,9 @@ from app.extensions import db
 from app.utils.validators import validate_email, validate_phone_number, validate_password
 from app.utils.email import send_verification_email
 
+from app.services.gatekeeper_service import GatekeeperService
+from app.models import Permission
+
 import uuid
 from google.cloud import storage
 from werkzeug.utils import secure_filename
@@ -83,6 +86,20 @@ class AuthService:
             print(f"GCS Upload Error: {e}")
             return {"error": "Failed to upload file."}, 500
 
+    def get_user_permissions(self, user: User) -> list:
+        """Calculates and returns a list of all final permissions for a user."""
+        if not user:
+            return []
+        gatekeeper = GatekeeperService()
+        all_permissions = Permission.query.all()
+        
+        final_permissions = [
+            perm.name for perm in all_permissions 
+            if gatekeeper.has_permission(user, perm.name)
+        ]
+        
+        return final_permissions
+
     def serialize_user(self, user: User) -> dict:
         """Serializes a user object into a dictionary."""
         if not user:
@@ -99,27 +116,6 @@ class AuthService:
             "roles": [role.name for role in user.roles], 
             "permissions": self.get_user_permissions(user)
         }
-
-    def get_user_permissions(self, user: User) -> list:
-        """Calculates and returns a list of all permissions for a user."""
-        if not user:
-            return []
-            
-        role_permissions = {perm.name for role in user.roles for perm in role.permissions}
-        
-        # Check for user.permission_overrides relationship before iterating
-        if hasattr(user, 'permission_overrides'):
-            user_specific_allow_perms = {override.permission.name for override in user.permission_overrides if override.override_type == 'ALLOW'}
-            user_specific_deny_perms = {override.permission.name for override in user.permission_overrides if override.override_type == 'DENY'}
-        else:
-            user_specific_allow_perms = set()
-            user_specific_deny_perms = set()
-            
-        # Final permissions are (role perms UNION user allow perms) MINUS user deny perms
-        final_permissions = (role_permissions.union(user_specific_allow_perms)) - user_specific_deny_perms
-        
-        return list(final_permissions)
-
     def _generate_and_store_code(self, identifier, code=None):
         """Generates a 6-digit code, stores it, and returns it."""
         if not code:

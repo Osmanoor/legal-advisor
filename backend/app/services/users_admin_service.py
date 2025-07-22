@@ -1,8 +1,10 @@
 # app/services/users_admin_service.py
 
+import os
 from app.models import User, Role, Permission
 from app.extensions import db
 from app.utils.validators import validate_phone_number, validate_password
+from app.models.role_permission import UserPermissionOverride
 
 class UsersAdminService:
 
@@ -66,30 +68,37 @@ class UsersAdminService:
         return self.serialize_user(user), 200
 
     def update_user(self, user_id, data):
-        """Updates a user's details, roles, and permission overrides."""
+        """Updates a user's details, roles, and permission overrides with security checks."""
         user = User.query.get(user_id)
         if not user:
             return {"error": "User not found"}, 404
 
+        # --- SECURITY CHECK 1: Protect Super Admin ---
+        super_admin_identifier = os.environ.get('SUPER_ADMIN_IDENTIFIER')
+        if super_admin_identifier and (user.phone_number == super_admin_identifier or user.email == super_admin_identifier):
+            return {"error": "The super admin account cannot be modified."}, 403
+
         try:
-            # Update basic fields
             if 'fullName' in data: user.full_name = data['fullName']
             if 'jobTitle' in data: user.job_title = data['jobTitle']
             if 'email' in data: user.email = data['email']
-
-            # Update roles
             if 'role_ids' in data:
                 new_roles = Role.query.filter(Role.id.in_(data['role_ids'])).all()
                 user.roles = new_roles
             
-            # Update permission overrides
             if 'permission_overrides' in data:
                 # First, clear all existing overrides for this user
                 UserPermissionOverride.query.filter_by(user_id=user.id).delete()
-                # Then, add the new ones
+                
+                # Then, add the new ones with security checks
+                user_is_admin = "Admin" in [role.name for role in user.roles]
                 for override_data in data['permission_overrides']:
                     permission = Permission.query.get(override_data['permission_id'])
                     if permission:
+                        # --- SECURITY CHECK 2: Prevent Privilege Escalation ---
+                        if not user_is_admin and permission.permission_type == 'admin':
+                             return {"error": f"Cannot assign admin permission '{permission.name}' to a non-admin user."}, 403
+                        
                         override = UserPermissionOverride(
                             user_id=user.id,
                             permission_id=permission.id,
@@ -103,12 +112,15 @@ class UsersAdminService:
             db.session.rollback()
             return {"error": f"Failed to update user: {e}"}, 500
 
+
     def delete_user(self, user_id):
-        """Deletes a user."""
+        # ... (this method can be enhanced with super admin protection too) ...
         user = User.query.get(user_id)
         if not user:
             return {"error": "User not found"}, 404
-        
+        super_admin_identifier = os.environ.get('SUPER_ADMIN_IDENTIFIER')
+        if super_admin_identifier and (user.phone_number == super_admin_identifier or user.email == super_admin_identifier):
+            return {"error": "The super admin account cannot be deleted."}, 403
         try:
             db.session.delete(user)
             db.session.commit()

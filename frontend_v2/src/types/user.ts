@@ -5,60 +5,110 @@ export type Role = string;
 
 // The permissions as defined in the backend's seeding script
 export type Permission =
-  | 'access_ai_assistant'
+  // User-facing features
+  | 'access_chat'
   | 'access_calculator'
   | 'access_text_corrector'
   | 'access_report_generator'
   | 'access_search_tool'
-  | 'access_admin_dashboard'
-  | 'access_ratings_management'
-  | 'access_contact_us'
-  | 'view_users_list'
+  | 'access_feedback'
+  
+  // Admin-facing features (Page/Component Access)
+  | 'view_analytics'
+  | 'manage_users'
+  | 'manage_feedback'
+  | 'manage_contacts'
+  | 'manage_global_settings'
+  
+  // Granular Admin actions (API endpoint protection)
+  | 'update_user'
   | 'delete_user'
-  | 'manage_admins'
-  | 'access_global_settings';
+  | 'update_admin'
+  ;
 
-// Updated User interface to match the backend's /me response
+// Base user object from /me endpoint
 export interface User {
   id: string;
   fullName: string;
   email: string | null;
   phoneNumber: string;
   jobTitle: string | null;
-  workplace: string | null; // <-- ADDED
+  workplace: string | null;
   linkedin_id: string | null;
   profile_picture_url: string | null;
   roles: string[];
   permissions: Permission[];
 }
 
+// --- More specific types for Admin Panel ---
+export interface UserSummary {
+  id: string;
+  fullName: string;
+  email: string | null;
+  phoneNumber: string;
+  roles: string[];
+  created_at: string;
+}
+
+export interface PermissionOverride {
+  permission_id: number;
+  permission_name: string;
+  override_type: 'ALLOW' | 'DENY';
+}
+
+export interface UserRole {
+  id: number;
+  name: string;
+}
+
+export interface AdminDetailedUser {
+  id: string;
+  fullName: string;
+  email: string | null;
+  phoneNumber: string;
+  jobTitle: string | null;
+  roles: UserRole[];
+  permission_overrides: PermissionOverride[];
+  created_at: string;
+}
+
+// --- FIX: Moved UserUpdatePayload here ---
+export interface UserUpdatePayload {
+  fullName?: string;
+  email?: string;
+  jobTitle?: string;
+  role_ids?: number[];
+  permission_overrides?: {
+      permission_id: number;
+      override_type: 'ALLOW' | 'DENY';
+  }[];
+}
+
+
+// --- Existing types ---
 export interface ChangePasswordData {
     currentPassword: string;
     newPassword: string;
 }
 
-// Login credentials
 export interface LoginCredentials {
   loginIdentifier: string;
   password: string;
   rememberMe?: boolean;
 }
 
-// Register data
 export interface RegisterData {
   fullName: string;
   password: string;
-  email?: string; // Optional
-  phoneNumber?: string; // Optional
+  email?: string;
+  phoneNumber?: string;
 }
 
-// Phone verification payload
 export interface VerificationData {
-  identifier: string; // Can be email or phone
+  identifier: string;
   code: string;
 }
 
-// Auth store state shape
 export interface AuthState {
   isAuthenticated: boolean;
   user: User | null;

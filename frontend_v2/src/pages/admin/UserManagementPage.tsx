@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useAdminUsers } from '@/hooks/api/useAdminUsers';
-import { User } from '@/types/user';
+import { UserSummary } from '@/types/user';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -17,19 +17,17 @@ import UserAvatar from '/public/images/avatars/avatar1.png'; // Placeholder
 export default function UserManagementPage() {
   const { t } = useLanguage();
   const [currentPage, setCurrentPage] = useState(1);
-  const { usersQuery } = useAdminUsers(currentPage); // Use the hook to fetch data
+  const { usersQuery } = useAdminUsers(currentPage);
 
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const handleEditClick = (user: User) => {
-    setSelectedUser(user);
+  const handleEditClick = (user: UserSummary) => {
+    setSelectedUserId(user.id);
     setIsEditDialogOpen(true);
   };
   
-  // Note: Local search will only work on the current page of data.
-  // A full server-side search would require passing the search term to the useAdminUsers hook.
   const filteredUsers = useMemo(() => {
     if (!usersQuery.data?.users) return [];
     return usersQuery.data.users.filter(user => 
@@ -38,7 +36,6 @@ export default function UserManagementPage() {
     );
   }, [usersQuery.data, searchTerm]);
   
-  // A simple status badge for display, can be expanded later
   const renderStatusBadge = () => {
       return <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-200">Active</Badge>;
   }
@@ -119,11 +116,13 @@ export default function UserManagementPage() {
         </>
       )}
 
-      {/* The dialog for editing will be connected in Phase 4 */}
       <UserEditDialog
-        user={selectedUser}
+        userId={selectedUserId}
         isOpen={isEditDialogOpen}
-        onClose={() => setIsEditDialogOpen(false)}
+        onClose={() => {
+            setIsEditDialogOpen(false);
+            setSelectedUserId(null);
+        }}
       />
     </div>
   );

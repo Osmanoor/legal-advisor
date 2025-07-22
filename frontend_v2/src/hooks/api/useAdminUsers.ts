@@ -2,27 +2,17 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/axios';
-import { User } from '@/types/user';
-
-// The payload now includes permission_overrides
-export interface UserUpdatePayload {
-  fullName?: string;
-  email?: string;
-  jobTitle?: string;
-  role_ids?: number[];
-  permission_overrides?: {
-      permission_id: number;
-      override_type: 'ALLOW' | 'DENY';
-  }[];
-}
+// --- FIX: Import UserUpdatePayload from the correct location ---
+import { UserSummary, AdminDetailedUser, UserUpdatePayload } from '@/types/user';
 
 interface PaginatedUsersResponse {
-  users: User[];
+  users: UserSummary[];
   total: number;
   pages: number;
   current_page: number;
 }
 
+// HOOK for fetching user list, updating, and deleting
 export function useAdminUsers(page: number = 1, perPage: number = 10) {
   const queryClient = useQueryClient();
 
@@ -37,17 +27,17 @@ export function useAdminUsers(page: number = 1, perPage: number = 10) {
   });
 
   const updateUserMutation = useMutation({
-    mutationFn: async (variables: { userId: string; payload: UserUpdatePayload }): Promise<User> => {
+    mutationFn: async (variables: { userId: string; payload: UserUpdatePayload }): Promise<AdminDetailedUser> => {
       const { userId, payload } = variables;
       const response = await api.put(`/admin/users/${userId}`, payload);
       return response.data;
     },
-    onSuccess: () => {
+    onSuccess: (updatedUser) => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
+      queryClient.setQueryData(['admin', 'users', updatedUser.id], updatedUser);
     },
   });
 
-  // --- NEW DELETE MUTATION ---
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string): Promise<{ message: string }> => {
         const response = await api.delete(`/admin/users/${userId}`);
@@ -61,6 +51,18 @@ export function useAdminUsers(page: number = 1, perPage: number = 10) {
   return {
     usersQuery,
     updateUserMutation,
-    deleteUserMutation, // Expose the new mutation
+    deleteUserMutation,
   };
+}
+
+// HOOK to fetch a single user's details for the edit dialog
+export function useAdminUser(userId: string | null) {
+  return useQuery<AdminDetailedUser, Error>({
+    queryKey: ['admin', 'users', userId],
+    queryFn: async () => {
+      const response = await api.get(`/admin/users/${userId}`);
+      return response.data;
+    },
+    enabled: !!userId,
+  });
 }

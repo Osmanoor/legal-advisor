@@ -11,50 +11,52 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { FeedbackCard } from '@/features/admin/components/Feedback/FeedbackCard';
 import { Search, Filter, ArrowDownUp, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/useToast';
+import { PaginationControls } from '@/components/common/PaginationControls';
 
 type ReviewFilter = ReviewFilterType;
+
+const ITEMS_PER_PAGE = 12; // Adjusted for a 4-column layout
 
 export default function FeedbackManagementPage() {
   const { showToast } = useToast();
   
-  // State for pagination, filtering, and searching
   const [currentPage, setCurrentPage] = useState(1);
   const [reviewFilter, setReviewFilter] = useState<ReviewFilter>('pending');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Fetch data and mutations from the dedicated hook
-  const { feedbackQuery, updateFeedbackMutation } = useAdminFeedback(currentPage, 20, reviewFilter);
+  // The hook now receives the currentPage and itemsPerPage
+  const { feedbackQuery, updateFeedbackMutation } = useAdminFeedback(currentPage, ITEMS_PER_PAGE, reviewFilter);
 
-  // Memoized filtering logic based on the fetched data and UI state
+  // Client-side search on the current page's data
   const filteredFeedback = useMemo(() => {
-    let feedback = feedbackQuery.data?.reviews || [];
+    if (!feedbackQuery.data?.reviews) return [];
     
-    // Filter by active sub-tab (approved/archived)
-    if (reviewFilter === 'approved') {
-      feedback = feedback.filter(item => item.is_approved);
-    } else if (reviewFilter === 'archived') {
-      feedback = feedback.filter(item => item.is_archived);
+    if (searchTerm.trim() === '') {
+      return feedbackQuery.data.reviews;
     }
     
-    // Filter by search term
-    if (searchTerm) {
-      feedback = feedback.filter(item => 
-        item.user_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.comment.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    return feedback;
-  }, [feedbackQuery.data, reviewFilter, searchTerm]);
+    return feedbackQuery.data.reviews.filter(item => 
+      item.user_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.comment.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [feedbackQuery.data, searchTerm]);
+
+  // Reset to page 1 whenever the filter changes
+  const handleFilterChange = (val: string) => {
+    setCurrentPage(1);
+    setReviewFilter(val as ReviewFilter);
+  }
   
-  // Handler to call the update mutation
   const handleUpdateReview = async (variables: { reviewId: number; payload: FeedbackUpdatePayload }) => {
-    try {
-      await updateFeedbackMutation.mutateAsync(variables);
-      showToast('Review updated successfully.', 'success');
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
-      showToast(`Failed to update review: ${errorMessage}`, 'error');
-    }
+    updateFeedbackMutation.mutate(variables, {
+        onSuccess: () => {
+            showToast('Review updated successfully.', 'success');
+        },
+        onError: (error) => {
+            const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+            showToast(`Failed to update review: ${errorMessage}`, 'error');
+        }
+    });
   };
 
   return (
@@ -72,19 +74,18 @@ export default function FeedbackManagementPage() {
                 />
                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             </div>
-            {/* These buttons are placeholders for future sorting/filtering functionality */}
             <Button variant="outline" size="icon"><Filter className="w-4 h-4" /></Button>
             <Button variant="outline" size="icon"><ArrowDownUp className="w-4 h-4" /></Button>
         </div>
       </div>
       
       {/* Sub-navigation tabs for filtering */}
-      <Tabs value={reviewFilter} onValueChange={(val) => setReviewFilter(val as ReviewFilter)}>
+      <Tabs value={reviewFilter} onValueChange={handleFilterChange}>
           <TabsList>
-              <TabsTrigger value="pending">Pending</TabsTrigger> {/* Changed from 'الكل' to 'Pending' */}
+              <TabsTrigger value="pending">Pending</TabsTrigger>
               <TabsTrigger value="approved">Approved</TabsTrigger>
               <TabsTrigger value="archived">Archived</TabsTrigger>
-              <TabsTrigger value="all">All</TabsTrigger> {/* Added an 'All' tab for completeness */}
+              <TabsTrigger value="all">All</TabsTrigger>
           </TabsList>
       </Tabs>
       
@@ -114,7 +115,15 @@ export default function FeedbackManagementPage() {
                     <p>No reviews found for this filter.</p>
                 </div>
             )}
-            {/* Pagination controls would go here */}
+            <div className="mt-8">
+                <PaginationControls
+                    currentPage={feedbackQuery.data?.current_page || 1}
+                    totalPages={feedbackQuery.data?.pages || 1}
+                    onPageChange={setCurrentPage}
+                    totalItems={feedbackQuery.data?.total || 0}
+                    itemsPerPage={ITEMS_PER_PAGE}
+                />
+            </div>
         </>
       )}
     </div>

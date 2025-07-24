@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { DateConverter } from '@/lib/calculator';
 import { DateDifference } from '@/types/calculator';
+import { trackEvent } from '@/lib/analytics';
 
 interface DateDifferenceFormProps {
   designConfig: {
@@ -48,6 +49,7 @@ export const DateDifferenceForm: React.FC<DateDifferenceFormProps> = ({ designCo
       }
       const diff = DateConverter.calculateDateDifference(start, end);
       setDifferenceResult(diff);
+      trackEvent({ event: 'feature_used', feature_name: 'date_calculator' });
     } catch (e) {
       setDifferenceResult({ error: t('calculator.common.error') });
       console.error("Date difference error:", e);

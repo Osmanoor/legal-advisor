@@ -14,7 +14,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const { direction } = useLanguage();
     
     return (
-      <div className="relative">
+      <div className="relative w-full">
         <input
           type={type}
           className={cn(

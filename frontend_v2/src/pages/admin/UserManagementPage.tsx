@@ -12,12 +12,15 @@ import LoadingSpinner from '@/components/ui/loading-spinner';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { UserEditDialog } from '@/features/admin/components/Users/UserEditDialog';
 import { Search, MoreVertical, Filter, ArrowDownUp, UserPlus, AlertCircle } from 'lucide-react';
+import { PaginationControls } from '@/components/common/PaginationControls';
 import UserAvatar from '/public/images/avatars/avatar1.png'; // Placeholder
+
+const ITEMS_PER_PAGE = 10;
 
 export default function UserManagementPage() {
   const { t } = useLanguage();
   const [currentPage, setCurrentPage] = useState(1);
-  const { usersQuery } = useAdminUsers(currentPage);
+  const { usersQuery } = useAdminUsers(currentPage, ITEMS_PER_PAGE);
 
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -30,6 +33,9 @@ export default function UserManagementPage() {
   
   const filteredUsers = useMemo(() => {
     if (!usersQuery.data?.users) return [];
+    if (!searchTerm.trim()) return usersQuery.data.users; // If search is empty, return all users from the current page
+    
+    // Perform filtering on the client side for the current page's data
     return usersQuery.data.users.filter(user => 
       user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (user.email && user.email.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -112,7 +118,13 @@ export default function UserManagementPage() {
               </TableBody>
             </Table>
           </div>
-          {/* Pagination controls can be added here */}
+          <PaginationControls
+            currentPage={usersQuery.data.current_page}
+            totalPages={usersQuery.data.pages}
+            onPageChange={setCurrentPage}
+            totalItems={usersQuery.data.total}
+            itemsPerPage={ITEMS_PER_PAGE}
+          />
         </>
       )}
 

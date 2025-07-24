@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeftRight } from 'lucide-react';
 import { DateConverter } from '@/lib/calculator';
 import { DateTime } from 'luxon';
+import { trackEvent } from '@/lib/analytics';
 
 interface DateConversionFormProps {
   designConfig: {
@@ -42,7 +43,7 @@ export const DateConversionForm: React.FC<DateConversionFormProps> = ({ designCo
 
   const handleConvert = () => {
     setConversionError(null);
-
+    let success = false
     if (lastEditedField === 'gregorian') {
       if (!gregorianDate) {
         setConversionError(t('calculator.common.validation.enterGregorian'));
@@ -58,6 +59,7 @@ export const DateConversionForm: React.FC<DateConversionFormProps> = ({ designCo
         }
         const convertedHijri = DateConverter.gregorianToHijri(dateObj.toJSDate());
         setHijriDateInput(convertedHijri || '');
+        success = true;
       } catch (e) {
         setConversionError(t('calculator.common.error'));
         setHijriDateInput('');
@@ -84,6 +86,7 @@ export const DateConversionForm: React.FC<DateConversionFormProps> = ({ designCo
       try {
         const convertedGregorian = DateConverter.hijriToGregorian(hijriDateInput.trim());
         setGregorianDate(DateTime.fromJSDate(convertedGregorian).toISODate() || '');
+        success = true;
       } catch (e) {
         setConversionError(t('calculator.common.error'));
         setGregorianDate('');
@@ -98,6 +101,9 @@ export const DateConversionForm: React.FC<DateConversionFormProps> = ({ designCo
       } else {
          setConversionError(t('calculator.common.validation.enterDateToConvert')); // Add this translation
       }
+    }
+    if (success) {
+      trackEvent({ event: 'feature_used', feature_name: 'date_calculator' });
     }
   };
   

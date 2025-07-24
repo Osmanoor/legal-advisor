@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ProcurementCalculator } from '@/lib/calculator';
 import { PercentageResult } from '@/types/calculator';
+import { trackEvent } from '@/lib/analytics';
 
 interface PercentageCalculatorProps {
   // designConfig is still useful for elements we don't explicitly override here,
@@ -33,6 +34,7 @@ export const PercentageCalculator: React.FC<PercentageCalculatorProps> = ({ desi
       Number(newAmount)
     );
     setCalcResult({ percentage: `${resultValue.toFixed(2)}%` });
+    trackEvent({ event: 'feature_used', feature_name: 'percentage_calculator' });
   };
 
   const handleReset = () => {

@@ -3,6 +3,8 @@
 import { create } from 'zustand';
 import { api } from '@/lib/axios';
 import { AuthState, LoginCredentials, RegisterData, User, VerificationData } from '@/types/user';
+import ReactGA from 'react-ga4';
+import { trackEvent } from '@/lib/analytics';
 
 // Add new state and actions to the AuthState type
 export interface ExtendedAuthState extends AuthState {
@@ -20,17 +22,40 @@ export const useAuthStore = create<ExtendedAuthState>((set) => ({
     set({ isLoading: true });
     try {
       const response = await api.get<User>('/auth/me');
-      set({ isAuthenticated: true, user: response.data, isLoading: false, isOnboarding: false });
+      const user = response.data;
+      set({ isAuthenticated: true, user: user, isLoading: false, isOnboarding: false });
+      
+      // GA: Set user ID on successful auth check
+      if (ReactGA.isInitialized) {
+        ReactGA.set({ user_id: user.id });
+        console.log(`[GA Event] User ID set: ${user.id}`);
+        trackEvent({ event: 'login' });
+      }
+
     } catch (error) {
       set({ isAuthenticated: false, user: null, isLoading: false, isOnboarding: false });
+      
+      // GA: Clear user ID on failed auth check
+      if (ReactGA.isInitialized) {
+        ReactGA.set({ user_id: null });
+        console.log(`[GA Event] User ID cleared on auth failure.`);
+      }
     }
   },
 
   login: async (credentials) => {
-    // On a normal login, onboarding is always false.
     try {
       const response = await api.post('/auth/login', credentials);
-      set({ isAuthenticated: true, user: response.data.user, isOnboarding: false });
+      const user = response.data.user;
+      set({ isAuthenticated: true, user: user, isOnboarding: false });
+      
+      // GA: Set user ID on successful login
+       if (ReactGA.isInitialized) {
+        ReactGA.set({ user_id: user.id });
+        console.log(`[GA Event] User ID set: ${user.id}`);
+        trackEvent({ event: 'login' });
+      }
+
     } catch (error) {
       set({ isAuthenticated: false, user: null });
       throw error;
@@ -42,6 +67,12 @@ export const useAuthStore = create<ExtendedAuthState>((set) => ({
       await api.post('/auth/logout');
     } finally {
       set({ isAuthenticated: false, user: null, isOnboarding: false });
+
+      // GA: Clear user ID on logout
+      if (ReactGA.isInitialized) {
+        ReactGA.set({ user_id: null });
+        console.log(`[GA Event] User ID cleared on logout.`);
+      }
     }
   },
 
@@ -50,21 +81,27 @@ export const useAuthStore = create<ExtendedAuthState>((set) => ({
     await api.post('/auth/register', data);
   },
   
-  // On successful verification, we set the user and flag that they are in the onboarding flow.
   verifyPhone: async (data) => {
     try {
       const response = await api.post('/auth/verify', data);
+      const user = response.data.user;
       set({ 
         isAuthenticated: true, 
-        user: response.data.user, 
-        isOnboarding: true // The user is logged in but needs to complete the final step.
+        user: user, 
+        isOnboarding: true
       });
+
+      // GA: Set user ID on successful verification (which is a login)
+      if (ReactGA.isInitialized) {
+        ReactGA.set({ user_id: user.id });
+        console.log(`[GA Event] User ID set: ${user.id}`);
+        trackEvent({ event: 'login' });
+      }
     } catch (error) {
       throw error;
     }
   },
 
-  // New action to be called when the user finishes the last step.
   completeOnboarding: () => {
     set({ isOnboarding: false });
   },

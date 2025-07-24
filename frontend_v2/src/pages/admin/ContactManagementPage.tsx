@@ -10,25 +10,30 @@ import { ContactsTable } from '@/features/admin/components/ContactsTable';
 import { ContactDetailDialog } from '@/features/admin/components/ContactDetailDialog';
 import { Search, Filter, ArrowDownUp, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/useToast';
+import { PaginationControls } from '@/components/common/PaginationControls';
+
+const ITEMS_PER_PAGE = 10;
 
 export default function ContactManagementPage() {
   const { showToast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
   
-  // --- State for the Dialog ---
   const [selectedContact, setSelectedContact] = useState<ContactSubmission | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const { contactsQuery, updateContactStatusMutation } = useAdminContacts();
+  // The hook now receives the currentPage
+  const { contactsQuery, updateContactStatusMutation } = useAdminContacts(currentPage, ITEMS_PER_PAGE);
 
+  // Filtering is now done on the backend for larger datasets.
+  // This frontend filter is good for immediate feedback while typing.
   const filteredContacts = useMemo(() => {
-    if (!contactsQuery.data) return [];
-    if (!searchTerm) return contactsQuery.data;
+    if (!contactsQuery.data?.submissions) return [];
+    if (!searchTerm) return contactsQuery.data.submissions;
 
-    return contactsQuery.data.filter(item => 
+    return contactsQuery.data.submissions.filter(item => 
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.message.toLowerCase().includes(searchTerm.toLowerCase())
+      item.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [contactsQuery.data, searchTerm]);
 
@@ -36,7 +41,7 @@ export default function ContactManagementPage() {
     updateContactStatusMutation.mutate({ id, status }, {
         onSuccess: () => {
             showToast('Contact status updated.', 'success');
-            setIsDialogOpen(false); // Close dialog on successful update
+            setIsDialogOpen(false);
         },
         onError: (error) => {
             showToast(`Failed to update status: ${error.message}`, 'error');
@@ -52,7 +57,7 @@ export default function ContactManagementPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-        <h1 className="text-2xl font-bold">رسائل التواصل ({contactsQuery.data?.length || 0})</h1>
+        <h1 className="text-2xl font-bold">رسائل التواصل ({contactsQuery.data?.total || 0})</h1>
         <div className="flex items-center gap-2 w-full md:w-auto">
             <div className="relative flex-grow">
                  <Input 
@@ -76,12 +81,20 @@ export default function ContactManagementPage() {
           <AlertDescription>{contactsQuery.error.message}</AlertDescription>
         </Alert>
       ) : (
-        <ContactsTable 
-          contacts={filteredContacts} 
-          onViewDetails={handleViewDetails}
-        />
+        <>
+            <ContactsTable 
+                contacts={filteredContacts} 
+                onViewDetails={handleViewDetails}
+            />
+            <PaginationControls
+                currentPage={contactsQuery.data?.current_page || 1}
+                totalPages={contactsQuery.data?.pages || 1}
+                onPageChange={setCurrentPage}
+                totalItems={contactsQuery.data?.total || 0}
+                itemsPerPage={ITEMS_PER_PAGE}
+            />
+        </>
       )}
-       {/* Render the Dialog */}
       <ContactDetailDialog
         submission={selectedContact}
         isOpen={isDialogOpen}

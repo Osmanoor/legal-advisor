@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { SearchTopBar } from '@/features/search/components/SearchTopBar';
+import { trackEvent } from '@/lib/analytics';
 
 export default function SearchPage() {
   const { t } = useLanguage();
@@ -31,7 +32,7 @@ export default function SearchPage() {
     // The refetch is triggered because the query key of useSearch will change.
     // However, calling refetch() explicitly ensures it runs immediately.
     setSearchParams({ query: newQuery, type: newType });
-    
+    trackEvent({ event: 'search', search_term: newQuery });
     // We need to use a timeout to allow React to update the state before refetching
     setTimeout(() => {
         refetch();
@@ -43,7 +44,7 @@ export default function SearchPage() {
       
       <SearchTopBar onSearch={handleSearch} isLoading={isFetching} />
 
-      <main className="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-6 lg:p-8">
+      <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
         <div className="max-w-4xl mx-auto">
           {isFetching ? (
             <div className="flex justify-center py-20">

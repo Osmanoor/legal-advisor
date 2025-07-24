@@ -129,20 +129,26 @@ class AdminService:
             print(f"Error updating settings: {e}")
             return {"error": "An internal error occurred while updating settings."}, 500
 
-    # ... (rest of the service is unchanged) ...
     def get_dashboard_stats(self):
         dummy_stats = { "total_users": 150, "new_messages": 12, "pending_reviews": 5 }
         return dummy_stats, 200
 
-    def get_contact_submissions(self):
-        submissions = ContactSubmission.query.order_by(ContactSubmission.submitted_at.desc()).all()
+    def get_contact_submissions(self, page=1, per_page=20):
+        paginated_submissions = ContactSubmission.query.order_by(ContactSubmission.submitted_at.desc()).paginate(
+            page=page, per_page=per_page, error_out=False
+        )
         submissions_data = [
             {
                 "id": s.id, "name": s.name, "email": s.email, "message": s.message,
                 "status": s.status, "submitted_at": s.submitted_at.isoformat()
-            } for s in submissions
+            } for s in paginated_submissions.items
         ]
-        return submissions_data, 200
+        return {
+            "submissions": submissions_data,
+            "total": paginated_submissions.total,
+            "pages": paginated_submissions.pages,
+            "current_page": paginated_submissions.page
+        }, 200
 
     def update_contact_submission_status(self, submission_id, new_status):
         submission = ContactSubmission.query.get(submission_id)

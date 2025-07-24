@@ -3,6 +3,7 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { api } from '@/lib/axios';
 import { TenderCalculationResult, WorkType } from '@/types/tenderMapping';
+import { trackEvent } from '@/lib/analytics';
 
 // Get all work types for dropdown
 export function useTenderWorkTypes() {
@@ -27,6 +28,9 @@ export function useCalculateProcurement() {
     }) => {
       const response = await api.post('/tender-mapping/calculate', data);
       return response.data as TenderCalculationResult;
+    },
+    onSuccess: () => {
+      trackEvent({ event: 'feature_used', feature_name: 'report_generator' });
     }
   });
 }

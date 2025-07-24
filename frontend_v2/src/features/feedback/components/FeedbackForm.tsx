@@ -12,6 +12,7 @@ import { useFeedback } from '@/hooks/api/useFeedback'; // <-- Import the new hoo
 import { useToast } from '@/hooks/useToast';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { AxiosError } from 'axios';
+import { trackEvent } from '@/lib/analytics';
 
 interface PreviewSettings {
   show_name: boolean;
@@ -50,6 +51,7 @@ export const FeedbackForm: React.FC = () => {
       preview_settings: previewSettings,
     }, {
         onSuccess: (data) => {
+            trackEvent({ event: 'feedback_submitted', rating: rating });
             showToast(data.message || "Thank you for your feedback!", "success");
             // Optionally, you can reset the form or disable it here
             setRating(0);

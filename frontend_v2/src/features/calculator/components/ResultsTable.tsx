@@ -4,6 +4,8 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { CalculationResult } from '@/types/calculator';
 import { ArrowRight, RotateCcw } from 'lucide-react';
+//uselanguage
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface ResultsTableProps {
   results: CalculationResult[];
@@ -12,6 +14,7 @@ interface ResultsTableProps {
 }
 
 export const ResultsTable: React.FC<ResultsTableProps> = ({ results, onBack, onReset }) => {
+  const { t, direction } = useLanguage();
   return (
     <div className="p-4 sm:p-6 bg-white border border-gray-200 rounded-2xl">
       {/* Header with Back button */}
@@ -23,9 +26,9 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, onBack, onR
       </div>
 
       {/* Results Card */}
-      <div className="bg-[#ECFFEA] rounded-lg p-6">
+      <div className="bg-[#ECFFEA] rounded-lg p-6 ">
         <div className="overflow-x-auto">
-          <table className="w-full text-right">
+          <table className="w-full text-right" dir={direction}>
             <thead>
               <tr className="border-b border-black/20">
                 <th className="p-4 font-normal text-gray-600">الترتيب</th>

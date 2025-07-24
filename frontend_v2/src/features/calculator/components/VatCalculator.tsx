@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { VATCalculator } from '@/lib/calculator'; // Assuming VATCalculator is in this path
 import { VATResult } from '@/types/calculator';
+import { trackEvent } from '@/lib/analytics';
 
 interface VatCalculatorProps {
   designConfig: {
@@ -83,6 +84,7 @@ export const VatCalculator: React.FC<VatCalculatorProps> = ({ designConfig }) =>
         break;
     }
     setVatResult(result);
+    trackEvent({ event: 'feature_used', feature_name: 'vat_calculator' });
   };
   
   const handleResetVat = () => {

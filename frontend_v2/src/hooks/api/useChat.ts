@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/axios';
 // Import the corrected and updated types
 import { ChatMessage, ChatSession, ChatOptions, NewChatSessionResponse } from '@/types/chat';
+import { trackEvent } from '@/lib/analytics';
 
 // --- API Functions ---
 // These function definitions remain the same, but the return types are now correct.
@@ -55,6 +56,7 @@ export function useChat() {
   const startNewChatMutation = useMutation({
     mutationFn: startNewChat,
     onSuccess: (newSessionData) => {
+      trackEvent({ event: 'feature_used', feature_name: 'ai_assistant' });
       queryClient.setQueryData(['chat', 'messages', newSessionData.id], newSessionData.messages);
       queryClient.invalidateQueries({ queryKey: ['chat', 'sessions'] });
     },
@@ -63,6 +65,7 @@ export function useChat() {
   const sendMessageMutation = useMutation({
     mutationFn: sendMessage,
     onSuccess: (newAssistantMessage, variables) => {
+      trackEvent({ event: 'feature_used', feature_name: 'ai_assistant' });
       const { sessionId } = variables;
       queryClient.setQueryData<ChatMessage[]>(['chat', 'messages', sessionId], (oldData) => {
           if (!oldData) return [];

@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { DateConverter } from '@/lib/calculator';
 import { DateTime } from 'luxon';
+import { trackEvent } from '@/lib/analytics';
 
 interface DateDurationFormProps {
   designConfig: {
@@ -78,6 +79,12 @@ export const DateDurationForm: React.FC<DateDurationFormProps> = ({ designConfig
         setCalculatedHijriDate(hijriResult);
       }
       if (!gregorianResult && !hijriResult) {
+        setDurationError(t('calculator.common.error'));
+      }
+      // Track event only if at least one date was successfully calculated
+      if (gregorianResult || hijriResult) { 
+        trackEvent({ event: 'feature_used', feature_name: 'date_calculator' });
+      } else {
         setDurationError(t('calculator.common.error'));
       }
 

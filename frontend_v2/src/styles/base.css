@@ -181,3 +181,13 @@
     filter: blur(10.5px);
   }
 }
+/*
+ * Temporary style for sharing a resource card as an image.
+ * This class is added to the card just before image generation
+ * and removed immediately after. It makes the <mark> highlights
+ * transparent for a clean look in the shared image.
+*/
+.is-sharing-mode mark {
+  background-color: transparent !important;
+  color: inherit !important;
+}

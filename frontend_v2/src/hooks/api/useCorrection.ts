@@ -2,6 +2,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { api } from '@/lib/axios';
 import { CorrectionRequest, CorrectionResponse } from '@/types/correction';
+import { trackEvent } from '@/lib/analytics';
 
 export function useCorrection() {
   return useMutation<CorrectionResponse, Error, CorrectionRequest>({
@@ -12,5 +13,8 @@ export function useCorrection() {
       });
       return response.data;
     },
+    onSuccess: () => {
+      trackEvent({ event: 'feature_used', feature_name: 'text_corrector' });
+    }
   });
 }

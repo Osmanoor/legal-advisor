@@ -4,6 +4,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useAuthStore } from '@/stores/authStore';
 import { RegisterData, VerificationData, ChangePasswordData } from '@/types/user';
 import { api } from '@/lib/axios';
+import { trackEvent } from '@/lib/analytics';
 
 export function useAuthMutations() {
   const { register, verifyPhone } = useAuthStore.getState();
@@ -11,6 +12,9 @@ export function useAuthMutations() {
   const registerMutation = useMutation({
     // The data type now matches the updated RegisterData interface
     mutationFn: (data: RegisterData) => register(data),
+    onSuccess: () => {
+      trackEvent({ event: 'sign_up' });
+    },
   });
 
   const verifyPhoneMutation = useMutation({

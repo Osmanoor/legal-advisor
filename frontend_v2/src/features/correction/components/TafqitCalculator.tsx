@@ -1,6 +1,6 @@
 // src/features/correction/components/TafqitCalculator.tsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useToast } from '@/hooks/useToast';
 import { tafqit } from '@/lib/tafqit';
@@ -9,12 +9,14 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Copy } from 'lucide-react';
 import { debounce } from '@/lib/utils';
+import { trackEvent } from '@/lib/analytics';
 
 export const TafqitCalculator = () => {
   const { t } = useLanguage();
   const { showToast } = useToast();
   const [amount, setAmount] = useState('');
   const [result, setResult] = useState('');
+  const trackedAmountRef = useRef<string | null>(null);
 
   const handleCopyToClipboard = () => {
     if (!result || result === t('calculator.tafqit.resultPlaceholder')) return;
@@ -26,7 +28,13 @@ export const TafqitCalculator = () => {
     const convertAmount = () => {
       if (amount.trim() !== '' && !isNaN(Number(amount))) {
         const num = Number(amount);
+        const newResult = tafqit(num);
         setResult(tafqit(num));
+        // Only track if the result is valid and the amount is different from the last tracked one
+        if (newResult && amount.trim() !== trackedAmountRef.current) {
+          trackEvent({ event: 'feature_used', feature_name: 'tafqit' });
+          trackedAmountRef.current = amount.trim();
+        }
       } else {
         setResult('');
       }

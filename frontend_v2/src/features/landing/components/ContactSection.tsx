@@ -11,6 +11,7 @@ import { useContact } from '@/hooks/api/useContact'; // <-- Import the hook
 import { useToast } from '@/hooks/useToast';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { AxiosError } from 'axios';
+import { trackEvent } from '@/lib/analytics';
 
 const GeometricPattern = () => (
     <div className="absolute bottom-0 right-0 opacity-20 text-[#2BB673] pointer-events-none">
@@ -37,6 +38,7 @@ export const ContactSection: React.FC = () => {
         
         submitContactMutation.mutate(formData, {
             onSuccess: (data) => {
+                trackEvent({ event: 'contact_form_submitted' });
                 showToast(data.message || "Message sent successfully!", "success");
                 // Clear the form
                 setFormData({ name: '', email: '', message: '' });

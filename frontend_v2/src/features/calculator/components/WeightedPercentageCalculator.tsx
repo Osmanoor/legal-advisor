@@ -158,7 +158,7 @@ export const WeightedPercentageCalculator: React.FC = () => {
               onUpdate={handleCompetitorUpdate}
               onRemove={handleRemoveCompetitor}
               isFirst={index === 0}
-              separatorLabel={`المنافس ${index + 2}`} // Correctly label subsequent competitors
+              separatorLabel={`المنافس ${index + 1}`} // Correctly label subsequent competitors
             />
           ))}
         </div>

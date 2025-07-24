@@ -65,7 +65,9 @@ def get_dashboard_stats():
 @admin_bp.route('/contact-submissions', methods=['GET'])
 @permission_required('manage_contacts')
 def get_contact_submissions():
-    result, status_code = admin_service.get_contact_submissions()
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 20, type=int)
+    result, status_code = admin_service.get_contact_submissions(page, per_page)
     return jsonify(result), status_code
 
 @admin_bp.route('/contact-submissions/<int:submission_id>/status', methods=['PUT'])

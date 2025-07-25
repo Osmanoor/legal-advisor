@@ -1,3 +1,4 @@
+/* src/index.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -69,3 +70,12 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* --- FIX: HIDE NUMBER INPUT SPINNERS --- */
+/* Hide spin buttons on number inputs for Chrome, Safari, Edge, Opera */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+

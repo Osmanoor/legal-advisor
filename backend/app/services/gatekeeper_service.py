@@ -1,15 +1,15 @@
 # app/services/gatekeeper_service.py
 
 import json
+import os
 from app.models import User
-
+from app.config import Config
 # Path to the settings file
-SETTINGS_FILE_PATH = 'global_settings.json'
 
 class GatekeeperService:
     def __init__(self):
         try:
-            with open(SETTINGS_FILE_PATH, 'r') as f:
+            with open(Config.SETTINGS_FILE_PATH, 'r') as f:
                 self.settings = json.load(f)
         except (FileNotFoundError, json.JSONDecodeError):
             self.settings = {}

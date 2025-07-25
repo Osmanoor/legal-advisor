@@ -5,14 +5,13 @@ from datetime import date
 from sqlalchemy import and_
 from app.extensions import db
 from app.models import UserUsageLog, User
+from app.config import Config
 
-# Path to the settings file
-SETTINGS_FILE_PATH = 'global_settings.json'
 
 class UsageService:
     def __init__(self):
         try:
-            with open(SETTINGS_FILE_PATH, 'r') as f:
+            with open(Config.SETTINGS_FILE_PATH, 'r') as f:
                 self.settings = json.load(f)
         except (FileNotFoundError, json.JSONDecodeError):
             # In a real app, you might fall back to defaults or raise an error

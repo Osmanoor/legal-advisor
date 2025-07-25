@@ -45,6 +45,7 @@ def create_app(config_class=Config):
     from app.api.reviews import reviews_bp
     from app.api.contact import contact_bp
     from app.api.settings import settings_bp
+    from app.api.calculator import calculator_bp
     
     app.register_blueprint(auth_bp, url_prefix='/api/auth') 
     app.register_blueprint(admin_bp, url_prefix='/api/admin')
@@ -60,6 +61,7 @@ def create_app(config_class=Config):
     app.register_blueprint(reviews_bp, url_prefix='/api/reviews')
     app.register_blueprint(contact_bp, url_prefix='/api/contact')
     app.register_blueprint(settings_bp, url_prefix='/api/settings')
+    app.register_blueprint(calculator_bp, url_prefix='/api/calculator')
     
     # Register custom CLI commands
     app.cli.add_command(seed_data_command)

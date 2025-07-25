@@ -1,0 +1,62 @@
+/* src/features/calculator/components/DatePicker.css */
+
+/* Main container for the date picker */
+.rmdp-container {
+    width: 100%;
+}
+
+/* Custom input field style */
+.date-picker-input {
+    display: flex;
+    height: 40px;
+    width: 100%;
+    border-radius: 0.5rem; /* rounded-lg */
+    border: 1px solid #E3E6EA; /* border-inputTheme-border */
+    background-color: #FFFFFF;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem; /* text-sm */
+    box-shadow: 0px 1px 3px rgba(25, 33, 61, 0.1); /* shadow-input-shadow */
+    color: #000000;
+    transition: all 0.2s;
+}
+
+.date-picker-input::placeholder {
+    color: #666F8D; /* placeholder:text-inputTheme-placeholder */
+}
+
+.date-picker-input:focus {
+    outline: none;
+    border-color: #51B749; /* focus:border-cta */
+    box-shadow: 0 0 0 2px rgba(81, 183, 73, 0.2); /* focus:ring-cta/20 */
+}
+
+/* Calendar popup styling */
+.rmdp-calendar {
+    border-radius: 0.5rem;
+    border: 1px solid #E3E6EA;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+/* Header of the calendar */
+.rmdp-header-values {
+    color: #296436; /* primary-dark */
+    font-weight: 600;
+}
+
+/* Day styling */
+.rmdp-day:not(.rmdp-disabled):not(.rmdp-day-hidden) span:hover {
+    background-color: #EDFFEC; /* primary-light */
+    color: #296436;
+}
+
+.rmdp-day.rmdp-selected span:not(.highlight) {
+    background-color: #51B749 !important; /* cta */
+    color: #FFFFFF !important;
+    box-shadow: none;
+}
+
+/* Today's date highlight */
+.rmdp-day.rmdp-today span {
+    background-color: #f0f0f0;
+    color: #333;
+}

@@ -1,4 +1,4 @@
-# services/correction_service.py
+# app/services/correction_service.py
 import os
 import google.generativeai as genai
 from typing import Dict, Optional
@@ -48,19 +48,55 @@ Rules:
 Input text:
 {text}"""
 
-    def correct_text(self, text: str, language: str = 'en') -> Dict[str, str]:
+    # --- NEW: Enhancement Prompt ---
+    def _get_enhancement_prompt(self, language: str) -> str:
+        """Get the appropriate text enhancement prompt based on language."""
+        if language == 'ar':
+            return """أنت خبير في تحسين الكتابة باللغة العربية. مهمتك هي إعادة صياغة النص المقدم لجعله أكثر احترافية ووضوحًا وتأثيرًا.
+
+القواعد:
+1. قم بإرجاع النص المحسّن فقط بدون أي شروحات أو تعليقات.
+2. حسّن اختيار الكلمات والعبارات لتكون أكثر بلاغة وقوة.
+3. أعد تنظيم الجمل إذا كان ذلك يحسن من تدفق النص ووضوحه.
+4. حافظ على المعنى الأساسي والقصد الأصلي للنص.
+5. حافظ على بنية الفقرات وفواصل الأسطر الأصلية قدر الإمكان.
+6. لا تضف معلومات جديدة، ركز فقط على تحسين الصياغة الحالية.
+
+النص المدخل:
+{text}"""
+        else:
+            return """You are an expert writing enhancement tool. Your task is to rewrite the provided text to be more professional, clear, and impactful.
+
+Rules:
+1. Return ONLY the enhanced text without any explanations, comments, or annotations.
+2. Improve word choice and phrasing for better clarity and impact.
+3. Reorganize sentences if it improves the flow and readability.
+4. Maintain the core meaning and original intent of the text.
+5. Preserve the original paragraph structure and line breaks as much as possible.
+6. Do not add new information; focus solely on improving the existing wording.
+
+Input text:
+{text}"""
+
+    # --- MODIFIED: Added 'mode' parameter ---
+    def correct_text(self, text: str, language: str = 'en', mode: str = 'correct') -> Dict[str, str]:
         """
-        Correct text using Gemini AI
+        Correct or enhance text using Gemini AI.
         
         Args:
-            text (str): Text to be corrected
-            language (str): Language of the text ('en' or 'ar')
+            text (str): Text to be processed.
+            language (str): Language of the text ('en' or 'ar').
+            mode (str): The operation to perform ('correct' or 'enhance').
             
         Returns:
-            Dict containing the corrected text or error message
+            Dict containing the processed text or error message.
         """
         try:
-            prompt = self._get_correction_prompt(language).format(text=text)
+            if mode == 'enhance':
+                prompt = self._get_enhancement_prompt(language).format(text=text)
+            else: # Default to 'correct'
+                prompt = self._get_correction_prompt(language).format(text=text)
+                
             chat = self.model.start_chat(history=[])
             response = chat.send_message(prompt)
             

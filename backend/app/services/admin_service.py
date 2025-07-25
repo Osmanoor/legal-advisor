@@ -3,9 +3,10 @@
 import os
 import json
 from app.models import Role, Permission, ContactSubmission
-from app.extensions import db
+from app.extensions import db 
+from app.config import Config
 
-SETTINGS_FILE_PATH = os.path.join(os.path.dirname(__file__), '..', 'global_settings.json')
+SETTINGS_FILE_PATH = Config.SETTINGS_FILE_PATH
 
 class AdminService:
 

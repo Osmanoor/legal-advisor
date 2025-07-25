@@ -1,5 +1,4 @@
-// File: src/components/ui/tabs.tsx
-
+// src/components/ui/tabs.tsx
 import * as React from "react";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 import { cn } from "@/lib/utils";
@@ -32,24 +31,25 @@ const TabsTrigger = React.forwardRef<
 >(({ className, children, ...props }, ref) => {
   const { direction } = useLanguage();
   return (
-  <TabsPrimitive.Trigger
-    ref={ref}
-    className={cn(
-      // MODIFICATION: Made padding and font size responsive.
-      "inline-flex items-center justify-center whitespace-nowrap rounded-md px-4 sm:px-6 py-2.5 text-[10px] sm:text-xs font-medium transition-all",
-      
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-      "disabled:pointer-events-none disabled:opacity-50",
-      "data-[state=active]:bg-tab-activeBg data-[state=active]:text-tab-activeText data-[state=active]:shadow-input-shadow data-[state=active]:font-semibold",
-      "data-[state=inactive]:text-tab-inactiveText data-[state=inactive]:font-normal",
-      direction === 'rtl' ? "flex-row-reverse" : "",
-      className
-    )}
-    style={{fontFamily: direction === 'rtl' ? 'var(--font-primary-arabic)' : 'var(--font-primary-latin)', height: '36px'}}
-    {...props}
-  >
-    {children}
-  </TabsPrimitive.Trigger>
+    <TabsPrimitive.Trigger
+      ref={ref}
+      className={cn(
+        "inline-flex items-center justify-center whitespace-nowrap rounded-md px-4 sm:px-6 py-2.5 text-xs sm:text-sm font-medium transition-all",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-cta",
+        "disabled:pointer-events-none disabled:opacity-50",
+        "data-[state=active]:bg-tab-activeBg data-[state=active]:text-tab-activeText data-[state=active]:shadow-sm data-[state=active]:font-semibold",
+        "data-[state=inactive]:text-tab-inactiveText data-[state=inactive]:font-normal",
+        direction === 'rtl' ? "flex-row-reverse" : "",
+        className
+      )}
+      style={{
+        fontFamily: direction === 'rtl' ? 'var(--font-primary-arabic)' : 'var(--font-primary-latin)',
+        height: '40px' // Consistent height
+      }}
+      {...props}
+    >
+      {children}
+    </TabsPrimitive.Trigger>
   );
 });
 TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
@@ -61,8 +61,9 @@ const TabsContent = React.forwardRef<
   <TabsPrimitive.Content
     ref={ref}
     className={cn(
-      "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-background",
-      "bg-white border border-inputTheme-border rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg", // MODIFIED: Responsive padding
+      "mt-4 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-background",
+      // Removed the card-like styles from here to make it more flexible.
+      // The parent component should now provide the Card or other container.
       className
     )}
     {...props}

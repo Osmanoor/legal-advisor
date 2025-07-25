@@ -24,26 +24,34 @@ export default function CorrectionPage() {
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
 
-  const handleTextApiCall = async (type: 'correct' | 'enhance') => {
+  // --- MODIFIED: This function now accepts the mode ---
+  const handleTextApiCall = async (mode: 'correct' | 'enhance') => {
     const plainText = inputText.replace(/<[^>]*>?/gm, '').trim();
     if (!plainText) {
       showToast(t('correction.error'), 'error');
       return;
     }
 
-    setCorrectionState(type === 'correct' ? 'loadingCorrection' : 'loadingEnhancement');
+    setCorrectionState(mode === 'correct' ? 'loadingCorrection' : 'loadingEnhancement');
     
     try {
-      const result = await correctionMutation.mutateAsync({ text: inputText, language: 'ar' });
+      // --- MODIFIED: Pass the mode to the mutation ---
+      const result = await correctionMutation.mutateAsync({ 
+        text: inputText, 
+        language: 'ar', 
+        mode: mode 
+      });
+
       setOutputText(result.corrected_text);
       setCorrectionState('corrected');
-      showToast(type === 'correct' ? t('correction.success') : t('correction.enhanceSuccess'), 'success');
+      showToast(mode === 'correct' ? t('correction.success') : t('correction.enhanceSuccess'), 'success');
     } catch (err) {
       showToast(t('correction.error'), 'error');
       setCorrectionState('writing');
     }
   };
 
+  // These functions now pass the correct mode
   const handleCorrectText = () => handleTextApiCall('correct');
   const handleEnhanceText = () => handleTextApiCall('enhance');
   

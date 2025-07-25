@@ -1,12 +1,20 @@
 // src/features/calculator/components/DateDifferenceForm.tsx
 import React, { useState } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
+import { useToast } from '@/hooks/useToast';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { DateConverter } from '@/lib/calculator';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useCalculatorAPI, CalendarType, DateDifferencePayload } from '@/hooks/api/useCalculator';
+import DatePicker, { DateObject } from "react-multi-date-picker";
+import gregorian from "react-date-object/calendars/gregorian";
+import gregorian_en from "react-date-object/locales/gregorian_en";
+import arabic from "react-date-object/calendars/arabic";
+import arabic_ar from "react-date-object/locales/arabic_ar";
 import { DateDifference } from '@/types/calculator';
-import { trackEvent } from '@/lib/analytics';
+import { AxiosError } from 'axios';
+import LoadingSpinner from '@/components/ui/loading-spinner';
+import './DatePicker.css';
 
 interface DateDifferenceFormProps {
   designConfig: {
@@ -14,61 +22,65 @@ interface DateDifferenceFormProps {
     labelClass: string;
     inputClass: string;
     buttonClass: string;
-    resultDisplayContainerClass: string;
-    resultLabelClass: string; // <<<< Make sure this is here
-    // resultValueClass: string; // Not strictly needed for this component's main display
-    resultSubValueContainerClass: string;
-    resultSubValueRowClass: string;
-    resultSubValueLabelClass: string;
-    resultSubValueAmountClass: string;
+    selectTriggerClass: string;
+    selectContentClass: string;
+    selectItemClass: string;
   };
 }
 
 export const DateDifferenceForm: React.FC<DateDifferenceFormProps> = ({ designConfig }) => {
   const { t, direction } = useLanguage();
+  const { showToast } = useToast();
+  const { dateDifferenceMutation } = useCalculatorAPI();
+  
+  const [calendarType, setCalendarType] = useState<CalendarType>('gregorian');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [differenceResult, setDifferenceResult] = useState<Partial<DateDifference>>({});
 
+  const handleDateChange = (date: DateObject | null, setter: React.Dispatch<React.SetStateAction<string>>, calendar: CalendarType) => {
+    if (date) {
+      setter(date.format(calendar === 'hijri' ? "YYYY/MM/DD" : "YYYY-MM-DD"));
+    } else {
+      setter('');
+    }
+  };
+
   const handleCalculateDifference = () => {
     setDifferenceResult({});
     if (!startDate || !endDate) {
-      setDifferenceResult({ error: t('calculator.common.validation.selectBothDates') });
+      showToast(t('calculator.common.validation.selectBothDates'), 'error');
       return;
     }
-    try {
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-        setDifferenceResult({ error: t('calculator.common.validation.invalidDate') });
-        return;
-      }
-      if (end < start) {
-        setDifferenceResult({ error: t('calculator.common.validation.endDateBeforeStart') });
-        return;
-      }
-      const diff = DateConverter.calculateDateDifference(start, end);
-      setDifferenceResult(diff);
-      trackEvent({ event: 'feature_used', feature_name: 'date_calculator' });
-    } catch (e) {
-      setDifferenceResult({ error: t('calculator.common.error') });
-      console.error("Date difference error:", e);
-    }
+
+    const payload: DateDifferencePayload = { start_date: startDate, end_date: endDate, calendar: calendarType };
+    
+    dateDifferenceMutation.mutate(payload, {
+        onSuccess: (data) => {
+            setDifferenceResult(data);
+        },
+        onError: (error) => {
+            const axiosError = error as AxiosError<{ error?: string }>;
+            const errorMessage = axiosError.response?.data?.error || t('calculator.common.error');
+            setDifferenceResult({ error: errorMessage });
+            showToast(errorMessage, 'error');
+        }
+    });
   };
   
   const handleReset = () => {
     setStartDate('');
     setEndDate('');
     setDifferenceResult({});
+    setCalendarType('gregorian');
   };
 
-  // Updated renderDiffPart for new styling
-  const renderDiffPart = (value: number | undefined, unitKey: string, isLast: boolean) => {
-    if (value === undefined || value === 0) return null; // Optionally hide if value is 0
+  const renderDiffPart = (value: number | undefined, unitKey: string) => {
+    if (value === undefined || value === 0) return null;
     return (
       <div className="text-center">
         <span className="block text-black text-sm font-medium" style={{fontFamily: 'var(--font-primary-arabic)'}}>
-          {t(unitKey)}
+          {t(unitKey, { count: value.toString() })}
         </span>
         <span className="block text-[#51B749] text-4xl font-bold" style={{fontFamily: 'var(--font-primary-arabic)', direction: 'ltr'}}>
           {value}
@@ -77,81 +89,103 @@ export const DateDifferenceForm: React.FC<DateDifferenceFormProps> = ({ designCo
     );
   };
 
-  const hasResults = differenceResult.years !== undefined || differenceResult.months !== undefined || differenceResult.days !== undefined;
   const resultParts = [
     { value: differenceResult.years, unitKey: 'calculator.date.units.years' },
     { value: differenceResult.months, unitKey: 'calculator.date.units.months' },
     { value: differenceResult.days, unitKey: 'calculator.date.units.days' },
-  ].filter(part => part.value !== undefined && part.value > 0); // Filter out zero/undefined parts for display
-
+  ].filter(part => part.value !== undefined && part.value > 0);
 
   return (
-    <div className="grid md:grid-cols-2 gap-6 md:gap-8 items-stretch" dir={direction}> {/* Changed items-start to items-stretch */}
-    {/* Inputs Column */}
-      <div className={`space-y-6 ${direction === 'rtl' ? 'md:order-1' : 'md:order-2'} flex flex-col`}>
+    <div className="grid md:grid-cols-2 gap-6 md:gap-8 items-stretch" dir={direction}>
+      <div className="space-y-6 flex flex-col">
         <div className={designConfig.fieldGroupClass}>
-          <Label htmlFor="diff-start-date" className={designConfig.labelClass} style={{fontFamily: 'var(--font-primary-arabic)'}}>
-            {t('calculator.date.difference.start')}
-          </Label>
-          <Input 
-            type="date" 
-            id="diff-start-date" 
-            value={startDate} 
-            onChange={(e) => setStartDate(e.target.value)} 
-            className={`${designConfig.inputClass} text-left`} // Keep text-left for date input consistency
-            dir="ltr" // Dates are typically LTR
-          />
+          <Label className={designConfig.labelClass}>نوع التقويم</Label>
+          <Select dir={direction} value={calendarType} onValueChange={(v) => { setCalendarType(v as CalendarType); setStartDate(''); setEndDate(''); }}>
+            <SelectTrigger className={designConfig.selectTriggerClass}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className={designConfig.selectContentClass}>
+              <SelectItem value="gregorian" className={designConfig.selectItemClass}>ميلادي</SelectItem>
+              <SelectItem value="hijri" className={designConfig.selectItemClass}>هجري</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        <div className={designConfig.fieldGroupClass}>
-          <Label htmlFor="diff-end-date" className={designConfig.labelClass} style={{fontFamily: 'var(--font-primary-arabic)'}}>
-            {t('calculator.date.difference.end')}
-          </Label>
-          <Input 
-            type="date" 
-            id="diff-end-date" 
-            value={endDate} 
-            onChange={(e) => setEndDate(e.target.value)} 
-            className={`${designConfig.inputClass} text-left`}
-            dir="ltr"
-          />
-        </div>
-        <div className="flex gap-4 mt-auto pt-4"> {/* mt-auto to push buttons to bottom */}
-            <Button onClick={handleReset} variant="outline" className="w-full h-[42px] rounded-lg text-sm font-medium">
-                {t('calculator.common.reset')}
-            </Button>
-            <Button 
-                onClick={handleCalculateDifference} 
-                disabled={!startDate || !endDate} 
-                className={`${designConfig.buttonClass} w-full`}
-            >
-                {t('calculator.date.difference.calculate')}
-            </Button>
+
+        {calendarType === 'gregorian' ? (
+          <>
+            <div className={designConfig.fieldGroupClass}>
+              <Label htmlFor="diff-start-date-gregorian" className={designConfig.labelClass}>{t('calculator.date.difference.start')}</Label>
+              <DatePicker
+                id="diff-start-date-gregorian"
+                value={startDate}
+                onChange={(date) => handleDateChange(date as DateObject, setStartDate, 'gregorian')}
+                calendar={gregorian}
+                locale={gregorian_en}
+                inputClass="date-picker-input"
+                format="YYYY-MM-DD"
+              />
+            </div>
+            <div className={designConfig.fieldGroupClass}>
+              <Label htmlFor="diff-end-date-gregorian" className={designConfig.labelClass}>{t('calculator.date.difference.end')}</Label>
+              <DatePicker
+                id="diff-end-date-gregorian"
+                value={endDate}
+                onChange={(date) => handleDateChange(date as DateObject, setEndDate, 'gregorian')}
+                calendar={gregorian}
+                locale={gregorian_en}
+                inputClass="date-picker-input"
+                format="YYYY-MM-DD"
+              />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className={designConfig.fieldGroupClass}>
+              <Label htmlFor="diff-start-date-hijri" className={designConfig.labelClass}>{t('calculator.date.difference.start')}</Label>
+              <DatePicker
+                id="diff-start-date-hijri"
+                value={startDate}
+                onChange={(date) => handleDateChange(date as DateObject, setStartDate, 'hijri')}
+                calendar={arabic}
+                locale={arabic_ar}
+                inputClass="date-picker-input"
+                format="YYYY/MM/DD"
+              />
+            </div>
+            <div className={designConfig.fieldGroupClass}>
+              <Label htmlFor="diff-end-date-hijri" className={designConfig.labelClass}>{t('calculator.date.difference.end')}</Label>
+              <DatePicker
+                id="diff-end-date-hijri"
+                value={endDate}
+                onChange={(date) => handleDateChange(date as DateObject, setEndDate, 'hijri')}
+                calendar={arabic}
+                locale={arabic_ar}
+                inputClass="date-picker-input"
+                format="YYYY/MM/DD"
+              />
+            </div>
+          </>
+        )}
+
+        <div className="flex gap-4 mt-auto pt-4">
+          <Button onClick={handleReset} variant="outline" className="w-full h-[42px] rounded-lg text-sm font-medium">{t('calculator.common.reset')}</Button>
+          <Button onClick={handleCalculateDifference} disabled={!startDate || !endDate || dateDifferenceMutation.isPending} className={`${designConfig.buttonClass} w-full`}>{t('calculator.date.difference.calculate')}</Button>
         </div>
       </div>
-      {/* Result Display Column (Styled Card) */}
-      <div 
-        className={`bg-[#ECFFEA] rounded-lg p-6 min-h-[333px] flex flex-col items-center justify-center ${direction === 'rtl' ? 'md:order-2' : 'md:order-1'}`}
-      >
-        {differenceResult.error ? (
-          <p className="text-sm text-red-500 text-center" style={{fontFamily: 'var(--font-primary-arabic)'}}>{differenceResult.error}</p>
+      <div className="bg-[#ECFFEA] rounded-lg p-6 min-h-[333px] flex flex-col items-center justify-center">
+        {dateDifferenceMutation.isPending ? (<LoadingSpinner />) :
+         differenceResult.error ? (
+          <p className="text-sm text-red-500 text-center">{differenceResult.error}</p>
         ) : resultParts.length > 0 ? (
-            <div className="w-full space-y-4">
-                {resultParts.map((part, index) => (
-                    <React.Fragment key={part.unitKey}>
-                        {renderDiffPart(part.value, part.unitKey, index === resultParts.length - 1)}
-                        {/* Optional: add a visual separator if needed, but space-y-4 might be enough */}
-                        {/* {index < resultParts.length - 1 && <hr className="border-green-200 my-2" />} */}
-                    </React.Fragment>
-                ))}
-            </div>
+          <div className="w-full space-y-4">
+            {resultParts.map((part) => (
+              <React.Fragment key={part.unitKey}>{renderDiffPart(part.value, part.unitKey)}</React.Fragment>
+            ))}
+          </div>
         ) : (
-            <span className="text-gray-600 text-center" style={{fontFamily: 'var(--font-primary-arabic)'}}>
-                {t('calculator.common.noResultYet')}
-            </span>
+          <span className="text-gray-600 text-center">{t('calculator.common.noResultYet')}</span>
         )}
       </div>
-
-      
     </div>
   );
 };

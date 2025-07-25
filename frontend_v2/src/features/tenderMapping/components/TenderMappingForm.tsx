@@ -6,7 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar } from 'lucide-react';
+import DatePicker, { DateObject } from "react-multi-date-picker";
+import gregorian from "react-date-object/calendars/gregorian";
+import gregorian_en from "react-date-object/locales/gregorian_en";
+import '../../calculator/components/DatePicker.css'; // Reuse styles
 
 interface WorkType {
   id: string;
@@ -36,6 +39,14 @@ export function TenderMappingForm({ workTypes, isLoading, onSubmit, onReset }: T
   
   const handleValueChange = (field: string, value: string) => {
     setFormValues(prev => ({ ...prev, [field]: value }));
+  };
+  
+  const handleDateChange = (date: DateObject | null) => {
+    if (date) {
+      handleValueChange('start_date', date.format("YYYY-MM-DD"));
+    } else {
+      handleValueChange('start_date', '');
+    }
   };
 
   const handleFormSubmit = (e: React.FormEvent) => {
@@ -70,7 +81,6 @@ export function TenderMappingForm({ workTypes, isLoading, onSubmit, onReset }: T
                 <SelectTrigger id="work_type" className="h-10 text-right"><SelectValue placeholder={t('tenderMapping.inputs.workTypePlaceholder')} /></SelectTrigger>
                 <SelectContent>
                   {workTypes.map(type => (
-                    // MODIFICATION: Added 'whitespace-normal' to allow text wrapping inside the option item.
                     <SelectItem 
                       key={type.id} 
                       value={type.name} 
@@ -92,10 +102,15 @@ export function TenderMappingForm({ workTypes, isLoading, onSubmit, onReset }: T
             </div>
             <div className="space-y-2 text-right">
               <Label htmlFor="start_date">{t('tenderMapping.inputs.startDate')}</Label>
-              <div className="relative">
-                <Input id="start_date" type="date" value={formValues.start_date} onChange={e => handleValueChange('start_date', e.target.value)} className="pr-10" dir="ltr" />
-                <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-on-light-muted" />
-              </div>
+              <DatePicker
+                id="start_date"
+                value={formValues.start_date}
+                onChange={handleDateChange}
+                calendar={gregorian}
+                locale={gregorian_en}
+                inputClass="date-picker-input"
+                format="YYYY-MM-DD"
+              />
             </div>
           </div>
           <Button type="submit" disabled={!isFormValid || isLoading} className="w-full h-11 text-base bg-cta">{t('tenderMapping.inputs.submit')}</Button>

@@ -80,3 +80,6 @@ class Config:
     }
     Journey_DIR = os.path.join('backend','data', 'journey')
     TENDER_MAPPING_DIR = os.path.join('backend','data', 'tender_mapping')
+
+    # --- Global Settings File Path ---
+    SETTINGS_FILE_PATH = os.path.join(basedir, 'global_settings.json')

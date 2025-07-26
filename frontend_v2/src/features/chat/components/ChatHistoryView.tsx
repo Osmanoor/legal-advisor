@@ -1,14 +1,13 @@
 // src/features/chat/components/ChatHistoryView.tsx
 
-import React, { useState, useMemo } from 'react'; // Import useMemo
+import React, { useState, useMemo } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
-import { ChatSession } from '@/types/chat';
 import { HistoryItem } from './HistoryItem';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, ListFilter } from 'lucide-react';
 import LoadingSpinner from '@/components/ui/loading-spinner';
-import { useChat } from '@/hooks/api/useChat'; // Import the main chat hook
+import { useChat } from '@/hooks/api/useChat';
 import { useToast } from '@/hooks/useToast';
 
 interface ChatHistoryViewProps {
@@ -21,14 +20,13 @@ export const ChatHistoryView: React.FC<ChatHistoryViewProps> = ({ onSessionSelec
   const { useChatSessions, deleteSessionMutation } = useChat();
   const { data: sessions, isLoading } = useChatSessions();
 
-
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('latest');
 
   const filteredAndSortedSessions = useMemo(() => {
     if (!sessions) return [];
     
-    return [...sessions] // Create a mutable copy for sorting
+    return [...sessions]
       .filter(session => session.title.toLowerCase().includes(searchTerm.toLowerCase()))
       .sort((a, b) => {
         if (sortBy === 'latest') {
@@ -73,8 +71,10 @@ export const ChatHistoryView: React.FC<ChatHistoryViewProps> = ({ onSessionSelec
           </div>
           <Select dir={direction} value={sortBy} onValueChange={setSortBy}>
             <SelectTrigger className="h-10 w-auto sm:w-[146px] bg-white border-border-default shadow-sm">
-              <ListFilter size={12} className="mx-2 text-text-on-light-muted"/>
-              <SelectValue placeholder={t('chat.sortBy')} />
+              <div className="flex items-center gap-2 w-full">
+                <ListFilter size={12} className="text-text-on-light-muted"/>
+                <SelectValue placeholder={t('chat.sortBy')} />
+              </div>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="latest">الأحدث</SelectItem>

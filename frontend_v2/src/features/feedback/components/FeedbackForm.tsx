@@ -68,7 +68,7 @@ export const FeedbackForm: React.FC = () => {
   return (
     <Card className="p-6 sm:p-8">
       <form onSubmit={handleSubmit} className="space-y-8">
-        <div className="flex flex-col items-center gap-2">
+        <div className="flex flex-col items-right gap-2">
           <Label className="font-medium">التقييم</Label>
           <StarRatingInput value={rating} onChange={setRating} />
         </div>
@@ -91,12 +91,24 @@ export const FeedbackForm: React.FC = () => {
               <Separator className="flex-1" />
           </div>
            
-           <div className="grid grid-cols-2 gap-x-8 gap-y-4 max-w-md mx-auto">
-                <div className="flex items-center justify-end gap-3"><Label htmlFor="show_name" className="text-sm font-light cursor-pointer">إظهار الاسم</Label><Checkbox id="show_name" checked={previewSettings.show_name} onCheckedChange={() => handleSettingChange('show_name')} /></div>
-                <div className="flex items-center justify-end gap-3"><Label htmlFor="show_job_title" className="text-sm font-light cursor-pointer">إظهار المسمى الوظيفي</Label><Checkbox id="show_job_title" checked={previewSettings.show_job_title} onCheckedChange={() => handleSettingChange('show_job_title')} /></div>
-                <div className="flex items-center justify-end gap-3"><Label htmlFor="show_profile_picture" className="text-sm font-light cursor-pointer">إظهار صورة البروفايل</Label><Checkbox id="show_profile_picture" checked={previewSettings.show_profile_picture} onCheckedChange={() => handleSettingChange('show_profile_picture')} /></div>
-                <div className="flex items-center justify-end gap-3"><Label htmlFor="show_workplace" className="text-sm font-light cursor-pointer">إظهار جهة العمل</Label><Checkbox id="show_workplace" checked={previewSettings.show_workplace} onCheckedChange={() => handleSettingChange('show_workplace')} /></div>
-           </div>
+             <div className="grid grid-cols-2 gap-x-24 gap-y-4 max-w-md mx-auto">
+              <div className="flex items-center justify-start gap-3">
+                <Checkbox id="show_name" checked={previewSettings.show_name} onCheckedChange={() => handleSettingChange('show_name')} />
+                <Label htmlFor="show_name" className="text-sm font-light cursor-pointer">إظهار الاسم</Label>
+              </div>
+              <div className="flex items-center justify-start gap-3">
+                <Checkbox id="show_job_title" checked={previewSettings.show_job_title} onCheckedChange={() => handleSettingChange('show_job_title')} />
+                <Label htmlFor="show_job_title" className="text-sm font-light cursor-pointer">إظهار المسمى الوظيفي</Label>
+              </div>
+              <div className="flex items-center justify-start gap-3">
+                <Checkbox id="show_profile_picture" checked={previewSettings.show_profile_picture} onCheckedChange={() => handleSettingChange('show_profile_picture')} />
+                <Label htmlFor="show_profile_picture" className="text-sm font-light cursor-pointer">إظهار صورة البروفايل</Label>
+              </div>
+              <div className="flex items-center justify-start gap-3">
+                <Checkbox id="show_workplace" checked={previewSettings.show_workplace} onCheckedChange={() => handleSettingChange('show_workplace')} />
+                <Label htmlFor="show_workplace" className="text-sm font-light cursor-pointer">إظهار جهة العمل</Label>
+              </div>
+             </div>
         </div>
 
         <Button type="submit" className="w-full bg-cta hover:bg-cta-hover h-11" disabled={submitFeedbackMutation.isPending}>

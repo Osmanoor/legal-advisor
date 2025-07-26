@@ -3,26 +3,11 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import get_jwt_identity
 from app.services.chat_service import ChatService
-from app.utils.auth_decorators import permission_required, usage_limited # Import new decorator
+from app.utils.auth_decorators import permission_required, usage_limited
+from app.services.chat_service import serialize_session_list_item, serialize_message
 
 chat_bp = Blueprint('chat_api', __name__)
 chat_service = ChatService()
-
-# ... (serialization helpers are unchanged) ...
-def serialize_resource(resource):
-    return { 'content': resource.content, 'metadata': resource.resource_metadata }
-def serialize_message(message):
-    return {
-        'id': str(message.id), 'role': message.role, 'content': message.content,
-        'timestamp': message.created_at.isoformat(), 
-        'resources': [serialize_resource(r) for r in message.resources]
-    }
-def serialize_session_list_item(session):
-    return {
-        'id': str(session.id), 'title': session.title,
-        'lastUpdated': session.updated_at.isoformat(),
-        'questionCount': len(session.messages) // 2 
-    }
 
 @chat_bp.route('/sessions', methods=['GET'])
 @permission_required('access_chat')
@@ -73,11 +58,20 @@ def start_new_chat():
     options = data.get('options', {})
     if not first_message:
         return jsonify({"error": "Initial message content is required"}), 400
-    session, error = chat_service.start_new_session(user_id, first_message, options)
+    
+    # --- FIX: Capture the explicit message objects returned from the service ---
+    session, user_message, assistant_message, error = chat_service.start_new_session(user_id, first_message, options)
+    
     if error:
         return jsonify({"error": error}), 500
+        
+    # --- FIX: Construct the messages array in the correct, guaranteed order ---
+    messages_payload = [serialize_message(user_message), serialize_message(assistant_message)]
+    
     return jsonify({
-        'id': str(session.id), 'title': session.title,
-        'updated_at': session.updated_at.isoformat(),
-        'messages': [serialize_message(m) for m in session.messages]
+        'id': str(session.id), 
+        'title': session.title,
+        'updated_at': session.updated_at.isoformat() + 'Z',
+        'questionCount': 1, # A new session always starts with one question
+        'messages': messages_payload
     }), 201

@@ -2,13 +2,10 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/axios';
-// Import the corrected and updated types
 import { ChatMessage, ChatSession, ChatOptions, NewChatSessionResponse } from '@/types/chat';
 import { trackEvent } from '@/lib/analytics';
 
 // --- API Functions ---
-// These function definitions remain the same, but the return types are now correct.
-
 const fetchChatSessions = async (): Promise<ChatSession[]> => {
   const response = await api.get('/chat/sessions');
   return response.data;
@@ -37,8 +34,6 @@ const deleteSession = async (sessionId: string): Promise<{ message: string }> =>
 
 
 // --- The Main Hook ---
-// The logic inside this hook is already correct and does not need to change.
-// It will now simply work because the data it receives matches the types it expects.
 export function useChat() {
   const queryClient = useQueryClient();
 
@@ -57,8 +52,20 @@ export function useChat() {
     mutationFn: startNewChat,
     onSuccess: (newSessionData) => {
       trackEvent({ event: 'feature_used', feature_name: 'ai_assistant' });
+      // --- FIX: Use the new structured response to populate the cache ---
+      // This places the guaranteed-order messages into the cache for the new session ID.
       queryClient.setQueryData(['chat', 'messages', newSessionData.id], newSessionData.messages);
-      queryClient.invalidateQueries({ queryKey: ['chat', 'sessions'] });
+      
+      // Add the new session to the session list without a full refetch for a faster UI update.
+      queryClient.setQueryData<ChatSession[]>(['chat', 'sessions'], (oldSessions) => {
+        const newSessionEntry = {
+          id: newSessionData.id,
+          title: newSessionData.title,
+          updated_at: newSessionData.updated_at,
+          questionCount: newSessionData.questionCount,
+        };
+        return oldSessions ? [newSessionEntry, ...oldSessions] : [newSessionEntry];
+      });
     },
   });
 

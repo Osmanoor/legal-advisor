@@ -222,22 +222,48 @@ export default function SettingsPage() {
           {/* Section 1: Editable Profile Details Form */}
           <form onSubmit={(e) => { e.preventDefault(); handleSaveChanges(); }}>
             <FormSeparatorWithLabel label="المعلومات الاساسية" />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mt-4">
-                <div className="space-y-1.5 text-right"><Label htmlFor="fullName">الاسم</Label><Input id="fullName" name="fullName" value={formData.fullName} onChange={handleChange} /></div>
-                <div className="space-y-1.5 text-right"><Label htmlFor="email">البريد الالكتروني</Label><Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} /></div>
-                <div className="space-y-1.5 text-right"><Label htmlFor="phoneNumber">رقم الهاتف</Label><Input id="phoneNumber" name="phoneNumber" value={user.phoneNumber} disabled className="bg-gray-100 cursor-not-allowed" /></div>
+            <div className="grid grid-cols-1 gap-y-4 mt-4 mb-8">
+              {/* Name in its own row */}
+              <div className="space-y-1.5 text-right">
+                <Label htmlFor="fullName">الاسم</Label>
+                <Input id="fullName" name="fullName" value={formData.fullName} onChange={handleChange} />
+              </div>
+              {/* Email and Phone Number in the second row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                <div className="space-y-1.5 text-right">
+                  <Label htmlFor="email">البريد الالكتروني</Label>
+                  <Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} />
+                </div>
+                <div className="space-y-1.5 text-right">
+                  <Label htmlFor="phoneNumber">رقم الهاتف</Label>
+                  <Input id="phoneNumber" name="phoneNumber" value={user.phoneNumber} disabled className="bg-gray-100 cursor-not-allowed" />
+                </div>
+              </div>
             </div>
 
             <FormSeparatorWithLabel label="المعلومات الاضافية" />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mt-4">
-                <div className="space-y-1.5 text-right"><Label htmlFor="workplace">جهة العمل</Label><Input id="workplace" name="workplace" value={formData.workplace} onChange={handleChange} /></div>
-                <div className="space-y-1.5 text-right"><Label htmlFor="jobTitle">المسمى الوظيفي</Label><Input id="jobTitle" name="jobTitle" value={formData.jobTitle} onChange={handleChange} /></div>
-                <div className="space-y-1.5 text-right"><Label htmlFor="linkedin">حساب لينكدإن</Label><Input id="linkedin" name="linkedin" value={formData.linkedin} onChange={handleChange} /></div>
+            <div className="grid grid-cols-1 gap-y-4 mt-4">
+              {/* Workplace in its own row */}
+              <div className="space-y-1.5 text-right">
+                <Label htmlFor="workplace">جهة العمل</Label>
+                <Input id="workplace" name="workplace" value={formData.workplace} onChange={handleChange} />
+              </div>
+              {/* Job Title and LinkedIn in the second row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                <div className="space-y-1.5 text-right">
+                  <Label htmlFor="jobTitle">المسمى الوظيفي</Label>
+                  <Input id="jobTitle" name="jobTitle" value={formData.jobTitle} onChange={handleChange} />
+                </div>
+                <div className="space-y-1.5 text-right">
+                  <Label htmlFor="linkedin">حساب لينكدإن</Label>
+                  <Input id="linkedin" name="linkedin" value={formData.linkedin} onChange={handleChange} />
+                </div>
+              </div>
             </div>
 
-            <div className="mt-8 flex justify-end">
-              <Button type="submit" className="bg-cta hover:bg-cta-hover" disabled={updateUserProfileMutation.isPending}>
-                {updateUserProfileMutation.isPending ? <LoadingSpinner size="sm" /> : "حفظ التغييرات"}
+            <div className="mt-8 flex w-full">
+              <Button type="submit" className="w-full bg-cta hover:bg-cta-hover" disabled={updateUserProfileMutation.isPending}>
+                {updateUserProfileMutation.isPending ? <LoadingSpinner size="sm" /> : "حفظ"}
               </Button>
             </div>
           </form>
@@ -248,12 +274,12 @@ export default function SettingsPage() {
           <div className="space-y-4">
             <Collapsible>
               <CollapsibleTrigger asChild>
-                <button className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer w-full text-right">
-                    <ChevronLeft className="collapsible-chevron" />
+                <button className="flex items-center justify-between p-4 border border-[#F0F2F5] rounded-lg hover:bg-gray-50 cursor-pointer w-full text-right">
                     <div className="flex items-center gap-4">
                         <span>تغيير كلمة السر</span>
                         <Lock className="text-gray-500"/>
                     </div>
+                    <ChevronLeft className="collapsible-chevron" />
                 </button>
               </CollapsibleTrigger>
               <CollapsibleContent className="radix-collapsible-content">
@@ -268,12 +294,12 @@ export default function SettingsPage() {
             
             <Collapsible>
               <CollapsibleTrigger asChild>
-                <button className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer w-full text-right">
-                    <ChevronLeft className="collapsible-chevron" />
+                <button className="flex items-center justify-between p-4 border border-[#F0F2F5] rounded-lg hover:bg-gray-50 cursor-pointer w-full text-right">
                     <div className="flex items-center gap-4">
                         <span>تغيير اللغة</span>
                         <Languages className="text-gray-500"/>
                     </div>
+                    <ChevronLeft className="collapsible-chevron" />
                 </button>
               </CollapsibleTrigger>
               <CollapsibleContent className="radix-collapsible-content">

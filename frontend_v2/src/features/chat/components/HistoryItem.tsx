@@ -7,34 +7,39 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { MoreVertical, MessageSquare, Clock, Trash2 } from 'lucide-react';
 import { ConfirmationDialog } from '@/features/admin/components/Users/ConfirmationDialog';
+import { DateTime } from 'luxon'; // <-- IMPORT LUXON
 
 interface HistoryItemProps {
   session: ChatSession;
   onSessionSelect: (sessionId: string) => void;
-  onSessionDelete: (sessionId: string) => void; // Add delete handler prop
-  isDeleting: boolean; // Add prop to show loading state
+  onSessionDelete: (sessionId: string) => void;
+  isDeleting: boolean;
 }
 
-// FIX: Renamed prop to onSessionSelect for clarity
 export const HistoryItem: React.FC<HistoryItemProps> = ({ session, onSessionSelect, onSessionDelete, isDeleting }) => {
   const { t, direction } = useLanguage();
 
-  const handleMoreOptionsClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    console.log(`More options for session: ${session.id}`);
-    // Delete logic will be added in a later phase
-  };
-
   const formatRelativeTime = (isoString: string): string => {
-    const date = new Date(isoString);
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
-    const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    // --- FIX: Use Luxon for robust date parsing ---
+    const date = DateTime.fromISO(isoString);
+    if (!date.isValid) {
+      // Fallback for any unexpected invalid date format
+      return "---"; 
+    }
 
-    if (dateOnly.getTime() === today.getTime()) return t('chat.today');
-    if (dateOnly.getTime() === yesterday.getTime()) return t('chat.yesterday');
-    return date.toLocaleDateString('ar-SA', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const now = DateTime.now();
+    const today = now.startOf('day');
+    const yesterday = now.minus({ days: 1 }).startOf('day');
+
+    if (date >= today) {
+      return t('chat.today');
+    }
+    if (date >= yesterday) {
+      return t('chat.yesterday');
+    }
+    // Convert Luxon object to JS Date for locale-specific formatting
+    return date.toJSDate().toLocaleDateString('ar-SA', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    // --- END FIX ---
   };
 
   return (
@@ -42,13 +47,29 @@ export const HistoryItem: React.FC<HistoryItemProps> = ({ session, onSessionSele
       onClick={() => onSessionSelect(session.id)}
       className="flex justify-between items-center p-3 md:p-4 bg-white border border-border-default rounded-lg shadow-sm hover:border-cta hover:bg-cta/5 transition-all cursor-pointer"
     >
+      {/* Title (Takes up remaining space) */}
       <div className="flex-grow flex flex-col items-start text-right overflow-hidden mr-2">
         <p className="w-full text-xs md:text-sm font-light text-text-on-light-strong truncate" style={{ fontFamily: 'var(--font-primary-arabic)' }}>
           {session.title}
         </p>
       </div>
-      <div className={`flex items-center text-text-on-light-muted flex-shrink-0 ${direction === 'rtl' ? 'flex-row-reverse gap-6' : 'gap-6'}`}>
+
+      {/* Right side container for metadata and actions */}
+      <div className={`flex items-center text-text-on-light-muted flex-shrink-0 ${direction === 'rtl' ? ' gap-4 md:gap-6' : 'flex-row-reverse gap-4 md:gap-6'}`}>
         
+        {/* Date */}
+        <div className={`hidden md:flex items-center w-24 gap-2 text-xs ${direction === 'rtl' ? 'flex-row-reverse' : ''}`}>
+          <Clock size={14} />
+          <span>{formatRelativeTime(session.updated_at)}</span>
+        </div>
+        
+        {/* Message Count */}
+        <div className={`hidden md:flex items-center w-20 gap-2 text-xs ${direction === 'rtl' ? 'flex-row-reverse' : ''}`}>
+          <MessageSquare size={14} />
+          <span>{session.questionCount} {session.questionCount > 1 ? t('chat.questionsCount') : t('chat.questionCount')}</span>
+        </div>
+
+        {/* Options Popover */}
         <Popover onOpenChange={(open) => { if (open) { /* stop propagation if needed */ }}}>
           <PopoverTrigger asChild>
             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => e.stopPropagation()}>
@@ -70,11 +91,6 @@ export const HistoryItem: React.FC<HistoryItemProps> = ({ session, onSessionSele
             />
           </PopoverContent>
         </Popover>
-
-        <div className={`hidden md:flex items-center w-20 gap-2 text-xs ${direction === 'rtl' ? 'flex-row-reverse' : ''}`}>
-          <Clock size={14} />
-          <span>{formatRelativeTime(session.updated_at)}</span>
-        </div>
       </div>
     </div>
   );

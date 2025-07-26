@@ -63,8 +63,8 @@ export function TenderMappingForm({ workTypes, isLoading, onSubmit, onReset }: T
   const isFormValid = formValues.work_type && formValues.budget && formValues.start_date && formValues.project_duration;
 
   return (
-    <div className="w-full">
-       <div className="text-center mb-6">
+    <div className="w-full" dir={direction}>
+       <div className={`mb-6 ${direction === 'rtl' ? 'text-right' : 'text-left'}'}`}>
         <h2 className="text-2xl font-medium text-text-on-light-strong" style={{ fontFamily: 'var(--font-primary-arabic)' }}>
           {t('tenderMapping.inputs.title')}
         </h2>

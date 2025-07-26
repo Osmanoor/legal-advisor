@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useChat } from '@/hooks/api/useChat';
-import { ChatOptions } from '@/types/chat';
+import { ChatMessage, ChatOptions } from '@/types/chat';
 import { Button } from '@/components/ui/button';
-import { Plus, Trash2, Sidebar, Clock, X } from 'lucide-react';
+import { Plus, Trash2, Sidebar, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ConfirmationDialog } from '@/features/admin/components/Users/ConfirmationDialog';
 import { useToast } from '@/hooks/useToast';
@@ -47,20 +47,34 @@ export default function ChatPage() {
   }, [messagesQuery.data, view]);
 
   const handleStartChat = (message: string, options: ChatOptions) => {
+    setView("activeChat");
+    
     startNewChatMutation.mutate({ message, options }, {
         onSuccess: (newSessionData) => {
             setActiveSessionId(newSessionData.id);
-            setView("activeChat");
+        },
+        onError: () => {
+          showToast("Failed to start a new chat session.", "error");
+          setView("welcome");
         }
     });
   };
 
   const handleSendMessage = (message: string, options: ChatOptions) => {
     if (!activeSessionId) return;
-    queryClient.setQueryData<any[]>(['chat', 'messages', activeSessionId], (oldData: any) => {
-        const userMessage = { id: `temp-${Date.now()}`, role: 'user', content: message, created_at: new Date().toISOString(), resources: [] };
-        return oldData ? [...oldData, userMessage] : [userMessage];
+    
+    const optimisticUserMsg: ChatMessage = { 
+      id: `temp-${Date.now()}`, 
+      role: 'user', 
+      content: message, 
+      timestamp: new Date().toISOString(),
+      resources: []
+    };
+    
+    queryClient.setQueryData<ChatMessage[]>(['chat', 'messages', activeSessionId], (oldData) => {
+        return oldData ? [...oldData, optimisticUserMsg] : [optimisticUserMsg];
     });
+
     sendMessageMutation.mutate({ sessionId: activeSessionId, message, options });
   };
   
@@ -81,8 +95,7 @@ export default function ChatPage() {
     deleteSessionMutation.mutate(activeSessionId, {
         onSuccess: () => {
             showToast("Chat session deleted.", "success");
-            setActiveSessionId(null);
-            setView('welcome');
+            handleCreateNew();
         },
         onError: (error) => {
              showToast(`Failed to delete session: ${error.message}`, "error");
@@ -97,43 +110,63 @@ export default function ChatPage() {
 
   const renderContent = () => {
     if (view === "activeChat") {
-      const activeSessionTitle = sessionsQuery.data?.find(s => s.id === activeSessionId)?.title || "Loading Chat...";
+      const activeSessionTitle = sessionsQuery.data?.find(s => s.id === activeSessionId)?.title 
+        || startNewChatMutation.variables?.message
+        || "New Chat...";
+      
+      const isLoading = startNewChatMutation.isPending || (activeSessionId && messagesQuery.isLoading);
+
       return (
-        <div className="flex flex-col h-full w-full relative overflow-hidden">
-          <div className="flex justify-between items-center py-4 border-b border-border-default shrink-0 px-4 md:px-6">
-            <p className="text-sm w-48 sm:w-auto md:text-base font-medium text-text-on-light-body truncate overflow-hidden">
-              {activeSessionTitle}
-            </p>
-            <div className="flex items-center gap-2 md:gap-4 shrink-0">
-              <Button size="sm" className="bg-cta hover:bg-cta-hover h-8 gap-1 px-2 md:px-4 text-xs" onClick={handleCreateNew}>
-                <Plus size={12} />
-                <span className="hidden md:inline">New Chat</span>
-              </Button>
-              <ConfirmationDialog
-                  trigger={
-                      <Button variant="ghost" size="icon" className="text-text-on-light-muted h-8 w-8" disabled={deleteSessionMutation.isPending}>
-                          <Trash2 size={16} />
-                      </Button>
-                  }
-                  title="Delete Chat Session"
-                  description={`Are you sure you want to permanently delete "${activeSessionTitle}"?`}
-                  onConfirm={handleDeleteActiveSession}
-                  confirmText="Yes, Delete"
-                  isConfirming={deleteSessionMutation.isPending}
-              />
-              <Button variant="ghost" size="icon" className="text-text-on-light-muted h-8 w-8" onClick={() => setIsHistoryPanelOpen(true)}>
-                <Sidebar size={16} />
-              </Button>
+        <div className="h-full w-full relative overflow-hidden">
+          {/* --- DEFINITIVE FIX: Positioned inside the container and resized --- */}
+          {/* <div className="absolute z-0 w-[50%] h-[50%] left-1/2 -translate-y-[-70%] bottom-0px bg-cta rounded-full filter blur-[100px] pointer-events-none"></div> */}
+
+          <div className="relative z-10 flex flex-col h-full">
+            <div className="flex justify-between items-center py-4 border-b border-border-default shrink-0 px-4 md:px-6 bg-background-body/80 backdrop-blur-sm">
+              <p className="text-sm w-48 sm:w-auto md:text-base font-medium text-text-on-light-body truncate overflow-hidden">
+                {activeSessionTitle}
+              </p>
+              <div className="flex items-center gap-2 md:gap-4 shrink-0">
+                <Button size="sm" className="bg-cta hover:bg-cta-hover h-8 gap-1 px-2 md:px-4 text-xs" onClick={handleCreateNew}>
+                  <Plus size={12} />
+                  <span className="hidden md:inline">New Chat</span>
+                </Button>
+                <ConfirmationDialog
+                    trigger={
+                        <Button variant="ghost" size="icon" className="text-text-on-light-muted h-8 w-8" disabled={deleteSessionMutation.isPending || !activeSessionId}>
+                            <Trash2 size={16} />
+                        </Button>
+                    }
+                    title="Delete Chat Session"
+                    description={`Are you sure you want to permanently delete "${activeSessionTitle}"?`}
+                    onConfirm={handleDeleteActiveSession}
+                    confirmText="Yes, Delete"
+                    isConfirming={deleteSessionMutation.isPending}
+                />
+                <Button variant="ghost" size="icon" className="text-text-on-light-muted h-8 w-8" onClick={() => setIsHistoryPanelOpen(true)}>
+                  <Sidebar size={16} />
+                </Button>
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 min-h-0">
+              {isLoading ? (
+                <div className="flex justify-center py-10"><LoadingSpinner size="lg" /></div>
+              ) : (
+                messagesQuery.data
+                  ?.slice()
+                  .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+                  .map((msg) => <MessageBubble key={msg.id} message={msg} />)
+              )}
+
+              {sendMessageMutation.isPending && <div className="flex justify-start"><LoadingSpinner /></div>}
+              
+              <div style={{ height: "200px" }} />
+              <div ref={messagesEndRef} />
             </div>
           </div>
-          <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 min-h-0 pb-52">
-            {messagesQuery.isLoading && <div className="flex justify-center py-10"><LoadingSpinner /></div>}
-            {messagesQuery.data?.map((msg) => <MessageBubble key={msg.id} message={msg} />)}
-            {sendMessageMutation.isPending && <div className="flex justify-start"><LoadingSpinner /></div>}
-            <div ref={messagesEndRef} />
-          </div>
-          <div className="absolute z-0 w-[70%] h-[80%] left-1/2 -translate-x-1/2 bottom-[-70%] bg-cta/10 rounded-full filter blur-[100px] pointer-events-none"></div>
-          <ChatInputBar onSendMessage={handleSendMessage} isLoading={sendMessageMutation.isPending} />
+          
+          <ChatInputBar onSendMessage={handleSendMessage} isLoading={sendMessageMutation.isPending || startNewChatMutation.isPending} />
         </div>
       );
     }
@@ -147,7 +180,7 @@ export default function ChatPage() {
             isStartingChat={startNewChatMutation.isPending}
         />
         {view === 'welcome' && (
-            <WelcomeSection onSuggestionClick={(q) => handleStartChat(q, { language: 'ar' })} />
+            <WelcomeSection onSuggestionClick={(q: string) => handleStartChat(q, { language: 'ar' })} />
         )}
         {view === 'history' && (
             <ChatHistoryView onSessionSelect={handleSessionSelect} />
@@ -210,8 +243,8 @@ export default function ChatPage() {
               "fixed bottom-0 flex flex-col bg-white z-50 shadow-xl transition-transform duration-300 ease-in-out",
               "w-full max-w-xs sm:max-w-sm",
               direction === "rtl"
-                ? `right-0 ${isHistoryPanelOpen ? "translate-x-0" : "translate-x-full"}`
-                : `left-0 ${isHistoryPanelOpen ? "translate-x-0" : "-translate-x-full"}`
+                ? `left-0 ${isHistoryPanelOpen ? "translate-x-0" : "-translate-x-full"}`
+                : `right-0 ${isHistoryPanelOpen ? "translate-x-0" : "translate-x-full"}`
             )}
             style={{ top: "86px" }}
           >

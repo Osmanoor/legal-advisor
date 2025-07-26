@@ -5,8 +5,6 @@ export interface Resource {
   content: string;
   metadata: {
     article_number: number;
-    // article_type is not in your screenshot, but it was in your old file, so I will keep it.
-    // If it's not in the backend response, it can be removed or made optional.
     article_type: string; 
     chapter_name: string;
     chapter_number: number;
@@ -21,7 +19,7 @@ export interface ChatMessage {
   id: string; // Will now be a UUID from the database
   role: 'user' | 'assistant';
   content: string;
-  resources?: Resource[]; // The key is to ensure the backend returns this structure
+  resources?: Resource[];
   timestamp: string; // Will be `created_at` from the database
 }
 
@@ -32,6 +30,7 @@ export interface ChatSession {
   id: string; // UUID from the database
   title: string;
   updated_at: string; // ISO string from the database
+  questionCount: number; // The number of user questions in the session
 }
 
 // The data returned when starting a new chat session

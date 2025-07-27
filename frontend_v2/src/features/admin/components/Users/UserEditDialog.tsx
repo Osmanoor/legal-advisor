@@ -1,20 +1,22 @@
-// src/features/admin/components/Users/UserEditDialog.tsx
+// File: src/features/admin/components/Users/UserEditDialog.tsx
 
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useAdminUsers, useAdminUser } from '@/hooks/api/useAdminUsers';
 import { useAdminRolesAndPermissions } from '@/hooks/api/useAdminRolesAndPermissions';
-import { AdminDetailedUser, UserUpdatePayload } from '@/types/user';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import { UserUpdatePayload } from '@/types/user';
+import { Dialog, DialogClose, DialogContent, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/useToast';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle, Trash2 } from 'lucide-react';
+import { AlertCircle, Trash2, X } from 'lucide-react';
 import { ConfirmationDialog } from './ConfirmationDialog';
 import { PermissionToggle, OverrideState } from './PermissionToggle';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import UserAvatar from '/public/images/avatars/avatar1.png';
 
 interface UserEditDialogProps {
   userId: string | null;
@@ -22,21 +24,30 @@ interface UserEditDialogProps {
   onClose: () => void;
 }
 
+const FormSeparatorWithLabel = ({ label }: { label: string }) => (
+    <div className="flex items-center gap-4 py-4">
+        <Separator className="flex-1" />
+        <span className="text-sm text-gray-500 whitespace-nowrap">{label}</span>
+        <Separator className="flex-1" />
+    </div>
+);
+
+
 export const UserEditDialog: React.FC<UserEditDialogProps> = ({ userId, isOpen, onClose }) => {
   const { direction } = useLanguage();
   const { updateUserMutation, deleteUserMutation } = useAdminUsers();
   const { data: user, isLoading: isLoadingUser, error: userError } = useAdminUser(userId);
-  const { data: rolesAndPerms, isLoading: isLoadingRoles, error: rolesError } = useAdminRolesAndPermissions();
+  const { data: rolesAndPerms, isLoading: isLoadingRoles } = useAdminRolesAndPermissions();
   const { showToast } = useToast();
 
-  // Local state for form fields
-  const [fullName, setFullName] = useState('');
+  const [status, setStatus] = useState<'active' | 'suspended'>('active');
+  const [roleId, setRoleId] = useState<number | undefined>(undefined);
   const [overrides, setOverrides] = useState<Record<number, OverrideState>>({});
   
-  // Populate state when user data is fetched
   useEffect(() => {
     if (user) {
-      setFullName(user.fullName);
+      setStatus(user.status);
+      setRoleId(user.roles[0]?.id);
       const initialOverrides: Record<number, OverrideState> = {};
       user.permission_overrides.forEach(ov => {
         initialOverrides[ov.permission_id] = ov.override_type;
@@ -53,17 +64,15 @@ export const UserEditDialog: React.FC<UserEditDialogProps> = ({ userId, isOpen, 
     if (!user) return;
     
     const payload: UserUpdatePayload = {};
-    if (fullName !== user.fullName) {
-      payload.fullName = fullName;
+    
+    if (status !== user.status) {
+      payload.status = status;
     }
     
-    const changedOverrides = Object.entries(overrides).filter(([permId, state]) => {
-      const originalOverride = user.permission_overrides.find(ov => ov.permission_id === Number(permId));
-      const originalState = originalOverride ? originalOverride.override_type : null;
-      return state !== originalState;
-    });
-
-    // We need to send ALL overrides, not just changed ones, as the backend clears them first.
+    if (roleId !== user.roles[0]?.id) {
+        payload.role_ids = roleId ? [roleId] : [];
+    }
+    
     payload.permission_overrides = Object.entries(overrides)
       .filter(([, state]) => state !== null)
       .map(([permId, state]) => ({
@@ -71,7 +80,7 @@ export const UserEditDialog: React.FC<UserEditDialogProps> = ({ userId, isOpen, 
         override_type: state as 'ALLOW' | 'DENY',
       }));
 
-    if (fullName === user.fullName && changedOverrides.length === 0) {
+    if (Object.keys(payload).length === 0 && JSON.stringify(payload.permission_overrides) === JSON.stringify(user.permission_overrides)) {
       showToast("No changes to save.", "info");
       onClose();
       return;
@@ -103,64 +112,97 @@ export const UserEditDialog: React.FC<UserEditDialogProps> = ({ userId, isOpen, 
 
   const isUserAdmin = user?.roles.some(r => r.name === 'Admin');
   const isLoading = isLoadingUser || isLoadingRoles;
-  const error = userError || rolesError;
+  const error = userError;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-3xl" dir={direction}>
-        <DialogHeader className="text-right mb-4">
-          <DialogTitle className="text-xl font-bold">Edit User: {user?.fullName || 'Loading...'}</DialogTitle>
-          <DialogDescription>Update user details and fine-tune their permissions.</DialogDescription>
-        </DialogHeader>
-
+      <DialogContent showCloseButton={false} className="sm:max-w-3xl p-0 flex flex-col max-h-[90vh]" dir={direction}>
         {isLoading ? (
-          <div className="flex justify-center items-center h-64"><LoadingSpinner /></div>
+            <div className="flex justify-center items-center h-96"><LoadingSpinner /></div>
         ) : error ? (
-          <Alert variant="destructive"><AlertCircle className="h-4 w-4" /><AlertDescription>Could not load data. {error.message}</AlertDescription></Alert>
+            <div className="p-6">
+                <Alert variant="destructive"><AlertCircle className="h-4 w-4" /><AlertDescription>Could not load user data. {error.message}</AlertDescription></Alert>
+            </div>
         ) : (
           user && rolesAndPerms && (
-            <div className="space-y-6 py-4 max-h-[60vh] overflow-y-auto pr-2">
-              <div className="space-y-2 text-right"><Label htmlFor="edit-fullName">Full Name</Label><Input id="edit-fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} /></div>
-              
-              <div>
-                <h3 className="font-semibold text-right mb-2">User Feature Permissions</h3>
-                <div className="space-y-2">
-                  {rolesAndPerms.all_permissions.user.map(p => (
-                    <PermissionToggle key={p.id} permission={p} state={overrides[p.id] || null} onChange={(s) => handleOverrideChange(p.id, s)} />
-                  ))}
+            <>
+                <div className="flex justify-between items-start p-6 border-b">
+                    <div className="flex items-center gap-4 text-right">
+                        <img src={UserAvatar} alt={user.fullName} className="w-14 h-14 rounded-full"/>
+                        <div>
+                            <p className="font-bold text-lg">{user.fullName}</p>
+                            <p className="text-sm text-gray-500">{user.phoneNumber}</p>
+                        </div>
+                    </div>
+                    <DialogClose asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full bg-gray-100 hover:bg-gray-200">
+                           <X className="h-4 w-4" />
+                        </Button>
+                    </DialogClose>
                 </div>
-              </div>
 
-              <div>
-                <h3 className="font-semibold text-right mb-2">Admin Panel Permissions</h3>
-                <div className="space-y-2">
-                  {rolesAndPerms.all_permissions.admin.map(p => (
-                    <PermissionToggle key={p.id} permission={p} state={overrides[p.id] || null} onChange={(s) => handleOverrideChange(p.id, s)} isDisabled={!isUserAdmin} />
-                  ))}
-                  {!isUserAdmin && <p className="text-xs text-gray-500 text-right mt-2">Admin permissions can only be assigned to users with the 'Admin' role.</p>}
+                <div className="px-6 py-4 space-y-6 overflow-y-auto flex-grow">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-2 text-right">
+                            <Label htmlFor="status">حالة الحساب</Label>
+                            <Select value={status} dir={direction} onValueChange={(value) => setStatus(value as 'active' | 'suspended')}>
+                                <SelectTrigger id="status"><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="active">Active</SelectItem>
+                                    <SelectItem value="suspended">Suspended</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                         <div className="space-y-2 text-right">
+                            <Label htmlFor="role">الدور</Label>
+                            <Select value={roleId?.toString()} dir={direction}  onValueChange={(value) => setRoleId(Number(value))}>
+                                <SelectTrigger id="role"><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                    {rolesAndPerms.roles.map(role => (
+                                        <SelectItem key={role.id} value={role.id.toString()}>{role.name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+
+                    <h2 className="text-lg font-semibold text-right pt-6">الصلاحيات</h2>
+
+                    <div>
+                        <FormSeparatorWithLabel label="صلاحيات المستخدم" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-4">
+                            {rolesAndPerms.all_permissions.user.map(p => (
+                                <PermissionToggle key={p.id} permission={p} state={overrides[p.id] || null} onChange={(s) => handleOverrideChange(p.id, s)} />
+                            ))}
+                        </div>
+                    </div>
+
+                    <div>
+                        <FormSeparatorWithLabel label="صلاحيات المشرف" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-4">
+                            {rolesAndPerms.all_permissions.admin.map(p => (
+                                <PermissionToggle key={p.id} permission={p} state={overrides[p.id] || null} onChange={(s) => handleOverrideChange(p.id, s)} isDisabled={!isUserAdmin} />
+                            ))}
+                        </div>
+                        {!isUserAdmin && <p className="text-xs text-gray-500 text-right mt-2">Admin permissions can only be assigned to users with the 'Admin' role.</p>}
+                    </div>
                 </div>
-              </div>
-            </div>
+
+                <DialogFooter className="p-6 gap-4 bg-gray-50 border-t flex justify-between shrink-0">
+                    <ConfirmationDialog
+                        trigger={ <Button variant="danger" disabled={deleteUserMutation.isPending}><Trash2 className="mr-2 h-4 w-4" /> Delete User</Button> }
+                        title="Delete User" description={`This will permanently delete the account for ${user.fullName}.`}
+                        onConfirm={handleDelete} isConfirming={deleteUserMutation.isPending}
+                    />
+                    <div className="flex gap-2">
+                        <Button onClick={handleSave} disabled={updateUserMutation.isPending}>
+                        {updateUserMutation.isPending ? <LoadingSpinner size="sm"/> : 'Save Changes'}
+                        </Button>
+                    </div>
+                </DialogFooter>
+            </>
           )
         )}
-
-        <DialogFooter className="mt-6 flex justify-between">
-          <div>
-            {user && (
-              <ConfirmationDialog
-                trigger={ <Button variant="danger" disabled={deleteUserMutation.isPending}><Trash2 className="mr-2 h-4 w-4" /> Delete User</Button> }
-                title="Delete User" description={`This will permanently delete the account for ${user.fullName}.`}
-                onConfirm={handleDelete} isConfirming={deleteUserMutation.isPending}
-              />
-            )}
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={onClose}>Cancel</Button>
-            <Button onClick={handleSave} disabled={isLoading || updateUserMutation.isPending}>
-              {updateUserMutation.isPending ? <LoadingSpinner size="sm"/> : 'Save Changes'}
-            </Button>
-          </div>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

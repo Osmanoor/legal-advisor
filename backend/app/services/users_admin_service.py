@@ -1,4 +1,4 @@
-# app/services/users_admin_service.py
+# File: app/services/users_admin_service.py
 
 import os
 from app.models import User, Role, Permission
@@ -68,7 +68,7 @@ class UsersAdminService:
         return self.serialize_user(user), 200
 
     def update_user(self, user_id, data):
-        """Updates a user's details, roles, and permission overrides with security checks."""
+        """Updates a user's details, roles, status, and permission overrides with security checks."""
         user = User.query.get(user_id)
         if not user:
             return {"error": "User not found"}, 404
@@ -82,6 +82,16 @@ class UsersAdminService:
             if 'fullName' in data: user.full_name = data['fullName']
             if 'jobTitle' in data: user.job_title = data['jobTitle']
             if 'email' in data: user.email = data['email']
+            
+            # --- MODIFICATION START: Handle status update ---
+            if 'status' in data:
+                new_status = data['status']
+                if new_status in ['active', 'suspended']:
+                    user.status = new_status
+                else:
+                    return {"error": "Invalid status value provided."}, 400
+            # --- MODIFICATION END ---
+            
             if 'role_ids' in data:
                 new_roles = Role.query.filter(Role.id.in_(data['role_ids'])).all()
                 user.roles = new_roles
@@ -138,7 +148,8 @@ class UsersAdminService:
             "email": user.email,
             "phoneNumber": user.phone_number,
             "roles": [role.name for role in user.roles],
-            "created_at": user.created_at.isoformat()
+            "created_at": user.created_at.isoformat(),
+            "status": user.status, # <-- ADDED
         }
 
     def serialize_user(self, user):
@@ -158,5 +169,6 @@ class UsersAdminService:
                 }
                 for override in user.permission_overrides
             ],
-            "created_at": user.created_at.isoformat()
+            "created_at": user.created_at.isoformat(),
+            "status": user.status, # <-- ADDED
         }

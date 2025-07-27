@@ -1,6 +1,4 @@
 // File: src/components/layouts/AdminLayout.tsx
-// @new
-// The main layout wrapper for all admin panel pages.
 
 import React from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -18,7 +16,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const { isSidebarOpen, setSidebarOpen } = useUIStore();
 
   return (
-    <div className={cn("flex h-screen bg-gray-100", direction === 'rtl' ? 'flex-row-reverse' : 'flex-row')}>
+    <div className={cn("flex h-screen bg-background-body", direction === 'rtl' ? 'flex-row-reverse' : 'flex-row')}>
       <AdminSidebar />
 
       {isSidebarOpen && (
@@ -31,7 +29,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
       <div className="flex-1 flex flex-col overflow-hidden lg:mr-[277px]">
         <DashboardHeader />
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4 md:p-6">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-white p-4 md:p-6">
           {children}
         </main>
       </div>

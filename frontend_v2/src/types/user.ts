@@ -1,4 +1,4 @@
-// src/types/user.ts
+// File: src/types/user.ts
 
 // The Role type is now a generic string, as it's fetched dynamically.
 export type Role = string;
@@ -48,6 +48,7 @@ export interface UserSummary {
   phoneNumber: string;
   roles: string[];
   created_at: string;
+  status: 'active' | 'suspended';
 }
 
 export interface PermissionOverride {
@@ -70,13 +71,14 @@ export interface AdminDetailedUser {
   roles: UserRole[];
   permission_overrides: PermissionOverride[];
   created_at: string;
+  status: 'active' | 'suspended';
 }
 
-// --- FIX: Moved UserUpdatePayload here ---
 export interface UserUpdatePayload {
   fullName?: string;
   email?: string;
   jobTitle?: string;
+  status?: 'active' | 'suspended';
   role_ids?: number[];
   permission_overrides?: {
       permission_id: number;
@@ -84,6 +86,15 @@ export interface UserUpdatePayload {
   }[];
 }
 
+// --- NEW: Payload for creating a user ---
+export interface UserCreatePayload {
+  fullName: string;
+  phoneNumber: string;
+  email?: string;
+  password: string;
+  jobTitle?: string;
+  role_id: number;
+}
 
 // --- Existing types ---
 export interface ChangePasswordData {

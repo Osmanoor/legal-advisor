@@ -1,9 +1,8 @@
-// src/hooks/api/useAdminUsers.ts
+// File: src/hooks/api/useAdminUsers.ts
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/axios';
-// --- FIX: Import UserUpdatePayload from the correct location ---
-import { UserSummary, AdminDetailedUser, UserUpdatePayload } from '@/types/user';
+import { UserSummary, AdminDetailedUser, UserUpdatePayload, UserCreatePayload } from '@/types/user';
 
 interface PaginatedUsersResponse {
   users: UserSummary[];
@@ -12,7 +11,7 @@ interface PaginatedUsersResponse {
   current_page: number;
 }
 
-// HOOK for fetching user list, updating, and deleting
+// HOOK for fetching user list, creating, updating, and deleting
 export function useAdminUsers(page: number = 1, perPage: number = 10) {
   const queryClient = useQueryClient();
 
@@ -23,6 +22,16 @@ export function useAdminUsers(page: number = 1, perPage: number = 10) {
         params: { page, per_page: perPage },
       });
       return response.data;
+    },
+  });
+
+  const createUserMutation = useMutation({
+    mutationFn: async (payload: UserCreatePayload): Promise<AdminDetailedUser> => {
+      const response = await api.post('/admin/users', payload);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
     },
   });
 
@@ -50,6 +59,7 @@ export function useAdminUsers(page: number = 1, perPage: number = 10) {
 
   return {
     usersQuery,
+    createUserMutation, // <-- EXPORTED
     updateUserMutation,
     deleteUserMutation,
   };

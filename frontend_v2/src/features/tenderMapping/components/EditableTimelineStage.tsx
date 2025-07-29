@@ -5,7 +5,7 @@ import { TenderStage } from '@/types/tenderMapping';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch-rtl';
+import { Switch } from '@/components/ui/switch'; // <-- UPDATED IMPORT
 import { Checkbox } from '@/components/ui/checkbox';
 import { Edit2, Calendar, Check, X } from 'lucide-react';
 

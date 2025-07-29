@@ -2,6 +2,7 @@
 import React, { createContext, useEffect, useState } from 'react';
 import { en } from '@/config/i18n/translations/en';
 import { ar } from '@/config/i18n/translations/ar';
+import { DirectionProvider } from '@radix-ui/react-direction'; // <-- Import Radix Provider
 
 export type Language = 'ar' | 'en';
 export type Direction = 'ltr' | 'rtl';
@@ -44,7 +45,9 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <LanguageContext.Provider value={{ language, direction, setLanguage, translations }}>
-      {children}
+      <DirectionProvider dir={direction}>
+        {children}
+      </DirectionProvider>
     </LanguageContext.Provider>
   );
 }

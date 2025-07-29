@@ -3,6 +3,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/axios';
 
+export type ContactStatusFilter = 'new' | 'read' | 'archived' | 'all';
+
 export interface ContactSubmission {
   id: number;
   name: string;
@@ -12,7 +14,6 @@ export interface ContactSubmission {
   submitted_at: string; // ISO string
 }
 
-// New interface for the paginated response
 export interface PaginatedContactsResponse {
   submissions: ContactSubmission[];
   total: number;
@@ -20,18 +21,17 @@ export interface PaginatedContactsResponse {
   current_page: number;
 }
 
-// The hook now accepts pagination parameters
-export function useAdminContacts(page: number = 1, perPage: number = 10) {
+export function useAdminContacts(page: number = 1, perPage: number = 10, filter: ContactStatusFilter = 'new') {
   const queryClient = useQueryClient();
 
-  // The query now uses the paginated response type and includes page in its key
   const contactsQuery = useQuery<PaginatedContactsResponse, Error>({
-    queryKey: ['admin', 'contacts', { page, perPage }],
+    queryKey: ['admin', 'contacts', { page, perPage, filter }],
     queryFn: async () => {
       const response = await api.get('/admin/contact-submissions', {
         params: {
           page: page,
           per_page: perPage,
+          filter: filter, // Pass filter to the API
         },
       });
       return response.data;
@@ -45,7 +45,6 @@ export function useAdminContacts(page: number = 1, perPage: number = 10) {
       return response.data;
     },
     onSuccess: () => {
-      // Invalidate all contacts queries to refetch the potentially changed list
       queryClient.invalidateQueries({ queryKey: ['admin', 'contacts'] });
     },
   });

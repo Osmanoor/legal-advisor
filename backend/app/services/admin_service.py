@@ -134,10 +134,20 @@ class AdminService:
         dummy_stats = { "total_users": 150, "new_messages": 12, "pending_reviews": 5 }
         return dummy_stats, 200
 
-    def get_contact_submissions(self, page=1, per_page=20):
-        paginated_submissions = ContactSubmission.query.order_by(ContactSubmission.submitted_at.desc()).paginate(
+    def get_contact_submissions(self, page=1, per_page=20, filter_by='new'):
+        # --- THIS IS THE CHANGE ---
+        query = ContactSubmission.query
+
+        # Apply filter based on the status
+        if filter_by in ['new', 'read', 'archived']:
+            query = query.filter(ContactSubmission.status == filter_by)
+        # If filter_by is 'all' or an unknown value, we don't apply a status filter
+
+        paginated_submissions = query.order_by(ContactSubmission.submitted_at.desc()).paginate(
             page=page, per_page=per_page, error_out=False
         )
+        # --- END OF CHANGE ---
+
         submissions_data = [
             {
                 "id": s.id, "name": s.name, "email": s.email, "message": s.message,

@@ -11,7 +11,7 @@
       "manage_feedback": true,
       "manage_global_settings": false,
       "manage_users": true,
-      "update_admin": false,
+      "update_admin": true,
       "update_user": true,
       "view_analytics": true
     },
@@ -25,10 +25,10 @@
     "features_enabled": {
       "access_calculator": true,
       "access_chat": true,
+      "access_feedback": true,
       "access_report_generator": true,
       "access_search_tool": true,
-      "access_text_corrector": true,
-      "access_feedback": true
+      "access_text_corrector": true
     },
     "usage_limits": {
       "ai_assistant_queries_per_day": 5,

@@ -66,8 +66,13 @@ def get_dashboard_stats():
 @permission_required('manage_contacts')
 def get_contact_submissions():
     page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 20, type=int)
-    result, status_code = admin_service.get_contact_submissions(page, per_page)
+    per_page = request.args.get('per_page', 10, type=int)
+    # --- THIS IS THE CHANGE ---
+    # Read the filter parameter from the request
+    filter_by = request.args.get('filter', 'new', type=str)
+    
+    # Pass the filter to the service layer
+    result, status_code = admin_service.get_contact_submissions(page, per_page, filter_by)
     return jsonify(result), status_code
 
 @admin_bp.route('/contact-submissions/<int:submission_id>/status', methods=['PUT'])

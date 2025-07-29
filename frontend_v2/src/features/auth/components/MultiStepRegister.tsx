@@ -1,3 +1,6 @@
+// src/features/auth/components/MultiStepRegister.tsx
+// Updated for i18n
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Stepper } from './Stepper';
@@ -19,9 +22,9 @@ export const MultiStepRegister = () => {
     });
 
     const steps = [
-        'المعلومات الأساسية',
-        'التحقق',
-        'المعلومات الإضافية',
+        t('auth.steps.basicInfo'),
+        t('auth.steps.verification'),
+        t('auth.steps.additionalInfo'),
     ];
 
     const handleStep1Success = (data: { identifier: string; email?: string; phoneNumber?: string }) => {
@@ -51,7 +54,6 @@ export const MultiStepRegister = () => {
         <div className="w-full">
             <Stepper currentStep={step} steps={steps} />
             
-            {/* Set a fixed height container to prevent layout shifts during transitions */}
             <div className="mt-8 relative h-[600px] sm:h-[550px]">
                 <AnimatePresence mode="wait">
                     <motion.div

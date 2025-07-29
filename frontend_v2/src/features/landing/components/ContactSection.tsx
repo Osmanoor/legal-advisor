@@ -1,4 +1,5 @@
 // src/features/landing/components/ContactSection.tsx
+// Updated for i18n
 
 import React, { useState } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -7,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Mail, MessageCircle } from 'lucide-react';
-import { useContact } from '@/hooks/api/useContact'; // <-- Import the hook
+import { useContact } from '@/hooks/api/useContact';
 import { useToast } from '@/hooks/useToast';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { AxiosError } from 'axios';
@@ -24,7 +25,7 @@ const GeometricPattern = () => (
 );
 
 export const ContactSection: React.FC = () => {
-    const { direction } = useLanguage();
+    const { t, direction } = useLanguage();
     const { showToast } = useToast();
     const { submitContactMutation } = useContact();
     const [formData, setFormData] = useState({ name: '', email: '', message: '' });
@@ -39,13 +40,12 @@ export const ContactSection: React.FC = () => {
         submitContactMutation.mutate(formData, {
             onSuccess: (data) => {
                 trackEvent({ event: 'contact_form_submitted' });
-                showToast(data.message || "Message sent successfully!", "success");
-                // Clear the form
+                showToast(data.message || t('landingPage.contact.form.success'), "success");
                 setFormData({ name: '', email: '', message: '' });
             },
             onError: (error) => {
                 const axiosError = error as AxiosError<{ error?: string }>;
-                const errorMessage = axiosError.response?.data?.error || 'Failed to send message.';
+                const errorMessage = axiosError.response?.data?.error || t('landingPage.contact.form.error');
                 showToast(errorMessage, 'error');
             }
         });
@@ -61,21 +61,21 @@ export const ContactSection: React.FC = () => {
                     <div className="relative grid md:grid-cols-2 gap-8 md:gap-16 items-center p-8 md:p-16">
                         <div className={`w-full ${direction === 'rtl' ? 'md:order-2' : ''}`}>
                             <form onSubmit={handleSubmit} className="space-y-5">
-                                <div className="space-y-2 text-right"><Label htmlFor="name">الاسم</Label><Input id="name" name="name" value={formData.name} onChange={handleChange} required placeholder="أدخل الاسم" /></div>
-                                <div className="space-y-2 text-right"><Label htmlFor="email">البريد الالكتروني</Label><Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} required placeholder="أدخل بريدك الالكتروني"/></div>
-                                <div className="space-y-2 text-right"><Label htmlFor="message">الرسالة</Label><Textarea id="message" name="message" value={formData.message} onChange={handleChange} required placeholder="فيما ترغب أن نساعدك" className="min-h-[140px]"/></div>
+                                <div className="space-y-2 text-right"><Label htmlFor="name">{t('landingPage.contact.form.name')}</Label><Input id="name" name="name" value={formData.name} onChange={handleChange} required placeholder={t('landingPage.contact.form.namePlaceholder')} /></div>
+                                <div className="space-y-2 text-right"><Label htmlFor="email">{t('landingPage.contact.form.email')}</Label><Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} required placeholder={t('landingPage.contact.form.emailPlaceholder')}/></div>
+                                <div className="space-y-2 text-right"><Label htmlFor="message">{t('landingPage.contact.form.message')}</Label><Textarea id="message" name="message" value={formData.message} onChange={handleChange} required placeholder={t('landingPage.contact.form.messagePlaceholder')} className="min-h-[140px]"/></div>
                                 <Button type="submit" className="w-full bg-cta hover:bg-cta-hover h-11" disabled={submitContactMutation.isPending}>
-                                    {submitContactMutation.isPending ? <LoadingSpinner size="sm" /> : "أرسل الرسالة"}
+                                    {submitContactMutation.isPending ? <LoadingSpinner size="sm" /> : t('landingPage.contact.form.send')}
                                 </Button>
                             </form>
                         </div>
                         
                         <div className={`text-right space-y-6 ${direction === 'rtl' ? 'md:order-1' : ''}`}>
                              <h2 className="text-4xl md:text-5xl font-medium text-text-on-light-strong" style={{ fontFamily: 'var(--font-primary-arabic)' }}>
-                                تواصل معنا
+                                {t('landingPage.contact.title')}
                             </h2>
                             <p className="text-lg text-gray-500 leading-relaxed">
-                                يسعدنا تواصلكم معنا. يرجى تعبئة النموذج وسنرد عليكم في أقرب وقت.
+                                {t('landingPage.contact.description')}
                             </p>
                             <div className="flex justify-end gap-4">
                                 <a href="mailto:contact@example.com" aria-label="Email" className="w-16 h-16 bg-[#296436] rounded-lg flex items-center justify-center text-white hover:opacity-90 transition-opacity">

@@ -1,10 +1,11 @@
 // src/components/common/PaginationControls.tsx
+// Updated for i18n
 
 import React, { useMemo } from 'react';
+import { useLanguage } from '@/hooks/useLanguage';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useLanguage } from '@/hooks/useLanguage';
 
 interface PaginationControlsProps {
   currentPage: number;
@@ -32,43 +33,35 @@ export const PaginationControls: React.FC<PaginationControlsProps> = ({
   className,
   siblingCount = 1,
 }) => {
-  const { direction } = useLanguage();
+  const { t, direction } = useLanguage();
   const PrevIcon = direction === 'rtl' ? ChevronRight : ChevronLeft;
   const NextIcon = direction === 'rtl' ? ChevronLeft : ChevronRight;
 
   const paginationRange = useMemo(() => {
-    const totalPageNumbers = siblingCount + 5; // siblingCount + firstPage + lastPage + currentPage + 2*DOTS
-
+    const totalPageNumbers = siblingCount + 5;
     if (totalPageNumbers >= totalPages) {
       return range(1, totalPages);
     }
-
     const leftSiblingIndex = Math.max(currentPage - siblingCount, 1);
     const rightSiblingIndex = Math.min(currentPage + siblingCount, totalPages);
-
     const shouldShowLeftDots = leftSiblingIndex > 2;
     const shouldShowRightDots = rightSiblingIndex < totalPages - 2;
-
     const firstPageIndex = 1;
     const lastPageIndex = totalPages;
-
     if (!shouldShowLeftDots && shouldShowRightDots) {
       const leftItemCount = 3 + 2 * siblingCount;
       const leftRange = range(1, leftItemCount);
       return [...leftRange, DOTS, totalPages];
     }
-
     if (shouldShowLeftDots && !shouldShowRightDots) {
       const rightItemCount = 3 + 2 * siblingCount;
       const rightRange = range(totalPages - rightItemCount + 1, totalPages);
       return [firstPageIndex, DOTS, ...rightRange];
     }
-
     if (shouldShowLeftDots && shouldShowRightDots) {
       const middleRange = range(leftSiblingIndex, rightSiblingIndex);
       return [firstPageIndex, DOTS, ...middleRange, DOTS, lastPageIndex];
     }
-    // Fallback just in case, should not be reached with the logic above
     return range(1, totalPages);
   }, [totalPages, siblingCount, currentPage]);
 
@@ -76,31 +69,23 @@ export const PaginationControls: React.FC<PaginationControlsProps> = ({
     return null;
   }
 
-  const onNext = () => {
-    onPageChange(currentPage + 1);
-  };
-
-  const onPrevious = () => {
-    onPageChange(currentPage - 1);
-  };
-
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
   return (
     <div className={cn("flex flex-col sm:flex-row items-center justify-between gap-4 w-full", className)}>
       <div className="text-sm text-gray-600">
-        Showing <span className="font-medium">{startItem}</span> to <span className="font-medium">{endItem}</span> of <span className="font-medium">{totalItems}</span> results
+        {t('pagination.showingResults', { start: startItem.toString(), end: endItem.toString(), total: totalItems.toString() })}
       </div>
       <div className="flex items-center gap-2">
         <Button
           variant="outline"
           size="sm"
-          onClick={onPrevious}
+          onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage <= 1}
         >
           <PrevIcon className="h-4 w-4" />
-          <span className="ml-1">Previous</span>
+          <span className="ml-1">{t('pagination.previous')}</span>
         </Button>
         <div className="flex items-center gap-1">
           {paginationRange?.map((pageNumber, index) => {
@@ -111,7 +96,6 @@ export const PaginationControls: React.FC<PaginationControlsProps> = ({
                 </span>
               );
             }
-
             return (
               <Button
                 key={pageNumber}
@@ -128,10 +112,10 @@ export const PaginationControls: React.FC<PaginationControlsProps> = ({
         <Button
           variant="outline"
           size="sm"
-          onClick={onNext}
+          onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage >= totalPages}
         >
-          <span className="mr-1">Next</span>
+          <span className="mr-1">{t('pagination.next')}</span>
           <NextIcon className="h-4 w-4" />
         </Button>
       </div>

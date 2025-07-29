@@ -1,4 +1,5 @@
 // src/features/auth/components/Step1_RequestReset.tsx
+// Updated for i18n
 
 import React, { useState } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -24,20 +25,19 @@ export const Step1_RequestReset: React.FC<Step1_RequestResetProps> = ({ onSucces
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!identifier.trim()) {
-      showToast('Please enter your email or phone number.', 'error');
+      showToast(t('auth.errorMissingIdentifier'), 'error');
       return;
     }
 
     forgotPasswordMutation.mutate({ identifier }, {
       onSuccess: (response) => {
-        // The backend sends a generic message for security, which we can show.
         const message = (response.data as { message: string }).message;
         showToast(message, 'success');
-        onSuccess(identifier); // Proceed to the next step
+        onSuccess(identifier);
       },
       onError: (error) => {
         const axiosError = error as AxiosError<{ error?: string }>;
-        const errorMessage = axiosError.response?.data?.error || 'An unknown error occurred.';
+        const errorMessage = axiosError.response?.data?.error || t('auth.errorGeneric');
         showToast(errorMessage, 'error');
       }
     });
@@ -49,13 +49,13 @@ export const Step1_RequestReset: React.FC<Step1_RequestResetProps> = ({ onSucces
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100 mb-4">
             <Mail className="h-6 w-6 text-cta" />
         </div>
-        <h2 className="text-2xl font-semibold">Forgot Password?</h2>
-        <p className="text-gray-500 mt-2">Enter your email or phone number and we'll send you a code to reset your password.</p>
+        <h2 className="text-2xl font-semibold">{t('auth.resetPasswordTitle')}</h2>
+        <p className="text-gray-500 mt-2">{t('auth.resetPasswordInstruction')}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <Label htmlFor="identifier">Email or Phone Number</Label>
+          <Label htmlFor="identifier">{t('auth.emailOrPhone')}</Label>
           <Input 
             id="identifier"
             value={identifier}
@@ -69,7 +69,7 @@ export const Step1_RequestReset: React.FC<Step1_RequestResetProps> = ({ onSucces
           className="w-full bg-cta hover:bg-cta-hover h-11"
           disabled={forgotPasswordMutation.isPending}
         >
-          {forgotPasswordMutation.isPending ? <LoadingSpinner size="sm" /> : 'Send Reset Code'}
+          {forgotPasswordMutation.isPending ? <LoadingSpinner size="sm" /> : t('auth.sendResetCode')}
         </Button>
       </form>
     </div>

@@ -1,4 +1,5 @@
 // src/features/auth/components/Step2_VerifyResetCode.tsx
+// Updated for i18n
 
 import React, { useState } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -15,24 +16,25 @@ interface Step2_VerifyResetCodeProps {
 }
 
 export const Step2_VerifyResetCode: React.FC<Step2_VerifyResetCodeProps> = ({ onSuccess, identifier }) => {
+  const { t } = useLanguage();
   const { showToast } = useToast();
   const { verifyCodeMutation } = usePasswordReset();
   const [otp, setOtp] = useState('');
 
   const handleSubmit = () => {
     if (otp.length < 6) {
-      showToast('Please enter the 6-digit code.', 'error');
+      showToast(t('auth.errorOtpIncomplete'), 'error');
       return;
     }
 
     verifyCodeMutation.mutate({ identifier, code: otp }, {
       onSuccess: () => {
-        showToast('Code verified successfully!', 'success');
-        onSuccess(otp); // Pass the verified code to the parent for the next step
+        showToast(t('auth.codeVerifiedSuccess'), 'success');
+        onSuccess(otp);
       },
       onError: (error) => {
         const axiosError = error as AxiosError<{ error?: string }>;
-        const errorMessage = axiosError.response?.data?.error || 'An unknown error occurred.';
+        const errorMessage = axiosError.response?.data?.error || t('auth.errorGeneric');
         showToast(errorMessage, 'error');
       }
     });
@@ -44,8 +46,10 @@ export const Step2_VerifyResetCode: React.FC<Step2_VerifyResetCodeProps> = ({ on
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100 mb-4">
             <KeyRound className="h-6 w-6 text-cta" />
         </div>
-        <h2 className="text-2xl font-semibold">Enter Verification Code</h2>
-        <p className="text-gray-500 mt-2">A 6-digit code was sent to <br/><strong>{identifier}</strong>.</p>
+        <h2 className="text-2xl font-semibold">{t('auth.otpPlaceholder')}</h2>
+        <p className="text-gray-500 mt-2">
+            {t('auth.otpSentTo', { identifier: '' })}<br/><strong>{identifier}</strong>.
+        </p>
       </div>
 
       <div className="mb-6">
@@ -61,7 +65,7 @@ export const Step2_VerifyResetCode: React.FC<Step2_VerifyResetCodeProps> = ({ on
         className="w-full max-w-sm bg-cta hover:bg-cta-hover h-11"
         disabled={verifyCodeMutation.isPending || otp.length < 6}
       >
-        {verifyCodeMutation.isPending ? "Verifying..." : "Verify Code"}
+        {verifyCodeMutation.isPending ? t('auth.verifying') : t('auth.verifyCode')}
       </Button>
     </div>
   );

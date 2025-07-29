@@ -1,26 +1,28 @@
-// File: src/features/admin/components/Analytics/UserTypeChart.tsx
-// @new
+// src/features/admin/components/Analytics/UserTypeChart.tsx
+// Updated for i18n
 
 import React from 'react';
 import { RadialBarChart, RadialBar, PolarAngleAxis, ResponsiveContainer, Legend } from 'recharts';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { AdminAnalyticsData } from '@/hooks/api/useAdminAnalytics';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface UserTypeChartProps {
   data: AdminAnalyticsData['userTypes'];
 }
 
 export const UserTypeChart: React.FC<UserTypeChartProps> = ({ data }) => {
+  const { t } = useLanguage();
   const total = data.registered + data.guests;
   const chartData = [
-    { name: 'ضيوف', value: data.guests, fill: '#C5FFC1' },
-    { name: 'مسجلين', value: data.registered, fill: '#51B749' },
+    { name: t('admin.analytics.guests'), value: data.guests, fill: '#C5FFC1' },
+    { name: t('admin.analytics.registered'), value: data.registered, fill: '#51B749' },
   ];
 
   return (
     <Card className="h-full">
       <CardHeader>
-        <CardTitle>نوع المستخدمين</CardTitle>
+        <CardTitle>{t('admin.analytics.userTypes')}</CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>

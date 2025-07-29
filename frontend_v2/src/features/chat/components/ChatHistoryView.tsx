@@ -1,4 +1,5 @@
 // src/features/chat/components/ChatHistoryView.tsx
+// Updated for i18n
 
 import React, { useState, useMemo } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -39,10 +40,10 @@ export const ChatHistoryView: React.FC<ChatHistoryViewProps> = ({ onSessionSelec
   const handleSessionDelete = (sessionId: string) => {
     deleteSessionMutation.mutate(sessionId, {
         onSuccess: () => {
-            showToast("Chat session deleted.", "success");
+            showToast(t('common.success'), "success");
         },
         onError: (error) => {
-            showToast(`Failed to delete session: ${error.message}`, "error");
+            showToast(`${t('common.error')}: ${error.message}`, "error");
         }
     });
   };
@@ -55,7 +56,7 @@ export const ChatHistoryView: React.FC<ChatHistoryViewProps> = ({ onSessionSelec
     <div className="w-full md:max-w-4xl mx-auto space-y-6 px-4">
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
         <h3 className="text-base font-medium text-text-on-light-muted" style={{ fontFamily: 'var(--font-primary-arabic)' }}>
-          {`${t('chat.historyTitle')} (${sessions?.length || 0})`}
+          {t('chat.historyTitle')} ({sessions?.length || 0})
         </h3>
         <div className="flex items-center gap-3 w-full sm:w-auto">
           <div className="relative flex-grow sm:flex-grow-0">
@@ -77,8 +78,8 @@ export const ChatHistoryView: React.FC<ChatHistoryViewProps> = ({ onSessionSelec
               </div>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="latest">الأحدث</SelectItem>
-              <SelectItem value="oldest">الأقدم</SelectItem>
+              <SelectItem value="latest">{t('admin.feedback.desc')}</SelectItem>
+              <SelectItem value="oldest">{t('admin.feedback.asc')}</SelectItem>
             </SelectContent>
           </Select>
         </div>

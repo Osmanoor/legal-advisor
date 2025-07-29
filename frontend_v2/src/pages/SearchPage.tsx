@@ -1,10 +1,11 @@
 // src/pages/SearchPage.tsx
+// Updated for i18n
 
 import { useState } from 'react';
+import { useLanguage } from '@/hooks/useLanguage';
 import { useSearch } from '@/hooks/api/useSearch';
 import { SearchResults } from '@/features/search/components/SearchResults';
 import { ResourceType } from '@/types';
-import { useLanguage } from '@/hooks/useLanguage';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import LoadingSpinner from '@/components/ui/loading-spinner';
@@ -18,22 +19,15 @@ export default function SearchPage() {
   
   const {
     data: results,
-    isLoading,
     isError,
     error,
     refetch,
-    isFetching, // Use isFetching for the loading state to handle refetches
+    isFetching,
   } = useSearch(searchParams.query, searchParams.type);
 
-  // This handler is passed to the SearchTopBar.
-  // It updates the state and triggers a refetch.
   const handleSearch = (newQuery: string, newType: ResourceType) => {
-    // We update the state, which will be passed to the useSearch hook.
-    // The refetch is triggered because the query key of useSearch will change.
-    // However, calling refetch() explicitly ensures it runs immediately.
     setSearchParams({ query: newQuery, type: newType });
     trackEvent({ event: 'search', search_term: newQuery });
-    // We need to use a timeout to allow React to update the state before refetching
     setTimeout(() => {
         refetch();
     }, 0);
@@ -67,8 +61,8 @@ export default function SearchPage() {
             </div>
           ) : (
             <div className="text-center py-20 text-gray-400">
-              <h3 className="text-lg font-semibold">Start a Search</h3>
-              <p>Enter a query in the bar above to find relevant articles.</p>
+              <h3 className="text-lg font-semibold">{t('search.startSearchPrompt.title')}</h3>
+              <p>{t('search.startSearchPrompt.description')}</p>
             </div>
           )}
         </div>

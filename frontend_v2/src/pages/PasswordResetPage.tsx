@@ -1,4 +1,5 @@
 // src/pages/PasswordResetPage.tsx
+// No changes needed, provided for completeness.
 
 import React from 'react';
 import { AuthLayout } from '@/components/layouts/AuthLayout';

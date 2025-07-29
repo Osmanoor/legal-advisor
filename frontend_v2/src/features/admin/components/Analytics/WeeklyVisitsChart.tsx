@@ -1,20 +1,22 @@
-// File: src/features/admin/components/Analytics/WeeklyVisitsChart.tsx
-// @new
+// src/features/admin/components/Analytics/WeeklyVisitsChart.tsx
+// Updated for i18n
 
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { AdminAnalyticsData } from '@/hooks/api/useAdminAnalytics';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface WeeklyVisitsChartProps {
   data: AdminAnalyticsData['weeklyVisits'];
 }
 
 export const WeeklyVisitsChart: React.FC<WeeklyVisitsChartProps> = ({ data }) => {
+  const { t } = useLanguage();
   return (
     <Card>
       <CardHeader>
-        <CardTitle>الزيارات الاسبوعية</CardTitle>
+        <CardTitle>{t('admin.analytics.weeklyVisits')}</CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>

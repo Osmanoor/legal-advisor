@@ -1,10 +1,11 @@
 // src/features/tenderMapping/components/TenderReportTabs.tsx
+// Updated for i18n
+
 import React from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { TenderCalculationResult, TenderDetail } from '@/types/tenderMapping';
 
-// Import tab content components
 import { ReportDetailsTab } from './ReportDetailsTab';
 import { ReportTimelineTab } from './ReportTimelineTab';
 import { ReportRegulationsTab } from './ReportRegulationsTab';
@@ -15,7 +16,6 @@ interface TenderReportTabsProps {
 }
 
 export const TenderReportTabs: React.FC<TenderReportTabsProps> = ({ result, onResultUpdate }) => {
-  // --- FIX: Added useLanguage hook to define 't' and 'direction' ---
   const { t, direction } = useLanguage();
 
   const tabsData = [
@@ -31,7 +31,7 @@ export const TenderReportTabs: React.FC<TenderReportTabsProps> = ({ result, onRe
       { key: 'offerSubmission', label: t('tenderMapping.results.offerSubmission'), value: apiResult.file_structure || 'غير محدد', icon: 'Archive' },
       { key: 'offerDuration', label: t('tenderMapping.results.offerDuration'), value: `${apiResult.review_period} أيام`, icon: 'Clock' },
       { key: 'exeedApproval', label: t('tenderMapping.results.exeedApproval'), value: apiResult.performance_guarantee?.toString() || 'غير محدد', icon: 'CheckSquare' },
-      { key: 'financeApproval', label: t('tenderMapping.results.financeApproval'), value: 'غير مطلوبة', icon: 'ShieldCheck' }, // Placeholder
+      { key: 'financeApproval', label: t('tenderMapping.results.financeApproval'), value: 'غير مطلوبة', icon: 'ShieldCheck' },
       { key: 'totalDuration', label: t('tenderMapping.results.totalDuration'), value: `${apiResult.total_duration} يوم`, icon: 'CalendarDays' },
       { key: 'localContentMechanism', label: t('tenderMapping.results.localContentMechanism'), value: apiResult.sme_priority || 'غير محدد', icon: 'Building' },
     ];
@@ -43,7 +43,7 @@ export const TenderReportTabs: React.FC<TenderReportTabsProps> = ({ result, onRe
     <div className="w-full">
       <div className={`text-center mb-6 ${direction === 'rtl' ? 'text-right' : 'text-left'}`} >
         <h2 className="text-2xl font-medium text-text-on-light-strong" style={{ fontFamily: 'var(--font-primary-arabic)' }}>
-          {t('tenderMapping.results.title')}
+          {t('tenderMapping.results.reportTitle')}
         </h2>
         <p className="text-sm text-text-on-light-muted mt-1">
           {t('tenderMapping.inputs.description')}
@@ -55,9 +55,8 @@ export const TenderReportTabs: React.FC<TenderReportTabsProps> = ({ result, onRe
           {tabsData.map(tab => (
             <TabsTrigger key={tab.value} value={tab.value}>
               <h2 className="text-10px" >
-          {t(tab.labelKey)}
-        </h2>
-              
+                {t(tab.labelKey)}
+              </h2>
             </TabsTrigger>
           ))}
         </TabsList>

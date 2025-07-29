@@ -1,6 +1,8 @@
 // src/features/calculator/components/CompetitorInput.tsx
+// Updated for i18n
 
 import React from 'react';
+import { useLanguage } from '@/hooks/useLanguage';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -13,7 +15,7 @@ interface CompetitorInputProps {
   index: number;
   onUpdate: (id: number, field: keyof Omit<Competitor, 'id'>, value: string) => void;
   onRemove: (id: number) => void;
-  isFirst: boolean; // To conditionally show the remove button
+  isFirst: boolean;
   separatorLabel: string;
 }
 
@@ -26,18 +28,19 @@ const FormSeparatorWithLabel = ({ label }: { label: string }) => (
 );
 
 export const CompetitorInput: React.FC<CompetitorInputProps> = ({ competitor, index, onUpdate, onRemove, isFirst, separatorLabel }) => {
+  const { t } = useLanguage();
   return (
     <div className="space-y-4">
       {!isFirst && <FormSeparatorWithLabel label={separatorLabel} />}
 
       <div className="flex items-end gap-4">
         <div className={cn("flex-1 space-y-2 text-right", !isFirst && "w-[calc(100%-44px)]")}>
-          <Label htmlFor={`name-${competitor.id}`}>أسم المنافس</Label>
+          <Label htmlFor={`name-${competitor.id}`}>{t('calculator.weighted.competitorName')}</Label>
           <Input 
             id={`name-${competitor.id}`} 
             value={competitor.name} 
             onChange={(e) => onUpdate(competitor.id, 'name', e.target.value)}
-            placeholder="اكتب أسم المنافس"
+            placeholder={t('calculator.weighted.competitorPlaceholder')}
           />
         </div>
         {!isFirst && (
@@ -49,23 +52,23 @@ export const CompetitorInput: React.FC<CompetitorInputProps> = ({ competitor, in
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2 text-right">
-          <Label htmlFor={`tech-score-${competitor.id}`}>التقييم الفني</Label>
+          <Label htmlFor={`tech-score-${competitor.id}`}>{t('calculator.weighted.technicalScore')}</Label>
           <Input 
             id={`tech-score-${competitor.id}`} 
             type="number"
             value={competitor.technicalScore} 
             onChange={(e) => onUpdate(competitor.id, 'technicalScore', e.target.value)}
-            placeholder="أدخل الرقم"
+            placeholder={t('calculator.weighted.scorePlaceholder')}
           />
         </div>
         <div className="space-y-2 text-right">
-          <Label htmlFor={`finance-offer-${competitor.id}`}>العرض المالي (بالريال)</Label>
+          <Label htmlFor={`finance-offer-${competitor.id}`}>{t('calculator.weighted.financialOffer')}</Label>
           <Input 
             id={`finance-offer-${competitor.id}`} 
             type="number"
             value={competitor.financialOffer} 
             onChange={(e) => onUpdate(competitor.id, 'financialOffer', e.target.value)}
-            placeholder="أدخل الرقم"
+            placeholder={t('calculator.weighted.offerPlaceholder')}
           />
         </div>
       </div>

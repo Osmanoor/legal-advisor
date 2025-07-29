@@ -1,4 +1,5 @@
 // src/components/dashboard/DashboardHeader.tsx
+// Updated for i18n
 
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -29,14 +30,13 @@ export const DashboardHeader = () => {
   const { isDesktop } = useBreakpoint();
   const [isMobileSearchVisible, setMobileSearchVisible] = useState(false);
 
-  // Get authentication state
   const { user, logout, isAuthenticated } = useAuthStore();
   
   const canAccessAdmin = user?.permissions.some(p => ADMIN_PAGE_PERMISSIONS.includes(p));
 
   const handleLogout = async () => {
     await logout();
-    navigate('/login'); // Redirect to login after logout
+    navigate('/login');
   };
 
   const showDefaultMobileHeader = !isDesktop && !isMobileSearchVisible;
@@ -59,19 +59,19 @@ export const DashboardHeader = () => {
           <div className="space-y-1">
             <Link to="/settings" className="flex items-center gap-2 w-full p-2 rounded-md text-sm hover:bg-gray-100">
               <UserIcon className="w-4 h-4" />
-              <span>Profile</span>
+              <span>{t('dashboard.header.profile')}</span>
             </Link>
             
             {canAccessAdmin && (
               <Link to="/admin" className="flex items-center gap-2 w-full p-2 rounded-md text-sm hover:bg-gray-100 text-cta font-medium">
                 <Shield className="w-4 h-4" />
-                <span>Admin Dashboard</span>
+                <span>{t('dashboard.header.adminDashboard')}</span>
               </Link>
             )}
 
             <button onClick={handleLogout} className="flex items-center gap-2 w-full p-2 rounded-md text-sm hover:bg-red-50 text-red-600">
               <LogOut className="w-4 h-4" />
-              <span>Logout</span>
+              <span>{t('dashboard.header.logout')}</span>
             </button>
           </div>
         </div>
@@ -83,7 +83,7 @@ export const DashboardHeader = () => {
     <Button asChild>
       <Link to="/login">
         <LogIn className="mr-2 h-4 w-4" />
-        Login
+        {t('dashboard.header.login')}
       </Link>
     </Button>
   );
@@ -105,7 +105,7 @@ export const DashboardHeader = () => {
             </Button>
             <Input
               type="text"
-              placeholder={t('common.search') + "..."}
+              placeholder={`${t('common.search')}...`}
               className="h-[34px] flex-grow bg-gray-100 border-gray-300 focus:ring-1 focus:ring-cta"
               dir={direction}
               style={{ fontFamily: 'var(--font-primary-latin)' }}
@@ -119,14 +119,12 @@ export const DashboardHeader = () => {
         <div className={cn("flex items-center gap-3", direction === 'rtl' ? 'mr-auto' : 'ml-auto')}>
           {isDesktop && (
             <div className={`flex items-center gap-3 ${direction === 'rtl' ? 'flex-row-reverse' : ''}`}>
-              {/* --- CONDITIONAL RENDERING --- */}
               {isAuthenticated ? <UserProfileDropdown /> : <GuestActions />}
-              {/* --- END CONDITIONAL RENDERING --- */}
               <div className={`flex items-center border border-gray-300 rounded-md px-3 h-[34px] w-[240px]`}>
                 <Search className={`w-5 h-5 text-gray-500 ${direction === 'rtl' ? 'ml-3' : 'mr-3'}`} />
                 <Input
                   type="text"
-                  placeholder={t('common.search') + "..."}
+                  placeholder={`${t('common.search')}...`}
                   className="border-none focus:ring-0 h-full p-0 text-sm placeholder-gray-400 flex-grow bg-transparent"
                   dir={direction}
                   style={{ fontFamily: 'var(--font-primary-latin)' }}
@@ -140,9 +138,7 @@ export const DashboardHeader = () => {
                 <Button variant="ghost" size="icon" onClick={() => setMobileSearchVisible(true)}>
                   <Search className="w-5 h-5 text-gray-600" />
                 </Button>
-                {/* --- CONDITIONAL RENDERING (MOBILE) --- */}
                 {isAuthenticated ? <UserProfileDropdown /> : <GuestActions />}
-                {/* --- END CONDITIONAL RENDERING (MOBILE) --- */}
               </div>
           )}
         </div>

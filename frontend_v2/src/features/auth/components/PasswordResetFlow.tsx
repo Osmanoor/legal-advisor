@@ -1,17 +1,20 @@
 // src/features/auth/components/PasswordResetFlow.tsx
+// Updated for i18n
 
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLanguage } from '@/hooks/useLanguage';
 import { Step1_RequestReset } from './Step1_RequestReset';
 import { Step2_VerifyResetCode } from './Step2_VerifyResetCode';
-import { Step3_SetNewPassword } from './Step3_SetNewPassword'; // Import the real component
+import { Step3_SetNewPassword } from './Step3_SetNewPassword';
 
 export const PasswordResetFlow: React.FC = () => {
-  const navigate = useNavigate(); // Hook for navigation
+  const { t } = useLanguage();
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [identifier, setIdentifier] = useState('');
-  const [verifiedCode, setVerifiedCode] = useState(''); // Stores the code from step 2
+  const [verifiedCode, setVerifiedCode] = useState('');
 
   const handleStep1Success = (userIdentifier: string) => {
     setIdentifier(userIdentifier);
@@ -24,7 +27,6 @@ export const PasswordResetFlow: React.FC = () => {
   };
 
   const handleFlowComplete = () => {
-    // Navigate the user back to the login page after success
     navigate('/login');
   };
 
@@ -56,7 +58,7 @@ export const PasswordResetFlow: React.FC = () => {
       
       <div className="mt-6 text-center">
         <Link to="/login" className="text-sm text-gray-600 hover:text-cta">
-          ‚Üê Back to Login
+          ‚Üê {t('auth.backToLogin')}
         </Link>
       </div>
     </div>

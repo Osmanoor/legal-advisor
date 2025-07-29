@@ -1,29 +1,30 @@
 // src/features/admin/components/ContactsTable.tsx
+// Updated for i18n
 
 import React from 'react';
+import { useLanguage } from '@/hooks/useLanguage';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'; // Using Popover for actions
-import { MoreHorizontal, Check, Archive, Mail } from 'lucide-react';
+import { MoreHorizontal } from 'lucide-react';
 import { ContactSubmission } from '@/hooks/api/useAdminContacts';
-import { cn } from '@/lib/utils';
 
 interface ContactsTableProps {
   contacts: ContactSubmission[];
-  onViewDetails: (submission: ContactSubmission) => void; // Prop to open the dialog
+  onViewDetails: (submission: ContactSubmission) => void;
 }
 
 export const ContactsTable: React.FC<ContactsTableProps> = ({ contacts, onViewDetails }) => {
-  
+  const { t } = useLanguage();
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'new':
-        return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200">New</Badge>;
+        return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200">{t('admin.contact.statuses.new')}</Badge>;
       case 'read':
-        return <Badge variant="secondary">Read</Badge>;
+        return <Badge variant="secondary">{t('admin.contact.statuses.read')}</Badge>;
       case 'archived':
-        return <Badge variant="outline">Archived</Badge>;
+        return <Badge variant="outline">{t('admin.contact.statuses.archived')}</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -34,12 +35,12 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({ contacts, onViewDe
       <Table>
         <TableHeader className="bg-gray-50">
           <TableRow>
-            <TableHead className="text-right">الاسم</TableHead>
-            <TableHead className="text-right">البريد الإلكتروني</TableHead>
-            <TableHead className="text-right">الرسالة (معاينة)</TableHead>
-            <TableHead className="text-right">الحالة</TableHead>
-            <TableHead className="text-right">تاريخ الإرسال</TableHead>
-            <TableHead className="text-center">الإجراءات</TableHead>
+            <TableHead className="text-right">{t('admin.contact.table.name')}</TableHead>
+            <TableHead className="text-right">{t('admin.contact.table.email')}</TableHead>
+            <TableHead className="text-right">{t('admin.contact.table.messagePreview')}</TableHead>
+            <TableHead className="text-right">{t('admin.contact.table.status')}</TableHead>
+            <TableHead className="text-right">{t('admin.contact.table.submittedAt')}</TableHead>
+            <TableHead className="text-center">{t('admin.contact.table.actions')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

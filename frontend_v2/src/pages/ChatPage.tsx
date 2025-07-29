@@ -1,3 +1,6 @@
+// src/pages/ChatPage.tsx
+// Updated for i18n
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -48,13 +51,12 @@ export default function ChatPage() {
 
   const handleStartChat = (message: string, options: ChatOptions) => {
     setView("activeChat");
-    
     startNewChatMutation.mutate({ message, options }, {
         onSuccess: (newSessionData) => {
             setActiveSessionId(newSessionData.id);
         },
         onError: () => {
-          showToast("Failed to start a new chat session.", "error");
+          showToast(t('chat.errorMessages.failed'), "error");
           setView("welcome");
         }
     });
@@ -94,11 +96,11 @@ export default function ChatPage() {
     if (!activeSessionId) return;
     deleteSessionMutation.mutate(activeSessionId, {
         onSuccess: () => {
-            showToast("Chat session deleted.", "success");
+            showToast(t('common.success'), "success");
             handleCreateNew();
         },
         onError: (error) => {
-             showToast(`Failed to delete session: ${error.message}`, "error");
+             showToast(`${t('common.error')}: ${error.message}`, "error");
         }
     })
   }
@@ -112,15 +114,12 @@ export default function ChatPage() {
     if (view === "activeChat") {
       const activeSessionTitle = sessionsQuery.data?.find(s => s.id === activeSessionId)?.title 
         || startNewChatMutation.variables?.message
-        || "New Chat...";
+        || t('chat.newChat');
       
       const isLoading = startNewChatMutation.isPending || (activeSessionId && messagesQuery.isLoading);
 
       return (
         <div className="h-full w-full relative overflow-hidden">
-          {/* --- DEFINITIVE FIX: Positioned inside the container and resized --- */}
-          {/* <div className="absolute z-0 w-[50%] h-[50%] left-1/2 -translate-y-[-70%] bottom-0px bg-cta rounded-full filter blur-[100px] pointer-events-none"></div> */}
-
           <div className="relative z-10 flex flex-col h-full">
             <div className="flex justify-between items-center py-4 border-b border-border-default shrink-0 px-4 md:px-6 bg-background-body/80 backdrop-blur-sm">
               <p className="text-sm w-48 sm:w-auto md:text-base font-medium text-text-on-light-body truncate overflow-hidden">
@@ -129,7 +128,7 @@ export default function ChatPage() {
               <div className="flex items-center gap-2 md:gap-4 shrink-0">
                 <Button size="sm" className="bg-cta hover:bg-cta-hover h-8 gap-1 px-2 md:px-4 text-xs" onClick={handleCreateNew}>
                   <Plus size={12} />
-                  <span className="hidden md:inline">New Chat</span>
+                  <span className="hidden md:inline">{t('chat.newChat')}</span>
                 </Button>
                 <ConfirmationDialog
                     trigger={
@@ -137,10 +136,10 @@ export default function ChatPage() {
                             <Trash2 size={16} />
                         </Button>
                     }
-                    title="Delete Chat Session"
-                    description={`Are you sure you want to permanently delete "${activeSessionTitle}"?`}
+                    title={t('chat.deleteSessionTitle')}
+                    description={t('chat.deleteSessionDescription', { title: activeSessionTitle })}
                     onConfirm={handleDeleteActiveSession}
-                    confirmText="Yes, Delete"
+                    confirmText={t('chat.deleteConfirm')}
                     isConfirming={deleteSessionMutation.isPending}
                 />
                 <Button variant="ghost" size="icon" className="text-text-on-light-muted h-8 w-8" onClick={() => setIsHistoryPanelOpen(true)}>

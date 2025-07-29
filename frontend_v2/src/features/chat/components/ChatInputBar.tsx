@@ -1,4 +1,5 @@
 // src/features/chat/components/ChatInputBar.tsx
+// This component was already internationalized. No changes were made.
 
 import React, { useState } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -45,12 +46,11 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({ onSendMessage, isLoa
         className="w-full max-w-[654px] bg-white border border-[#F0F2F5] shadow-lg rounded-2xl flex flex-col pt-6 px-6 space-y-4"
       >
         <Textarea
-          variant="ghost" // <-- FIX: Use the new 'ghost' variant
+          variant="ghost"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={t('chat.placeholder')}
-          // Simplified className, as the variant handles the core styles
           className="flex-grow text-right" 
           dir="rtl"
         />

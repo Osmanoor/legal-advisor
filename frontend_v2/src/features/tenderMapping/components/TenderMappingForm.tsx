@@ -1,4 +1,5 @@
-// File: src/features/tenderMapping/components/TenderMappingForm.tsx
+// src/features/tenderMapping/components/TenderMappingForm.tsx
+// Updated for i18n
 
 import React, { useState } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -9,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import DatePicker, { DateObject } from "react-multi-date-picker";
 import gregorian from "react-date-object/calendars/gregorian";
 import gregorian_en from "react-date-object/locales/gregorian_en";
-import '../../calculator/components/DatePicker.css'; // Reuse styles
+import '../../calculator/components/DatePicker.css';
 
 interface WorkType {
   id: string;
@@ -66,7 +67,7 @@ export function TenderMappingForm({ workTypes, isLoading, onSubmit, onReset }: T
     <div className="w-full" dir={direction}>
        <div className={`mb-6 ${direction === 'rtl' ? 'text-right' : 'text-left'}'}`}>
         <h2 className="text-2xl font-medium text-text-on-light-strong" style={{ fontFamily: 'var(--font-primary-arabic)' }}>
-          {t('tenderMapping.inputs.title')}
+          {t('tenderMapping.form.title')}
         </h2>
         <p className="text-sm text-text-on-light-muted mt-1">
           {t('tenderMapping.inputs.description')}
@@ -76,9 +77,9 @@ export function TenderMappingForm({ workTypes, isLoading, onSubmit, onReset }: T
         <form onSubmit={handleFormSubmit} className="space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
             <div className="space-y-2 text-right">
-              <Label htmlFor="work_type">{t('tenderMapping.inputs.workType')}</Label>
+              <Label htmlFor="work_type">{t('tenderMapping.form.workType')}</Label>
               <Select dir={direction} value={formValues.work_type} onValueChange={(val) => handleValueChange('work_type', val)}>
-                <SelectTrigger id="work_type" className="h-10 text-right"><SelectValue placeholder={t('tenderMapping.inputs.workTypePlaceholder')} /></SelectTrigger>
+                <SelectTrigger id="work_type" className="h-10 text-right"><SelectValue placeholder={t('tenderMapping.form.selectWorkType')} /></SelectTrigger>
                 <SelectContent>
                   {workTypes.map(type => (
                     <SelectItem 
@@ -93,15 +94,15 @@ export function TenderMappingForm({ workTypes, isLoading, onSubmit, onReset }: T
               </Select>
             </div>
             <div className="space-y-2 text-right">
-              <Label htmlFor="budget">{t('tenderMapping.inputs.budget')}</Label>
-              <Input id="budget" type="number" value={formValues.budget} onChange={e => handleValueChange('budget', e.target.value)} placeholder={t('tenderMapping.inputs.budgetPlaceholder')} />
+              <Label htmlFor="budget">{t('tenderMapping.form.budget')}</Label>
+              <Input id="budget" type="number" value={formValues.budget} onChange={e => handleValueChange('budget', e.target.value)} placeholder={t('tenderMapping.form.enterBudget')} />
             </div>
             <div className="space-y-2 text-right">
-              <Label htmlFor="project_duration">{t('tenderMapping.inputs.projectDuration')}</Label>
-              <Input id="project_duration" type="number" value={formValues.project_duration} onChange={e => handleValueChange('project_duration', e.target.value)} placeholder={t('tenderMapping.inputs.projectDurationPlaceholder')} />
+              <Label htmlFor="project_duration">{t('tenderMapping.form.projectDuration')}</Label>
+              <Input id="project_duration" type="number" value={formValues.project_duration} onChange={e => handleValueChange('project_duration', e.target.value)} placeholder={t('tenderMapping.form.enterDuration')} />
             </div>
             <div className="space-y-2 text-right">
-              <Label htmlFor="start_date">{t('tenderMapping.inputs.startDate')}</Label>
+              <Label htmlFor="start_date">{t('tenderMapping.form.startDate')}</Label>
               <DatePicker
                 id="start_date"
                 value={formValues.start_date}
@@ -113,7 +114,7 @@ export function TenderMappingForm({ workTypes, isLoading, onSubmit, onReset }: T
               />
             </div>
           </div>
-          <Button type="submit" disabled={!isFormValid || isLoading} className="w-full h-11 text-base bg-cta">{t('tenderMapping.inputs.submit')}</Button>
+          <Button type="submit" disabled={!isFormValid || isLoading} className="w-full h-11 text-base bg-cta">{t('common.submit')}</Button>
         </form>
       </div>
     </div>

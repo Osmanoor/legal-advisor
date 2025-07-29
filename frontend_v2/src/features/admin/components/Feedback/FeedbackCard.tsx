@@ -1,3 +1,6 @@
+// src/features/admin/components/Feedback/FeedbackCard.tsx
+// Updated for i18n
+
 import React, { useState } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { Feedback, FeedbackUpdatePayload } from '@/hooks/api/useAdminFeedback';
@@ -31,7 +34,7 @@ const SettingDisplay = ({ icon, label, isEnabled }: { icon: React.ElementType, l
 );
 
 export const FeedbackCard: React.FC<FeedbackCardProps> = ({ item, onUpdate, isUpdating }) => {
-  const { direction } = useLanguage();
+  const { t, direction } = useLanguage();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleUpdate = (payload: FeedbackUpdatePayload) => {
@@ -63,9 +66,9 @@ export const FeedbackCard: React.FC<FeedbackCardProps> = ({ item, onUpdate, isUp
                 <span>{new Date(item.submitted_at).toLocaleDateString()}</span>
               </div>
               <div className="flex items-center gap-2">
-                {item.is_approved && <Badge className="bg-green-100 text-green-700">Approved</Badge>}
-                {item.is_archived && <Badge variant="outline">Archived</Badge>}
-                {!item.is_approved && !item.is_archived && <Badge variant="secondary" className="bg-blue-100 text-blue-700">Pending</Badge>}
+                {item.is_approved && <Badge className="bg-green-100 text-green-700">{t('admin.feedback.card.approved')}</Badge>}
+                {item.is_archived && <Badge variant="outline">{t('admin.feedback.card.archived')}</Badge>}
+                {!item.is_approved && !item.is_archived && <Badge variant="secondary" className="bg-blue-100 text-blue-700">{t('admin.feedback.card.pending')}</Badge>}
               </div>
                <StarRatingDisplay rating={item.rating} />
             </div>
@@ -73,9 +76,8 @@ export const FeedbackCard: React.FC<FeedbackCardProps> = ({ item, onUpdate, isUp
         </CardContent>
       </Card>
       
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen} >
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent className="sm:max-w-lg p-6" dir={direction}>
-              {/* Custom Header */}
               <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-3">
                     <img src={item.user_profile_picture_url || '/images/avatars/avatar1.png'} alt={item.user_name} className="w-10 h-10 rounded-full object-cover" />
@@ -86,7 +88,6 @@ export const FeedbackCard: React.FC<FeedbackCardProps> = ({ item, onUpdate, isUp
                 <DialogClose />
               </div>
 
-              {/* Rating and Date Row */}
               <div className="flex justify-between items-center mb-4">
                  <StarRatingDisplay rating={item.rating} />
                  <div className="flex items-center gap-1 text-xs text-gray-500">
@@ -95,35 +96,32 @@ export const FeedbackCard: React.FC<FeedbackCardProps> = ({ item, onUpdate, isUp
                  </div>
               </div>
 
-              {/* Comment */}
               <div className="py-4">
-                <p className="text-sm text-gray-700 text-right">{item.comment || "لا يوجد تعليق."}</p>
+                <p className="text-sm text-gray-700 text-right">{item.comment || t('admin.feedback.dialog.noComment')}</p>
               </div>
 
-              {/* Separator */}
               <Separator className="my-4" />
 
-              {/* Settings */}
               <div>
-                  <h4 className="font-semibold text-right mb-3">إعدادات العرض التي اختارها المستخدم:</h4>
+                  <h4 className="font-semibold text-right mb-3">{t('admin.feedback.dialog.userDisplaySettings')}</h4>
                   <div className="grid grid-cols-2 gap-2 text-right">
-                      <SettingDisplay icon={User} label="إظهار الاسم" isEnabled={item.preview_settings.show_name} />
-                      <SettingDisplay icon={Briefcase} label="إظهار المسمى الوظيفي" isEnabled={item.preview_settings.show_job_title} />
-                      <SettingDisplay icon={ImageIcon} label="إظهار صورة الملف الشخصي" isEnabled={item.preview_settings.show_profile_picture} />
-                      <SettingDisplay icon={Building} label="إظهار جهة العمل" isEnabled={item.preview_settings.show_workplace} />
+                      <SettingDisplay icon={User} label={t('admin.feedback.dialog.showName')} isEnabled={item.preview_settings.show_name} />
+                      <SettingDisplay icon={Briefcase} label={t('admin.feedback.dialog.showJobTitle')} isEnabled={item.preview_settings.show_job_title} />
+                      <SettingDisplay icon={ImageIcon} label={t('admin.feedback.dialog.showProfilePicture')} isEnabled={item.preview_settings.show_profile_picture} />
+                      <SettingDisplay icon={Building} label={t('admin.feedback.dialog.showWorkplace')} isEnabled={item.preview_settings.show_workplace} />
                   </div>
               </div>
               
-              <DialogFooter className="pt-6 flex-col-reverse sm:flex-row  gap-2">
+              <DialogFooter className="pt-6 flex-col-reverse sm:flex-row sm:justify-between gap-2">
                   <div className="flex gap-2">
                     {!item.is_archived && (
                         <Button variant="outline" onClick={() => handleUpdate({ is_archived: true })} disabled={isUpdating}>
-                            <Archive className="ml-2 h-4 w-4"/> أرشفة
+                            <Archive className="ml-2 h-4 w-4"/> {t('admin.feedback.dialog.archive')}
                         </Button>
                     )}
                     {(item.is_approved || item.is_archived) && (
                          <Button variant="ghost" onClick={() => handleUpdate({ is_approved: false, is_archived: false })} disabled={isUpdating}>
-                            <RotateCcw className="ml-2 h-4 w-4"/> نقل إلى قيد المراجعة
+                            <RotateCcw className="ml-2 h-4 w-4"/> {t('admin.feedback.dialog.moveToPending')}
                          </Button>
                     )}
                   </div>
@@ -132,7 +130,7 @@ export const FeedbackCard: React.FC<FeedbackCardProps> = ({ item, onUpdate, isUp
                     {!item.is_approved && (
                         <Button className="bg-green-600 hover:bg-green-700" onClick={() => handleUpdate({ is_approved: true })} disabled={isUpdating}>
                             {isUpdating ? <LoadingSpinner size="sm" /> : <CheckCircle className="ml-2 h-4 w-4"/>}
-                            موافقة
+                            {t('admin.feedback.dialog.approve')}
                         </Button>
                     )}
                   </div>

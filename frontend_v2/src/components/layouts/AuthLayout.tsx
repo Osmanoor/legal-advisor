@@ -1,4 +1,6 @@
-// File: src/components/layouts/AuthLayout.tsx
+// src/components/layouts/AuthLayout.tsx
+// Updated for i18n
+
 import React from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
 import NewLogoDark from '@/assets/logo-new-dark-name.svg';
@@ -16,7 +18,6 @@ export function AuthLayout({ children }: AuthLayoutProps) {
 
   return (
     <div className="w-full flex flex-col lg:flex-row">
-      {/* Right Pane (Form Area) */}
       <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-6 md:p-12 order-1 lg:order-1 min-h-screen">
         <div className="w-full max-w-md">
           <div className="flex justify-center lg:justify-start mb-8">
@@ -26,9 +27,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
         </div>
       </div>
 
-      {/* Left Pane (Visual Area) */}
       <div className="relative hidden lg:flex lg:h-screen sticky top-0 w-1/2 bg-[#51B749] items-start justify-center p-12 order-2 lg:order-2 overflow-hidden">
-        {/* Background Image */}
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-30"
           style={{ 
@@ -38,7 +37,6 @@ export function AuthLayout({ children }: AuthLayoutProps) {
           }}
         />
         
-        {/* Glowing Ellipse */}
         <div 
           className="absolute w-[572.54px] h-[572.54px] rounded-full"
           style={{
@@ -49,7 +47,6 @@ export function AuthLayout({ children }: AuthLayoutProps) {
           }}
         />
         
-        {/* Vector Left */}
         <div 
           className="absolute"
           style={{
@@ -67,7 +64,6 @@ export function AuthLayout({ children }: AuthLayoutProps) {
           }}
         />
         
-        {/* Vector Right */}
         <div 
           className="absolute"
           style={{
@@ -86,7 +82,6 @@ export function AuthLayout({ children }: AuthLayoutProps) {
           }}
         />
         
-        {/* Content Container */}
         <div className="relative z-10 text-center text-white w-full max-w-lg ">
           <h1 className="text-lg font-bold leading-tight" style={{ fontFamily: 'var(--font-primary-arabic)'}}>
             {t('auth.slogan.title')}

@@ -1,4 +1,5 @@
-// File: src/features/admin/components/Users/UserEditDialog.tsx
+// src/features/admin/components/Users/UserEditDialog.tsx
+// Updated for i18n
 
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -34,7 +35,7 @@ const FormSeparatorWithLabel = ({ label }: { label: string }) => (
 
 
 export const UserEditDialog: React.FC<UserEditDialogProps> = ({ userId, isOpen, onClose }) => {
-  const { direction } = useLanguage();
+  const { t } = useLanguage();
   const { updateUserMutation, deleteUserMutation } = useAdminUsers();
   const { data: user, isLoading: isLoadingUser, error: userError } = useAdminUser(userId);
   const { data: rolesAndPerms, isLoading: isLoadingRoles } = useAdminRolesAndPermissions();
@@ -65,13 +66,8 @@ export const UserEditDialog: React.FC<UserEditDialogProps> = ({ userId, isOpen, 
     
     const payload: UserUpdatePayload = {};
     
-    if (status !== user.status) {
-      payload.status = status;
-    }
-    
-    if (roleId !== user.roles[0]?.id) {
-        payload.role_ids = roleId ? [roleId] : [];
-    }
+    if (status !== user.status) payload.status = status;
+    if (roleId !== user.roles[0]?.id) payload.role_ids = roleId ? [roleId] : [];
     
     payload.permission_overrides = Object.entries(overrides)
       .filter(([, state]) => state !== null)
@@ -80,19 +76,19 @@ export const UserEditDialog: React.FC<UserEditDialogProps> = ({ userId, isOpen, 
         override_type: state as 'ALLOW' | 'DENY',
       }));
 
-    if (Object.keys(payload).length === 0 && JSON.stringify(payload.permission_overrides) === JSON.stringify(user.permission_overrides)) {
-      showToast("No changes to save.", "info");
+    if (Object.keys(payload).length === 1 && 'permission_overrides' in payload && JSON.stringify(payload.permission_overrides) === JSON.stringify(user.permission_overrides.map(o => ({ permission_id: o.permission_id, override_type: o.override_type })))) {
+      showToast(t('common.success'), "info");
       onClose();
       return;
     }
 
     updateUserMutation.mutate({ userId: user.id, payload }, {
       onSuccess: () => {
-        showToast('User updated successfully', 'success');
+        showToast(t('common.success'), 'success');
         onClose();
       },
       onError: (e) => {
-        showToast(`Failed to update user: ${(e as Error).message}`, 'error');
+        showToast(`${t('common.error')}: ${(e as Error).message}`, 'error');
       }
     });
   };
@@ -101,11 +97,11 @@ export const UserEditDialog: React.FC<UserEditDialogProps> = ({ userId, isOpen, 
     if (!user) return;
     deleteUserMutation.mutate(user.id, {
       onSuccess: () => {
-        showToast('User deleted successfully', 'success');
+        showToast(t('common.success'), 'success');
         onClose();
       },
       onError: (e) => {
-        showToast(`Failed to delete user: ${(e as Error).message}`, 'error');
+        showToast(`${t('common.error')}: ${(e as Error).message}`, 'error');
       }
     });
   };
@@ -116,12 +112,12 @@ export const UserEditDialog: React.FC<UserEditDialogProps> = ({ userId, isOpen, 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent showCloseButton={false} className="sm:max-w-3xl p-0 flex flex-col max-h-[90vh]" dir={direction}>
+      <DialogContent showCloseButton={false} className="sm:max-w-3xl p-0 flex flex-col max-h-[90vh]">
         {isLoading ? (
             <div className="flex justify-center items-center h-96"><LoadingSpinner /></div>
         ) : error ? (
             <div className="p-6">
-                <Alert variant="destructive"><AlertCircle className="h-4 w-4" /><AlertDescription>Could not load user data. {error.message}</AlertDescription></Alert>
+                <Alert variant="destructive"><AlertCircle className="h-4 w-4" /><AlertDescription>{t('common.error')}: {error.message}</AlertDescription></Alert>
             </div>
         ) : (
           user && rolesAndPerms && (
@@ -144,18 +140,18 @@ export const UserEditDialog: React.FC<UserEditDialogProps> = ({ userId, isOpen, 
                 <div className="px-6 py-4 space-y-6 overflow-y-auto flex-grow">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2 text-right">
-                            <Label htmlFor="status">حالة الحساب</Label>
-                            <Select value={status} dir={direction} onValueChange={(value) => setStatus(value as 'active' | 'suspended')}>
+                            <Label htmlFor="status">{t('admin.users.editDialog.accountStatus')}</Label>
+                            <Select value={status} onValueChange={(value) => setStatus(value as 'active' | 'suspended')}>
                                 <SelectTrigger id="status"><SelectValue /></SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="active">Active</SelectItem>
-                                    <SelectItem value="suspended">Suspended</SelectItem>
+                                    <SelectItem value="active">{t('admin.users.active')}</SelectItem>
+                                    <SelectItem value="suspended">{t('admin.users.suspended')}</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
                          <div className="space-y-2 text-right">
-                            <Label htmlFor="role">الدور</Label>
-                            <Select value={roleId?.toString()} dir={direction}  onValueChange={(value) => setRoleId(Number(value))}>
+                            <Label htmlFor="role">{t('admin.users.editDialog.role')}</Label>
+                            <Select value={roleId?.toString()} onValueChange={(value) => setRoleId(Number(value))}>
                                 <SelectTrigger id="role"><SelectValue /></SelectTrigger>
                                 <SelectContent>
                                     {rolesAndPerms.roles.map(role => (
@@ -166,10 +162,10 @@ export const UserEditDialog: React.FC<UserEditDialogProps> = ({ userId, isOpen, 
                         </div>
                     </div>
 
-                    <h2 className="text-lg font-semibold text-right pt-6">الصلاحيات</h2>
+                    <h2 className="text-lg font-semibold text-right pt-6">{t('admin.users.editDialog.permissions')}</h2>
 
                     <div>
-                        <FormSeparatorWithLabel label="صلاحيات المستخدم" />
+                        <FormSeparatorWithLabel label={t('admin.users.editDialog.userPermissions')} />
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-4">
                             {rolesAndPerms.all_permissions.user.map(p => (
                                 <PermissionToggle key={p.id} permission={p} state={overrides[p.id] || null} onChange={(s) => handleOverrideChange(p.id, s)} />
@@ -178,25 +174,27 @@ export const UserEditDialog: React.FC<UserEditDialogProps> = ({ userId, isOpen, 
                     </div>
 
                     <div>
-                        <FormSeparatorWithLabel label="صلاحيات المشرف" />
+                        <FormSeparatorWithLabel label={t('admin.users.editDialog.adminPermissions')} />
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-4">
                             {rolesAndPerms.all_permissions.admin.map(p => (
                                 <PermissionToggle key={p.id} permission={p} state={overrides[p.id] || null} onChange={(s) => handleOverrideChange(p.id, s)} isDisabled={!isUserAdmin} />
                             ))}
                         </div>
-                        {!isUserAdmin && <p className="text-xs text-gray-500 text-right mt-2">Admin permissions can only be assigned to users with the 'Admin' role.</p>}
+                        {!isUserAdmin && <p className="text-xs text-gray-500 text-right mt-2">{t('admin.users.editDialog.nonAdminNote')}</p>}
                     </div>
                 </div>
 
                 <DialogFooter className="p-6 gap-4 bg-gray-50 border-t flex justify-between shrink-0">
                     <ConfirmationDialog
-                        trigger={ <Button variant="danger" disabled={deleteUserMutation.isPending}><Trash2 className="mr-2 h-4 w-4" /> Delete User</Button> }
-                        title="Delete User" description={`This will permanently delete the account for ${user.fullName}.`}
+                        trigger={ <Button variant="danger" disabled={deleteUserMutation.isPending}><Trash2 className="mr-2 h-4 w-4" /> {t('admin.users.editDialog.deleteUser')}</Button> }
+                        title={t('admin.users.confirmDialog.title')}
+                        description={t('admin.users.confirmDialog.description', { name: user.fullName })}
                         onConfirm={handleDelete} isConfirming={deleteUserMutation.isPending}
+                        confirmText={t('admin.users.confirmDialog.confirm')}
                     />
                     <div className="flex gap-2">
                         <Button onClick={handleSave} disabled={updateUserMutation.isPending}>
-                        {updateUserMutation.isPending ? <LoadingSpinner size="sm"/> : 'Save Changes'}
+                        {updateUserMutation.isPending ? <LoadingSpinner size="sm"/> : t('admin.users.editDialog.saveChanges')}
                         </Button>
                     </div>
                 </DialogFooter>

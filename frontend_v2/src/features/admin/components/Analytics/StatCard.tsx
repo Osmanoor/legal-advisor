@@ -1,6 +1,5 @@
-// File: src/features/admin/components/Analytics/StatCard.tsx
-// @new
-
+// src/features/admin/components/Analytics/StatCard.tsx
+// No changes needed, text is passed via props.
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowUp } from 'lucide-react';

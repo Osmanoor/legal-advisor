@@ -1,11 +1,12 @@
 // src/features/search/components/SearchTopBar.tsx
+// Updated for i18n
 
 import React, { useState } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, ListFilter } from 'lucide-react'; // MODIFIED: Imported Menu icon
+import { Search, ListFilter } from 'lucide-react';
 import { ResourceType } from '@/types';
 
 interface SearchTopBarProps {
@@ -16,12 +17,10 @@ interface SearchTopBarProps {
 export const SearchTopBar: React.FC<SearchTopBarProps> = ({ onSearch, isLoading }) => {
   const { t, direction } = useLanguage();
   const [query, setQuery] = useState('');
-  // MODIFIED: State is undefined initially to allow placeholder to show
   const [type, setType] = useState<ResourceType | undefined>(undefined);
 
   const handleSearchClick = () => {
     if (query.trim()) {
-      // MODIFIED: Default to 'Both' if no type is selected
       onSearch(query, type || 'Both');
     }
   };
@@ -46,7 +45,7 @@ export const SearchTopBar: React.FC<SearchTopBarProps> = ({ onSearch, isLoading 
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyPress={handleKeyPress}
-          placeholder="ابحث عن..."
+          placeholder={t('search.topBarPlaceholder')}
           className="h-12 text-base w-full"
           dir={direction}
         />
@@ -55,19 +54,18 @@ export const SearchTopBar: React.FC<SearchTopBarProps> = ({ onSearch, isLoading 
           disabled={isLoading || !query.trim()}
           size="icon"
           className="w-12 h-12 bg-cta hover:bg-cta-hover shrink-0"
+          aria-label={t('common.search')}
         >
           <Search className="h-6 w-6 text-white" />
         </Button>
       </div>
 
-      {/* --- MODIFIED: The Select component part --- */}
       <div className="flex items-center">
         <Select dir={direction} value={type} onValueChange={(value) => setType(value as ResourceType)}>
           <SelectTrigger className="w-[180px] h-10 bg-white border-gray-200 shadow-sm text-gray-700 font-medium">
             <div className="flex items-center gap-2">
-               {/* In RTL, this Menu icon will appear on the right */}
               <ListFilter className="h-4 w-4 text-gray-600" />
-              <SelectValue placeholder="تصفية حسب" />
+              <SelectValue placeholder={t('search.filterPlaceholder')} />
             </div>
           </SelectTrigger>
           <SelectContent>

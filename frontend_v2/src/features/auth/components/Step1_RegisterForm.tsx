@@ -1,3 +1,6 @@
+// src/features/auth/components/Step1_RegisterForm.tsx
+// Updated for i18n
+
 import React, { useState } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useToast } from '@/hooks/useToast';
@@ -8,20 +11,19 @@ import { SocialLogins } from './SocialLogins';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { AxiosError } from 'axios';
 import { useAuthMutations } from '@/hooks/api/useAuth';
-// Import the validator from the library
 import PhoneInput, { isPossiblePhoneNumber } from 'react-phone-number-input';
-import 'react-phone-number-input/style.css'; // Import default styles for the library
-import './PhoneNumberInput.css'; // Import our custom styles to override and match the design
+import 'react-phone-number-input/style.css';
+import './PhoneNumberInput.css';
 
 interface Step1_RegisterFormProps {
   onSuccess: (data: { identifier: string; email?: string, phoneNumber?: string }) => void;
 }
 
 export const Step1_RegisterForm: React.FC<Step1_RegisterFormProps> = ({ onSuccess }) => {
+  const { t } = useLanguage();
   const { showToast } = useToast();
   const { registerMutation } = useAuthMutations();
   
-  // State for controlled components
   const [phoneNumber, setPhoneNumber] = useState<string | undefined>();
   const [formData, setFormData] = useState({
     fullName: '',
@@ -37,26 +39,18 @@ export const Step1_RegisterForm: React.FC<Step1_RegisterFormProps> = ({ onSucces
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
-      showToast('Passwords do not match.', 'error');
+      showToast(t('auth.errorPasswordsDoNotMatch'), 'error');
       return;
     }
-
-    // --- Sanitize and validate the state right before submission ---
     
-    // 1. Trim the email to handle whitespace and treat empty strings as undefined.
     const finalEmail = formData.email.trim() ? formData.email.trim() : undefined;
-    
-    // 2. Use the library's validator to check if the phone number is valid and possible.
-    // If it's not, treat it as undefined, even if it contains just a country code.
     const finalPhoneNumber = phoneNumber && isPossiblePhoneNumber(phoneNumber) ? phoneNumber : undefined;
     
-    // 3. Ensure at least one valid identifier was provided.
     if (!finalEmail && !finalPhoneNumber) {
-      showToast('Please provide either a valid email or a phone number.', 'error');
+      showToast(t('auth.errorMissingIdentifier'), 'error');
       return;
     }
 
-    // 4. Build the payload with the cleaned data.
     const payload = {
         fullName: formData.fullName,
         password: formData.password,
@@ -66,12 +60,8 @@ export const Step1_RegisterForm: React.FC<Step1_RegisterFormProps> = ({ onSucces
 
     registerMutation.mutate(payload, {
       onSuccess: () => {
-        showToast('Registration successful! Please verify your account.', 'success');
-        
-        // 5. Determine the primary identifier for the next step.
-        // Prioritize phone number if both were provided and valid.
+        showToast(t('auth.registrationSuccess'), 'success');
         const primaryIdentifier = finalPhoneNumber || finalEmail || '';
-        
         onSuccess({ 
             identifier: primaryIdentifier,
             email: finalEmail, 
@@ -80,7 +70,7 @@ export const Step1_RegisterForm: React.FC<Step1_RegisterFormProps> = ({ onSucces
       },
       onError: (error) => {
         const axiosError = error as AxiosError<{ error?: string }>;
-        const errorMessage = axiosError.response?.data?.error || 'An unknown error occurred.';
+        const errorMessage = axiosError.response?.data?.error || t('auth.errorGeneric');
         showToast(errorMessage, 'error');
       }
     });
@@ -90,16 +80,16 @@ export const Step1_RegisterForm: React.FC<Step1_RegisterFormProps> = ({ onSucces
     <div className="w-full">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-            <Label htmlFor="fullName">الأسم بالكامل</Label>
-            <Input id="fullName" name="fullName" value={formData.fullName} onChange={handleChange} required placeholder="ادخل الأسم بالكامل"/>
+            <Label htmlFor="fullName">{t('auth.fullName')}</Label>
+            <Input id="fullName" name="fullName" value={formData.fullName} onChange={handleChange} required placeholder={t('auth.fullNamePlaceholder')}/>
         </div>
         <div>
-            <Label htmlFor="email">البريد الألكتروني (اختياري)</Label>
-            <Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} placeholder="ادخل بريد الاكتروني"/>
+            <Label htmlFor="email">{t('auth.emailOptional')}</Label>
+            <Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} placeholder={t('auth.emailPlaceholder')}/>
         </div>
         
         <div className="space-y-2 text-right">
-          <Label htmlFor="phoneNumber">رقم الهاتف (اختياري)</Label>
+          <Label htmlFor="phoneNumber">{t('auth.phoneOptional')}</Label>
           <PhoneInput
             international
             defaultCountry="SA"
@@ -111,16 +101,16 @@ export const Step1_RegisterForm: React.FC<Step1_RegisterFormProps> = ({ onSucces
         </div>
 
         <div>
-            <Label htmlFor="password">كلمة السر</Label>
-            <Input id="password" name="password" type="password" value={formData.password} onChange={handleChange} required placeholder="ادخل كلمة السر"/>
+            <Label htmlFor="password">{t('auth.password')}</Label>
+            <Input id="password" name="password" type="password" value={formData.password} onChange={handleChange} required placeholder={t('auth.passwordPlaceholder')}/>
         </div>
         <div>
-            <Label htmlFor="confirmPassword">تأكيد كلمة السر</Label>
-            <Input id="confirmPassword" name="confirmPassword" type="password" value={formData.confirmPassword} onChange={handleChange} required placeholder="أعد إدخال كلمة السر"/>
+            <Label htmlFor="confirmPassword">{t('auth.confirmPassword')}</Label>
+            <Input id="confirmPassword" name="confirmPassword" type="password" value={formData.confirmPassword} onChange={handleChange} required placeholder={t('auth.confirmPasswordPlaceholder')}/>
         </div>
 
         <Button type="submit" className="w-full bg-cta hover:bg-cta-hover h-11" disabled={registerMutation.isPending}>
-          {registerMutation.isPending ? <LoadingSpinner size="sm" /> : "إنشاء حساب"}
+          {registerMutation.isPending ? <LoadingSpinner size="sm" /> : t('auth.signup')}
         </Button>
       </form>
       <SocialLogins />

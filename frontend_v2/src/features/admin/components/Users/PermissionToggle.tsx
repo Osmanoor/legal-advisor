@@ -1,6 +1,8 @@
 // src/features/admin/components/Users/PermissionToggle.tsx
+// Updated for i18n
 
 import React from 'react';
+import { useLanguage } from '@/hooks/useLanguage';
 import { cn } from '@/lib/utils';
 import { Check, X, ArrowDownUp } from 'lucide-react';
 import { AllPermissions } from '@/types/admin';
@@ -15,6 +17,8 @@ interface PermissionToggleProps {
 }
 
 export const PermissionToggle: React.FC<PermissionToggleProps> = ({ permission, state, onChange, isDisabled = false }) => {
+  const { t } = useLanguage();
+
   const handleClick = () => {
     if (isDisabled) return;
     let nextState: OverrideState = null;
@@ -26,19 +30,19 @@ export const PermissionToggle: React.FC<PermissionToggleProps> = ({ permission, 
 
   const stateConfig = {
     [null as any]: {
-      label: 'Inherit',
+      label: t('admin.users.permissionToggle.inherit'),
       icon: <ArrowDownUp size={16} className="text-gray-500" />,
       bg: 'bg-gray-100',
       text: 'text-gray-600',
     },
     ALLOW: {
-      label: 'Allow',
+      label: t('admin.users.permissionToggle.allow'),
       icon: <Check size={16} className="text-green-600" />,
       bg: 'bg-green-100',
       text: 'text-green-700',
     },
     DENY: {
-      label: 'Deny',
+      label: t('admin.users.permissionToggle.deny'),
       icon: <X size={16} className="text-red-600" />,
       bg: 'bg-red-100',
       text: 'text-red-700',

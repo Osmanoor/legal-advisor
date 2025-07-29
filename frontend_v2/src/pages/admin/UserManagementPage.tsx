@@ -1,6 +1,8 @@
-// File: src/pages/admin/UserManagementPage.tsx
+// src/pages/admin/UserManagementPage.tsx
+// Updated for i18n
 
 import React, { useState, useMemo } from 'react';
+import { useLanguage } from '@/hooks/useLanguage';
 import { useAdminUsers } from '@/hooks/api/useAdminUsers';
 import { useAdminRolesAndPermissions } from '@/hooks/api/useAdminRolesAndPermissions';
 import { UserSummary } from '@/types/user';
@@ -30,16 +32,15 @@ type SortDirection = 'asc' | 'desc';
 const ITEMS_PER_PAGE = 10;
 
 export default function UserManagementPage() {
+  const { t } = useLanguage();
   const [currentPage, setCurrentPage] = useState(1);
   const { usersQuery } = useAdminUsers(currentPage, ITEMS_PER_PAGE);
   const { data: rolesAndPermsData } = useAdminRolesAndPermissions();
 
-  // State for dialogs
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   
-  // State for search, filter, and sort
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState<{ status: 'all' | 'active' | 'suspended', roleId: string }>({ status: 'all', roleId: 'all' });
   const [sort, setSort] = useState<{ key: SortKey, direction: SortDirection }>({ key: 'created_at', direction: 'desc' });
@@ -51,10 +52,7 @@ export default function UserManagementPage() {
   
   const processedUsers = useMemo(() => {
     if (!usersQuery.data?.users) return [];
-
     let users = [...usersQuery.data.users];
-
-    // 1. Search Filter
     if (searchTerm.trim()) {
       users = users.filter(user => 
         user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -62,47 +60,38 @@ export default function UserManagementPage() {
         (user.phoneNumber && user.phoneNumber.includes(searchTerm))
       );
     }
-
-    // 2. Status Filter
     if (filters.status !== 'all') {
       users = users.filter(user => user.status === filters.status);
     }
-
-    // 3. Role Filter
     if (filters.roleId !== 'all') {
       users = users.filter(user => user.roles.includes(rolesAndPermsData?.roles.find(r => r.id === parseInt(filters.roleId))?.name || ''));
     }
-
-    // 4. Sorting
     users.sort((a, b) => {
       const aValue = a[sort.key];
       const bValue = b[sort.key];
-      
       let comparison = 0;
       if (aValue > bValue) comparison = 1;
       else if (aValue < bValue) comparison = -1;
-      
       return sort.direction === 'desc' ? -comparison : comparison;
     });
-
     return users;
   }, [usersQuery.data, searchTerm, filters, sort, rolesAndPermsData]);
   
   const renderStatusBadge = (status: 'active' | 'suspended') => {
       if (status === 'suspended') {
-          return <Badge variant="destructive" className="bg-red-100 text-red-700">Suspended</Badge>;
+          return <Badge variant="destructive" className="bg-red-100 text-red-700">{t('admin.users.suspended')}</Badge>;
       }
-      return <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-200">Active</Badge>;
+      return <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-200">{t('admin.users.active')}</Badge>;
   }
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-        <h1 className="text-2xl font-bold">المستخدمين ({usersQuery.data?.total || 0})</h1>
+        <h1 className="text-2xl font-bold">{t('admin.users.title')} ({usersQuery.data?.total || 0})</h1>
         <div className="flex items-center gap-2 w-full md:w-auto">
             <div className="relative flex-grow">
                  <Input 
-                    placeholder="Search..." 
+                    placeholder={t('admin.users.searchPlaceholder')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10"
@@ -111,19 +100,19 @@ export default function UserManagementPage() {
             </div>
             
             <Popover>
-                <PopoverTrigger asChild><Button variant="outline" size="icon"><Filter className="w-4 h-4" /></Button></PopoverTrigger>
+                <PopoverTrigger asChild><Button variant="outline" size="icon" aria-label={t('admin.users.filter')}><Filter className="w-4 h-4" /></Button></PopoverTrigger>
                 <PopoverContent className="w-64" align="end">
-                    <div className="space-y-4 text-right">
-                        <div className="space-y-2"><Label>الحالة</Label>
+                    <div className="space-y-4 text-right p-2">
+                        <div className="space-y-2"><Label>{t('admin.users.status')}</Label>
                             <RadioGroup value={filters.status} onValueChange={(v) => setFilters(f => ({...f, status: v as any}))}>
-                                <div className="flex items-center justify-end gap-2"><Label htmlFor="status-all">الكل</Label><RadioGroupItem value="all" id="status-all"/></div>
-                                <div className="flex items-center justify-end gap-2"><Label htmlFor="status-active">Active</Label><RadioGroupItem value="active" id="status-active"/></div>
-                                <div className="flex items-center justify-end gap-2"><Label htmlFor="status-suspended">Suspended</Label><RadioGroupItem value="suspended" id="status-suspended"/></div>
+                                <div className="flex items-center justify-end gap-2"><Label htmlFor="status-all">{t('admin.users.all')}</Label><RadioGroupItem value="all" id="status-all"/></div>
+                                <div className="flex items-center justify-end gap-2"><Label htmlFor="status-active">{t('admin.users.active')}</Label><RadioGroupItem value="active" id="status-active"/></div>
+                                <div className="flex items-center justify-end gap-2"><Label htmlFor="status-suspended">{t('admin.users.suspended')}</Label><RadioGroupItem value="suspended" id="status-suspended"/></div>
                             </RadioGroup>
                         </div>
-                         <div className="space-y-2"><Label>الدور</Label>
+                         <div className="space-y-2"><Label>{t('admin.users.role')}</Label>
                             <RadioGroup value={filters.roleId} onValueChange={(v) => setFilters(f => ({...f, roleId: v}))}>
-                                <div className="flex items-center justify-end gap-2"><Label htmlFor="role-all">الكل</Label><RadioGroupItem value="all" id="role-all"/></div>
+                                <div className="flex items-center justify-end gap-2"><Label htmlFor="role-all">{t('admin.users.all')}</Label><RadioGroupItem value="all" id="role-all"/></div>
                                 {rolesAndPermsData?.roles.map(role => (
                                     <div key={role.id} className="flex items-center justify-end gap-2"><Label htmlFor={`role-${role.id}`}>{role.name}</Label><RadioGroupItem value={role.id.toString()} id={`role-${role.id}`}/></div>
                                 ))}
@@ -134,26 +123,26 @@ export default function UserManagementPage() {
             </Popover>
 
             <Popover>
-                <PopoverTrigger asChild><Button variant="outline" size="icon"><ArrowDownUp className="w-4 h-4" /></Button></PopoverTrigger>
+                <PopoverTrigger asChild><Button variant="outline" size="icon" aria-label={t('admin.users.sort')}><ArrowDownUp className="w-4 h-4" /></Button></PopoverTrigger>
                 <PopoverContent className="w-64" align="end">
-                    <div className="space-y-4 text-right">
-                        <div className="space-y-2"><Label>ترتيب حسب</Label>
+                    <div className="space-y-4 text-right p-2">
+                        <div className="space-y-2"><Label>{t('admin.users.sort')}</Label>
                             <RadioGroup value={sort.key} onValueChange={(v) => setSort(s => ({...s, key: v as SortKey}))}>
-                                <div className="flex items-center justify-end gap-2"><Label htmlFor="sort-date">تاريخ الإنشاء</Label><RadioGroupItem value="created_at" id="sort-date"/></div>
-                                <div className="flex items-center justify-end gap-2"><Label htmlFor="sort-name">الاسم الكامل</Label><RadioGroupItem value="fullName" id="sort-name"/></div>
+                                <div className="flex items-center justify-end gap-2"><Label htmlFor="sort-date">{t('admin.users.dateCreated')}</Label><RadioGroupItem value="created_at" id="sort-date"/></div>
+                                <div className="flex items-center justify-end gap-2"><Label htmlFor="sort-name">{t('admin.users.fullName')}</Label><RadioGroupItem value="fullName" id="sort-name"/></div>
                             </RadioGroup>
                         </div>
-                        <div className="space-y-2"><Label>الاتجاه</Label>
+                        <div className="space-y-2"><Label>{t('admin.users.direction')}</Label>
                            <RadioGroup value={sort.direction} onValueChange={(v) => setSort(s => ({...s, direction: v as SortDirection}))}>
-                                <div className="flex items-center justify-end gap-2"><Label htmlFor="sort-desc">تنازلي</Label><RadioGroupItem value="desc" id="sort-desc"/></div>
-                                <div className="flex items-center justify-end gap-2"><Label htmlFor="sort-asc">تصاعدي</Label><RadioGroupItem value="asc" id="sort-asc"/></div>
+                                <div className="flex items-center justify-end gap-2"><Label htmlFor="sort-desc">{t('admin.users.desc')}</Label><RadioGroupItem value="desc" id="sort-desc"/></div>
+                                <div className="flex items-center justify-end gap-2"><Label htmlFor="sort-asc">{t('admin.users.asc')}</Label><RadioGroupItem value="asc" id="sort-asc"/></div>
                            </RadioGroup>
                         </div>
                     </div>
                 </PopoverContent>
             </Popover>
 
-             <Button onClick={() => setIsAddDialogOpen(true)}><UserPlus className="mr-2 h-4 w-4"/> إضافة مستخدم</Button>
+             <Button onClick={() => setIsAddDialogOpen(true)}><UserPlus className="mr-2 h-4 w-4"/> {t('admin.users.addUser')}</Button>
         </div>
       </div>
       
@@ -174,11 +163,11 @@ export default function UserManagementPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="text-right">الأسم</TableHead>
-                  <TableHead className="text-right">الحالة</TableHead>
-                  <TableHead className="text-right px-6">البريد / الهاتف</TableHead>
-                  <TableHead className="text-right">الدور</TableHead>
-                  <TableHead></TableHead> {/* For actions */}
+                  <TableHead className="text-right">{t('admin.users.table.name')}</TableHead>
+                  <TableHead className="text-right">{t('admin.users.table.status')}</TableHead>
+                  <TableHead className="text-right px-6">{t('admin.users.table.emailPhone')}</TableHead>
+                  <TableHead className="text-right">{t('admin.users.table.role')}</TableHead>
+                  <TableHead></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -202,7 +191,7 @@ export default function UserManagementPage() {
                 )) : (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-10 text-gray-500">
-                      No users match the current filters.
+                      {t('admin.users.noUsersMatch')}
                     </TableCell>
                   </TableRow>
                 )}

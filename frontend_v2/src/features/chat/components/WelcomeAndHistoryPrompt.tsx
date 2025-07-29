@@ -1,6 +1,9 @@
+// src/features/chat/components/WelcomeAndHistoryPrompt.tsx
+// Updated for i18n
+
 import React from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
-import { useAuthStore } from '@/stores/authStore'; // Import auth store
+import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/button';
 import { Send, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -20,7 +23,7 @@ export const WelcomeAndHistoryPrompt: React.FC<WelcomeAndHistoryPromptProps> = (
   isStartingChat,
 }) => {
   const { t } = useLanguage();
-  const { user, isAuthenticated } = useAuthStore(); // Get user info
+  const { user, isAuthenticated } = useAuthStore();
 
   const handlePromptKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && e.currentTarget.value.trim() && !isStartingChat) {
@@ -35,15 +38,13 @@ export const WelcomeAndHistoryPrompt: React.FC<WelcomeAndHistoryPromptProps> = (
     }
   };
 
-  // Determine the welcome title based on auth state
   const welcomeTitle = isAuthenticated && user?.fullName 
     ? t("chat.welcome.title").replace("ماسي", user.fullName.split(' ')[0]) 
     : t("chat.welcome.title").replace("، ماسي", "");
 
   return (
     <div className="w-full max-w-3xl mx-auto px-4">
-      <div className="p-8 md:p-12 border-2 border-border-input rounded-2xl  relative overflow-hidden">
-        {/* --- FIX: Corrected decorative circle positioning and styling --- */}
+      <div className="p-8 md:p-12 border-2 border-border-input rounded-2xl relative overflow-hidden">
         <div className="absolute z-0 w-[50%] h-[80%] left-1/2 -translate-x-1/2 bottom-[-80%] bg-cta rounded-full filter blur-[100px] pointer-events-none"></div>
         
         <Button
@@ -57,7 +58,6 @@ export const WelcomeAndHistoryPrompt: React.FC<WelcomeAndHistoryPromptProps> = (
         </Button>
         
         <div className="relative pt-10 md:pt-0 z-10 flex flex-col items-center text-center gap-6">
-          {/* --- FIX: Personalized welcome title --- */}
           <h2 className="text-2xl font-medium text-text-on-light-strong" style={{ fontFamily: "var(--font-primary-arabic)" }}>
             {welcomeTitle}
           </h2>
@@ -76,6 +76,7 @@ export const WelcomeAndHistoryPrompt: React.FC<WelcomeAndHistoryPromptProps> = (
               className="absolute bg-cta border-primary-dark left-2 top-1/2 -translate-y-1/2 w-10 h-10 p-0"
               onClick={handleSendClick}
               disabled={isStartingChat}
+              aria-label={t('chat.send')}
             >
               <Send size={20} className="w-5 h-5 text-text-on-dark" fill="currentColor" />
             </Button>

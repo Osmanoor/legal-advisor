@@ -1,4 +1,5 @@
 // src/features/auth/components/Step3_AdditionalInfoForm.tsx
+// Updated for i18n
 
 import React, { useState } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -23,7 +24,7 @@ export const Step3_AdditionalInfoForm: React.FC<Step3_AdditionalInfoFormProps> =
 
   const [formData, setFormData] = useState({
     jobTitle: '',
-    workplace: '', // This field is for UI only, not sent to backend
+    workplace: '',
     linkedin: ''
   });
 
@@ -32,33 +33,29 @@ export const Step3_AdditionalInfoForm: React.FC<Step3_AdditionalInfoFormProps> =
   };
 
   const finishFlow = () => {
-    completeOnboarding(); // Mark onboarding as finished
-    onComplete();         // Navigate to the dashboard
+    completeOnboarding();
+    onComplete();
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const hasDataToSubmit = formData.jobTitle || formData.linkedin;
+    const hasDataToSubmit = formData.jobTitle || formData.linkedin || formData.workplace;
     if (!hasDataToSubmit) {
-      finishFlow(); // If form is empty, treat as a skip
+      finishFlow();
       return;
     }
 
-    updateUserProfileMutation.mutate({
-      jobTitle: formData.jobTitle,
-      linkedin: formData.linkedin,
-      workplace: formData.workplace,
-    }, {
+    updateUserProfileMutation.mutate(formData, {
       onSuccess: () => {
-        showToast("Profile information saved!", "success");
+        showToast(t('auth.profileSavedSuccess'), "success");
         finishFlow();
       },
       onError: (error) => {
         const axiosError = error as AxiosError<{ error?: string }>;
-        const errorMessage = axiosError.response?.data?.error || 'Could not save additional info.';
+        const errorMessage = axiosError.response?.data?.error || t('auth.errorSavingProfile');
         showToast(errorMessage, "error");
-        finishFlow(); // Still finish onboarding even if optional info fails to save
+        finishFlow();
       }
     });
   };
@@ -71,24 +68,24 @@ export const Step3_AdditionalInfoForm: React.FC<Step3_AdditionalInfoFormProps> =
     <div className="w-full pt-8">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <Label htmlFor="workplace">جهة العمل</Label>
-          <Input id="workplace" name="workplace" value={formData.workplace} onChange={handleChange} placeholder="أدخل اسم جهة العمل" />
+          <Label htmlFor="workplace">{t('auth.workplace')}</Label>
+          <Input id="workplace" name="workplace" value={formData.workplace} onChange={handleChange} placeholder={t('auth.workplacePlaceholder')} />
         </div>
         <div>
-          <Label htmlFor="jobTitle">المسمى الوظيفي</Label>
-          <Input id="jobTitle" name="jobTitle" value={formData.jobTitle} onChange={handleChange} placeholder="أدخل المسمى الوظيفي" />
+          <Label htmlFor="jobTitle">{t('auth.jobTitle')}</Label>
+          <Input id="jobTitle" name="jobTitle" value={formData.jobTitle} onChange={handleChange} placeholder={t('auth.jobTitlePlaceholder')} />
         </div>
         <div>
-          <Label htmlFor="linkedin">حساب لينكدإن</Label>
-          <Input id="linkedin" name="linkedin" value={formData.linkedin} onChange={handleChange} placeholder="أدخل حساب لينكدإن" />
+          <Label htmlFor="linkedin">{t('auth.linkedinAccount')}</Label>
+          <Input id="linkedin" name="linkedin" value={formData.linkedin} onChange={handleChange} placeholder={t('auth.linkedinPlaceholder')} />
         </div>
 
         <div className="flex flex-col-reverse sm:flex-row gap-4 pt-4">
             <Button type="button" variant="outline" className="w-full h-11" onClick={handleSkip} disabled={updateUserProfileMutation.isPending}>
-                تخطي
+                {t('auth.skip')}
             </Button>
             <Button type="submit" className="w-full bg-cta hover:bg-cta-hover h-11" disabled={updateUserProfileMutation.isPending}>
-                {updateUserProfileMutation.isPending ? <LoadingSpinner size="sm" /> : "تأكيد"}
+                {updateUserProfileMutation.isPending ? <LoadingSpinner size="sm" /> : t('auth.submit')}
             </Button>
         </div>
       </form>

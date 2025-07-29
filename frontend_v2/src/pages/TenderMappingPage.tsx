@@ -1,4 +1,6 @@
 // src/pages/TenderMappingPage.tsx
+// Updated for i18n
+
 import React, { useState } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { TenderCalculationResult } from '@/types/tenderMapping';
@@ -6,8 +8,6 @@ import { useTenderWorkTypes, useCalculateProcurement } from '@/hooks/api/useTend
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
 import LoadingSpinner from '@/components/ui/loading-spinner';
-
-// Import the new components
 import { TenderMappingForm } from '@/features/tenderMapping/components/TenderMappingForm';
 import { TenderReportTabs } from '@/features/tenderMapping/components/TenderReportTabs';
 
@@ -28,8 +28,7 @@ export default function TenderMappingPage() {
       const result = await calculateMutation.mutateAsync(values);
       setCalculationResult(result);
     } catch (error) {
-      console.error('Error calculating procurement:', error);
-      // Optionally show a toast notification on error
+      console.error(t('tenderMapping.error'), error);
     }
   };
   
@@ -38,7 +37,7 @@ export default function TenderMappingPage() {
   };
 
   const handleReset = () => {
-    setCalculationResult(null); // This will switch the view back to the form
+    setCalculationResult(null);
   };
 
   if (isLoadingWorkTypes) {
@@ -66,7 +65,7 @@ export default function TenderMappingPage() {
         {calculateMutation.isPending ? (
           <div className="flex flex-col items-center justify-center py-20 bg-background-body rounded-lg">
             <LoadingSpinner size="lg" className="mb-4" />
-            <p>{t('tenderMapping.loading')}</p>
+            <p>{t('tenderMapping.calculating')}</p>
           </div>
         ) : calculationResult ? (
           <TenderReportTabs result={calculationResult} onResultUpdate={handleResultUpdate} />
@@ -75,7 +74,7 @@ export default function TenderMappingPage() {
             workTypes={workTypes || []}
             isLoading={calculateMutation.isPending}
             onSubmit={handleSubmit}
-            onReset={handleReset} // Pass reset handler to form
+            onReset={handleReset}
           />
         )}
       </div>

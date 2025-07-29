@@ -1,4 +1,6 @@
 // src/features/chat/components/WelcomeSection.tsx
+// This component was already internationalized. No changes were made.
+
 import { useLanguage } from '@/hooks/useLanguage';
 import { Card, CardContent } from '@/components/ui/card';
 

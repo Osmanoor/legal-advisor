@@ -1,6 +1,8 @@
 // src/features/admin/components/Users/ConfirmationDialog.tsx
+// Updated for i18n
 
 import React from 'react';
+import { useLanguage } from '@/hooks/useLanguage';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Button } from '@/components/ui/button';
 import { X, AlertTriangle } from 'lucide-react';
@@ -22,6 +24,8 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   confirmText = "Confirm",
   isConfirming = false,
 }) => {
+  const { t } = useLanguage();
+
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>
@@ -42,10 +46,10 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
 
           <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse gap-3">
             <Button variant="danger" onClick={onConfirm} disabled={isConfirming}>
-              {isConfirming ? "Deleting..." : confirmText}
+              {isConfirming ? t('admin.users.confirmDialog.deleting') : confirmText}
             </Button>
             <Dialog.Close asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline">{t('admin.users.confirmDialog.cancel')}</Button>
             </Dialog.Close>
           </div>
 

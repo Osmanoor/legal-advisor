@@ -15,45 +15,53 @@ export const ar = {
     downloading: 'جاري التنزيل...',
     sending: 'جاري الإرسال...',
     retry: 'حاول مرة أخرى',
+    reset: 'إعادة تعيين',
   },
   auth: {
-    // Slogan for AuthLayout
+    // --- Slogan for AuthLayout ---
     slogan: {
       title: 'كل ما تحتاجه في مجال المشتريات الحكومية',
       subtitle: 'الآن رقمي و سهل'
     },
-    // Login & Signup
-    loginTitle: 'تسجيل الدخول',
-    signupTitle: 'إنشاء حساب',
+    
+    // --- General Actions & Prompts ---
     login: 'تسجيل دخول',
     signup: 'إنشاء حساب',
-    email: 'البريد الألكتروني',
-    password: 'كلمة السر',
-    confirmPassword: 'تأكيد كلمة السر',
-    fullName: 'الأسم بالكامل',
-    emailPlaceholder: 'ادخل بريد الاكتروني',
-    passwordPlaceholder: 'ادخل كلمة السر',
-    confirmPasswordPlaceholder: 'أعد إدخال كلمة السر',
-    fullNamePlaceholder: 'ادخل الأسم بالكامل',
-    forgotPassword: 'نسيت كلمة السر ؟',
-    rememberMe: 'تذكرني',
+    submit: 'تأكيد',
     or: 'أو',
+    skip: 'تخطي',
+    backToLogin: 'العودة لتسجيل الدخول',
+    noAccountPrompt: 'ليس لديك حساب ؟',
+    createAccountAction: 'أنشئ حساب',
+    hasAccountPrompt: 'لديك حساب بالفعل ؟',
+
+    // --- Login Form ---
+    loginTitle: 'تسجيل الدخول',
+    emailOrPhone: 'البريد الإلكتروني او رقم الهاتف',
+    password: 'كلمة السر',
+    rememberMe: 'تذكرني',
+    forgotPassword: 'نسيت كلمة السر ؟',
     loginWithGoogle: 'تسجيل دخول عن طريق Google',
     loginWithLinkedIn: 'تسجيل دخول عن طريق LinkedIn',
-    continueAsGuest: 'الأستمرار كضيف',
-    // Password Reset
-    resetPasswordTitle: 'إعادة ضبط كلمة السر',
-    resetPasswordInstruction: 'تم ارسال الرقم السري لرقم الهاتف {phoneNumber}. هل تريد تغيير الرقم ؟',
-    changeNumber: 'تغيير الرقم',
-    otpPlaceholder: 'ادخل رمز التحقق',
-    setNewPasswordTitle: 'قم بتعيين كلمة السر الجديدة',
-    submit: 'تأكيد',
-    backToLogin: 'العودة لتسجيل الدخول',
-    // Confirmation
-    confirmAccountTitle: 'تأكيد الحساب',
-    confirmInstruction: 'تم إرسال رمز التحقق إلى بريدك الإلكتروني {email}.',
-    resendCode: 'إعادة إرسال الرمز',
-    // Additional Info
+    
+    // --- Registration Flow ---
+    signupTitle: 'إنشاء حساب',
+    fullName: 'الأسم بالكامل',
+    fullNamePlaceholder: 'ادخل الأسم بالكامل',
+    emailOptional: 'البريد الألكتروني (اختياري)',
+    emailPlaceholder: 'ادخل بريد الاكتروني',
+    phoneOptional: 'رقم الهاتف (اختياري)',
+    passwordPlaceholder: 'ادخل كلمة السر',
+    confirmPassword: 'تأكيد كلمة السر',
+    confirmPasswordPlaceholder: 'أعد إدخال كلمة السر',
+
+    // --- Verification Step ---
+    verifyInstruction: 'أدخل الرقم السري المرسل لرقم الهاتف {identifier}،',
+    changeNumber: 'هل تريد تغيير الرقم ؟',
+    verifying: 'جاري التحقق...',
+    verifyCode: 'تأكيد الرمز',
+    
+    // --- Additional Info Step ---
     additionalInfoTitle: 'معلومات إضافية',
     additionalInfoSubtitle: 'نود معرفة المزيد عنك لتحسين تجربتك.',
     jobTitle: 'المسمى الوظيفي',
@@ -62,17 +70,40 @@ export const ar = {
     workplacePlaceholder: 'ادخل اسم جهة العمل',
     linkedinAccount: 'حساب لينكدإن',
     linkedinPlaceholder: 'ادخل حساب لينكدإن',
-    skip: 'تخطي',
-    // Validation & Errors
-    errorInvalidCredentials: 'البريد الإلكتروني أو كلمة المرور غير صحيحة.',
-    errorEmailExists: 'هذا البريد الإلكتروني مسجل بالفعل.',
-    errorPasswordsDoNotMatch: 'كلمتا السر غير متطابقتين.',
-    errorGeneric: 'حدث خطأ ما. يرجى المحاولة مرة أخرى.',
+
+    // --- Password Reset Flow ---
+    resetPasswordTitle: 'إعادة ضبط كلمة السر',
+    resetPasswordInstruction: 'أدخل بريدك الإلكتروني أو رقم هاتفك وسنرسل لك رمزًا لإعادة تعيين كلمة المرور الخاصة بك.',
+    sendResetCode: 'إرسال رمز إعادة التعيين',
+    otpPlaceholder: 'أدخل رمز التحقق',
+    otpSentTo: 'تم إرسال رمز مكون من 6 أرقام إلى {identifier}.',
+    setNewPasswordTitle: 'قم بتعيين كلمة السر الجديدة',
+    setNewPasswordInstruction: 'الرجاء إنشاء كلمة مرور جديدة وقوية لحسابك.',
+    newPassword: 'كلمة المرور الجديدة',
+    newPasswordPlaceholder: 'أدخل كلمة المرور الجديدة',
+    confirmNewPasswordPlaceholder: 'تأكيد كلمة المرور الجديدة',
+    resetPasswordAction: 'إعادة ضبط كلمة السر',
+
+    // --- Stepper ---
     steps: {
       basicInfo: 'المعلومات الأساسية',
       verification: 'التحقق',
       additionalInfo: 'المعلومات الإضافية'
     },
+
+    // --- Validation, Success & Error Toasts ---
+    errorInvalidCredentials: 'البريد الإلكتروني أو كلمة المرور غير صحيحة.',
+    errorEmailExists: 'هذا البريد الإلكتروني مسجل بالفعل.',
+    errorPasswordLength: 'يجب أن تكون كلمة المرور 8 أحرف على الأقل.',
+    errorPasswordsDoNotMatch: 'كلمتا السر غير متطابقتين.',
+    errorGeneric: 'حدث خطأ ما. يرجى المحاولة مرة أخرى.',
+    errorMissingIdentifier: 'يرجى تقديم بريد إلكتروني أو رقم هاتف صالح.',
+    errorOtpIncomplete: 'الرجاء إدخال الرمز المكون من 6 أرقام بالكامل.',
+    errorSavingProfile: 'تعذر حفظ المعلومات الإضافية.',
+    registrationSuccess: 'تم التسجيل بنجاح! يرجى التحقق من حسابك.',
+    verificationSuccess: 'تم التحقق بنجاح!',
+    codeVerifiedSuccess: 'تم التحقق من الرمز بنجاح!',
+    profileSavedSuccess: 'تم حفظ معلومات الملف الشخصي!',
   },
   navigation: {
     home: 'الرئيسية',
@@ -90,6 +121,7 @@ export const ar = {
     faq: "الأسئلة الشائعة",
     whatSetsUsApart: "ما يميزنا",
     solutions: "حلولنا",
+    feedback: "قيمنا",
   },
   procurement: {
     systemName: 'نظام المنافسات والمشتريات الحكومية',
@@ -154,6 +186,11 @@ export const ar = {
       network: "حدث خطأ في الشبكة",
       retry: "يرجى المحاولة مرة أخرى"
     },
+    deleteSessionTitle: "حذف جلسة المحادثة",
+    deleteSessionDescription: "هل أنت متأكد أنك تريد حذف '{title}' بشكل دائم؟",
+    deleteConfirm: "نعم، احذف",
+    you: "أنت",
+    assistantName: "المساعد الذكي",
   },
   library: {
     title: 'المكتبة',
@@ -328,12 +365,16 @@ export const ar = {
       users: 'مستخدم نشط',
       accuracy: 'دقة الإجابات',
     },
-    contact: { // Old section
+    contact: {
       title: 'تواصل معنا',
+      description: 'يسعدنا تواصلكم معنا. يرجى تعبئة النموذج وسنرد عليكم في أقرب وقت.',
       form: {
         name: 'الاسم',
+        namePlaceholder: 'أدخل الاسم',
         email: 'البريد الإلكتروني',
+        emailPlaceholder: 'أدخل بريدك الالكتروني',
         message: 'الرسالة',
+        messagePlaceholder: 'فيما ترغب أن نساعدك',
         send: 'إرسال الرسالة',
         sending: 'جاري الإرسال...',
         success: 'تم إرسال الرسالة بنجاح',
@@ -373,43 +414,189 @@ export const ar = {
       title: 'عوامل التصفية',
       clearAll: 'مسح جميع عوامل التصفية',
       apply: 'تطبيق عوامل التصفية'
+    },
+    topBarPlaceholder: 'ابحث عن...',
+    filterPlaceholder: 'تصفية حسب',
+    startSearchPrompt: {
+      title: 'ابدأ البحث',
+      description: 'أدخل استعلامًا في الشريط أعلاه للعثور على المواد ذات الصلة.'
     }
   },
   admin: {
-    title: 'لوحة المشرف',
-    login: {
-      title: 'تسجيل دخول المشرف',
-      username: 'اسم المستخدم',
-      password: 'كلمة المرور',
-      submit: 'تسجيل الدخول',
-      error: 'بيانات غير صحيحة'
+    // --- NEW ADMIN TRANSLATIONS ---
+    sidebar: {
+      analytics: 'الأحصائيات',
+      userManagement: 'إدارة المستخدمين',
+      feedbackManagement: 'إدارة التقييم',
+      contactMessages: 'رسائل التواصل',
+      generalSettings: 'الإعدادات العامة',
+      help: 'المساعدة',
+      logout: 'تسجيل الخروج'
     },
-    tabs: {
-      contacts: 'جهات الاتصال',
-      emails: 'رسائل البريد الإلكتروني'
+    analytics: {
+      title: 'الأحصائيات',
+      visits: 'عدد الزيارات',
+      users: 'عدد المستخدمين',
+      mostVisited: 'الصفحة الأكثر زيارة',
+      actions: 'الأفعال',
+      clicks: 'الضغطات على الموقع',
+      toolUsage: 'استخدام الأدوات',
+      communication: 'التواصل',
+      feedback: 'تسجيل تعليق',
+      userTypes: 'نوع المستخدمين',
+      guests: 'ضيوف',
+      registered: 'مسجلين',
+      weeklyVisits: 'الزيارات الأسبوعية',
+      errorLoading: 'فشل تحميل بيانات التحليلات. يرجى المحاولة مرة أخرى لاحقًا.'
     },
-    contacts: {
+    contact: {
       title: 'رسائل التواصل',
+      searchPlaceholder: 'ابحث بالاسم أو البريد...',
+      filterByStatus: 'تصفية حسب الحالة',
+      sortBy: 'ترتيب حسب',
       date: 'التاريخ',
       name: 'الاسم',
-      email: 'البريد الإلكتروني',
-      message: 'الرسالة',
-      export: 'تصدير CSV',
-      noData: 'لا توجد رسائل تواصل',
-      error: 'فشل في تحميل الرسائل'
+      direction: 'الاتجاه',
+      desc: 'تنازلي',
+      asc: 'تصاعدي',
+      statuses: {
+        new: 'الجديدة',
+        read: 'قيد المعالجة',
+        archived: 'المؤرشفة',
+        all: 'الكل'
+      },
+      dialog: {
+        title: 'رسالة تواصل من: {name}',
+        receivedAt: 'تم الاستلام في {date}',
+        replyViaEmail: 'الرد عبر البريد الإلكتروني',
+        markAsProcessing: 'وضع كقيد المعالجة',
+        archive: 'أرشفة',
+        moveToNew: 'نقل إلى جديد',
+        markAsNew: 'وضع كجديد'
+      },
+      table: {
+        name: 'الاسم',
+        email: 'البريد الإلكتروني',
+        messagePreview: 'الرسالة (معاينة)',
+        status: 'الحالة',
+        submittedAt: 'تاريخ الإرسال',
+        actions: 'الإجراءات'
+      }
     },
-    emails: {
-      title: 'سجلات البريد الإلكتروني',
+    feedback: {
+      title: 'إدارة التقييمات',
+      searchPlaceholder: 'ابحث بالمستخدم أو التعليق...',
+      sortBy: 'ترتيب حسب',
       date: 'التاريخ',
-      recipient: 'المستلم',
-      subject: 'الموضوع',
-      body: 'الرسالة',
-      attachment: 'المرفق',
-      export: 'تصدير CSV',
-      noData: 'لا توجد سجلات بريد إلكتروني',
-      error: 'فشل في تحميل سجلات البريد'
+      rating: 'التقييم',
+      direction: 'الاتجاه',
+      desc: 'تنازلي',
+      asc: 'تصاعدي',
+      noReviews: 'لم يتم العثور على تقييمات لهذا الفلتر.',
+      statuses: {
+        pending: 'قيد المراجعة',
+        approved: 'الموافق عليها',
+        archived: 'المؤرشفة',
+        all: 'الكل'
+      },
+      card: {
+        approved: 'موافق عليه',
+        archived: 'مؤرشف',
+        pending: 'قيد المراجعة'
+      },
+      dialog: {
+        noComment: 'لا يوجد تعليق.',
+        userDisplaySettings: 'إعدادات العرض التي اختارها المستخدم:',
+        showName: 'إظهار الاسم',
+        showJobTitle: 'إظهار المسمى الوظيفي',
+        showProfilePicture: 'إظهار صورة الملف الشخصي',
+        showWorkplace: 'إظهار جهة العمل',
+        archive: 'أرشفة',
+        moveToPending: 'نقل إلى قيد المراجعة',
+        approve: 'موافقة'
+      }
     },
-    logout: 'تسجيل الخروج'
+    users: {
+      title: 'المستخدمين',
+      searchPlaceholder: 'ابحث...',
+      filter: 'تصفية',
+      sort: 'ترتيب حسب',
+      addUser: 'إضافة مستخدم',
+      status: 'الحالة',
+      role: 'الدور',
+      all: 'الكل',
+      active: 'نشط',
+      suspended: 'موقوف',
+      dateCreated: 'تاريخ الإنشاء',
+      fullName: 'الاسم الكامل',
+      direction: 'الاتجاه',
+      desc: 'تنازلي',
+      asc: 'تصاعدي',
+      noUsersMatch: 'لا يوجد مستخدمون يطابقون عوامل التصفية الحالية.',
+      table: {
+        name: 'الأسم',
+        status: 'الحالة',
+        emailPhone: 'البريد / الهاتف',
+        role: 'الدور'
+      },
+      addDialog: {
+        title: 'إضافة مستخدم جديد',
+        description: 'أدخل تفاصيل المستخدم الجديد لإنشاء حساب له.',
+        fullName: 'الاسم الكامل',
+        fullNameRequired: 'الاسم الكامل مطلوب',
+        phoneNumber: 'رقم الهاتف',
+        phoneNumberRequired: 'رقم الهاتف مطلوب',
+        emailOptional: 'البريد الإلكتروني (اختياري)',
+        password: 'كلمة المرور',
+        passwordRequired: 'كلمة المرور مطلوبة',
+        role: 'الدور',
+        roleRequired: 'الدور مطلوب',
+        selectRole: 'اختر دورًا',
+        jobTitleOptional: 'المسمى الوظيفي (اختياري)',
+        cancel: 'إلغاء',
+        createUser: 'إنشاء مستخدم',
+        creatingUser: 'جاري إنشاء المستخدم...'
+      },
+      editDialog: {
+        accountStatus: 'حالة الحساب',
+        role: 'الدور',
+        permissions: 'الصلاحيات',
+        userPermissions: 'صلاحيات المستخدم',
+        adminPermissions: 'صلاحيات المشرف',
+        nonAdminNote: 'لا يمكن تعيين صلاحيات المشرف إلا للمستخدمين الذين لديهم دور "Admin".',
+        deleteUser: 'حذف المستخدم',
+        saveChanges: 'حفظ التغييرات',
+        saving: 'جاري الحفظ...'
+      },
+      permissionToggle: {
+        inherit: 'وراثة',
+        allow: 'سماح',
+        deny: 'رفض'
+      },
+      confirmDialog: {
+        title: 'حذف المستخدم',
+        description: 'سيؤدي هذا إلى حذف حساب {name} بشكل دائم.',
+        confirm: 'نعم، احذف',
+        deleting: 'جاري الحذف...',
+        cancel: 'إلغاء'
+      },
+    },
+    settings: {
+      title: 'الإعدادات العامة',
+      save: 'حفظ التغييرات',
+      saving: 'جاري الحفظ...',
+      guestTitle: 'صلاحيات المستخدم الضيف',
+      guestDescription: 'تحكم في ما يمكن للزوار المجهولين الوصول إليه وحدود استخدامهم.',
+      registeredTitle: 'صلاحيات المستخدم المسجل',
+      registeredDescription: 'قم بتعيين الوصول والحدود الافتراضية لجميع المستخدمين المسجلين الدخول.',
+      adminTitle: 'صلاحيات المشرف الافتراضية',
+      adminDescription: 'قم بتعيين الصلاحيات الافتراضية لجميع المسؤولين (لا يتأثر المشرفون الخارقون).',
+      featureAccess: 'الوصول إلى الميزات',
+      usageLimits: 'حدود الاستخدام (يوميًا)',
+      usageLimitsUnlimited: 'حدود الاستخدام (يوميًا، -1 لغير محدود)',
+      adminPanelAccess: 'الوصول إلى لوحة الإدارة',
+      unlimitedPlaceholder: '-1 لغير محدود'
+    }
   },
   correction: {
     title: 'معالج النصوص',
@@ -439,11 +626,32 @@ export const ar = {
     tabs: {
       numericalValues: 'القيم الحسابية',
       dates: 'التواريخ',
-      // Old tabs
-      percentage: 'النسبة المئوية',
-      vat: 'الضريبة',
-      amount: 'المبلغ مع نسبة',
-      tafqit: 'التفقيط'
+      weightedPercentage: 'النسبة الموزونة',
+    },
+    weighted: {
+      title: 'حاسبة النسبة الموزونة',
+      technicalWeight: 'نسبة التقييم الفني',
+      financialWeight: 'نسبة العرض المالي',
+      competitorOffers: 'عروض المتنافسين',
+      addCompetitor: 'اضافة منافس',
+      competitorName: 'أسم المنافس',
+      technicalScore: 'التقييم الفني',
+      financialOffer: 'العرض المالي (بالريال)',
+      competitorPlaceholder: 'اكتب أسم المنافس',
+      scorePlaceholder: 'أدخل الرقم',
+      offerPlaceholder: 'أدخل الرقم',
+      results: {
+        title: 'نتائج المنافسة',
+        rank: 'الترتيب',
+        competitorName: 'أسم المنافس',
+        weightedScore: 'النسبة الموزونة',
+        anotherCompetition: 'منافسة أخرى'
+      },
+      validation: {
+        allFieldsRequired: 'يرجى ملء جميع الحقول لكل منافس.',
+        technicalScoreRange: "التقييم الفني لـ '{name}' يجب أن يكون بين 0 و 100.",
+        financialOfferPositive: "العرض المالي لـ '{name}' يجب أن يكون رقمًا موجبًا."
+      }
     },
     selectNumericalType: 'اختر نوع الحساب العددي',
     selectDateType: 'اختر نوع حساب التاريخ',
@@ -687,7 +895,12 @@ export const ar = {
     // Result View
     results: {
       title: 'تقرير المنافسة',
-      
+      reportTitle: 'تقرير المنافسة',
+      basicInfo: 'المعلومات الأساسية',
+      timelineTitle: 'الجدول الزمني ({duration} يوم)',
+      referencedArticles: 'المواد المرجعية',
+      articleNumbers: 'أرقام المواد',
+      articleNumber: 'المادة {number}',
       // Tabs
       tabs: {
         details: 'تفاصيل المنافسة',
@@ -723,6 +936,89 @@ export const ar = {
     },
     
     loading: 'جارٍ حساب نوع المنافسة...',
-    error: 'حدث خطأ أثناء معالجة طلبك'
+    error: 'حدث خطأ أثناء معالجة طلبك',
+    calculating: 'جاري الحساب...',
+    form: {
+      title: 'حاسبة نوع المنافسة',
+      description: 'أدخل تفاصيل المشروع لتحديد نوع المنافسة المناسب',
+      workType: 'نوع العمل',
+      budget: 'المبلغ (بالريال)',
+      startDate: 'تاريخ البدء',
+      projectDuration: 'مدة المشروع (بالأشهر)',
+      selectWorkType: 'اختر نوع العمل',
+      enterBudget: 'أدخل مبلغ المشروع',
+      enterDuration: 'أدخل مدة المشروع بالأشهر'
+    },
+  },
+  dashboard: {
+    header: {
+      profile: 'الملف الشخصي',
+      adminDashboard: 'لوحة التحكم للمشرف',
+      logout: 'تسجيل الخروج',
+      login: 'تسجيل الدخول'
+    },
+    sidebar: {
+      settings: 'الاعدادات',
+      help: 'المساعدة',
+      logout: 'تسجيل خروج'
+    }
+  },
+  pagination: {
+    showingResults: 'عرض {start} إلى {end} من {total} نتائج',
+    previous: 'السابق',
+    next: 'التالي'
+  },
+  settings: {
+    title: 'الإعدادات',
+    jobTitlePlaceholder: 'لم يتم تقديم مسمى وظيفي',
+    uploadAction: 'تحميل صورة',
+    uploading: 'جاري التحميل...',
+    basicInfo: 'المعلومات الاساسية',
+    name: 'الاسم',
+    email: 'البريد الالكتروني',
+    phone: 'رقم الهاتف',
+    additionalInfo: 'المعلومات الاضافية',
+    workplace: 'جهة العمل',
+    jobTitle: 'المسمى الوظيفي',
+    linkedin: 'حساب لينكدإن',
+    save: 'حفظ',
+    changePassword: 'تغيير كلمة السر',
+    changeLanguage: 'تغيير اللغة',
+    currentPassword: 'كلمة المرور الحالية',
+    newPassword: 'كلمة المرور الجديدة',
+    confirmNewPassword: 'تأكيد كلمة المرور الجديدة',
+    updatePassword: 'تحديث كلمة المرور',
+    toasts: {
+      fileTooLarge: 'الملف كبير جدًا. الحجم الأقصى 5 ميجابايت.',
+      avatarSuccess: 'تم تحديث الصورة الشخصية بنجاح!',
+      avatarError: 'فشل تحميل الصورة.',
+      profileSuccess: 'تم تحديث الملف الشخصي بنجاح!',
+      profileError: 'فشل تحديث الملف الشخصي.',
+      passwordLengthError: 'يجب أن تكون كلمة المرور الجديدة 8 أحرف على الأقل.',
+      passwordMismatchError: 'كلمتا المرور الجديدتان غير متطابقتين.',
+      passwordSuccess: 'تم تحديث كلمة المرور بنجاح!',
+      passwordError: 'فشل تغيير كلمة المرور.'
+    }
+  },
+  feedback: {
+    title: 'التقييم والملاحظات',
+    subtitle: 'نحن نقدر رأيك! يرجى أخذ لحظة لتقييم تجربتك.',
+    form: {
+      rating: 'التقييم',
+      comments: 'ملاحظاتك',
+      commentsPlaceholder: 'أكتب ملاحظاتك هنا',
+      settings: 'الإعدادت',
+      showName: 'إظهار الاسم',
+      showJobTitle: 'إظهار المسمى الوظيفي',
+      showProfilePicture: 'إظهار صورة البروفايل',
+      showWorkplace: 'إظهار جهة العمل',
+      submit: 'إرسال التقييم',
+      submitting: 'جاري الإرسال...'
+    },
+    toasts: {
+      ratingRequired: 'يرجى تحديد تقييم قبل الإرسال.',
+      success: 'شكرا لملاحظاتك!',
+      error: 'فشل إرسال التقييم.'
+    }
   },
 };

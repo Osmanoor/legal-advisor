@@ -1,6 +1,8 @@
 // src/pages/admin/SettingsPage.tsx
+// Updated for i18n
 
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from '@/hooks/useLanguage';
 import { useAdminSettings } from '@/hooks/api/useAdminSettings';
 import { GlobalSettings } from '@/types/admin';
 import { Button } from '@/components/ui/button';
@@ -14,6 +16,7 @@ import { FeatureAccessCard } from '@/features/admin/components/Settings/FeatureA
 import { UsageLimitsCard } from '@/features/admin/components/Settings/UsageLimitsCard';
 
 export default function AdminSettingsPage() {
+  const { t } = useLanguage();
   const { showToast } = useToast();
   const { settingsQuery, updateSettingsMutation } = useAdminSettings();
   const [settings, setSettings] = useState<GlobalSettings | null>(null);
@@ -61,10 +64,10 @@ export default function AdminSettingsPage() {
     if (!settings) return;
     updateSettingsMutation.mutate(settings, {
       onSuccess: () => {
-        showToast('Settings saved successfully!', 'success');
+        showToast(t('common.success'), 'success');
       },
       onError: (error) => {
-        showToast(`Failed to save settings: ${error.message}`, 'error');
+        showToast(`${t('common.error')}: ${error.message}`, 'error');
       },
     });
   };
@@ -77,58 +80,56 @@ export default function AdminSettingsPage() {
     return (
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
-        <AlertDescription>{settingsQuery.error?.message || "Failed to load settings."}</AlertDescription>
+        <AlertDescription>{settingsQuery.error?.message || t('common.error')}</AlertDescription>
       </Alert>
     );
   }
 
   const allUserPermissions = settingsQuery.data?.all_permissions.user || [];
   const allAdminPermissions = settingsQuery.data?.all_permissions.admin || [];
-  // --- MODIFICATION: Combine permissions for the admin card ---
   const allPermissionsForAdmin = [...allUserPermissions, ...allAdminPermissions];
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Global Settings</h1>
+        <h1 className="text-2xl font-bold">{t('admin.settings.title')}</h1>
         <Button onClick={handleSaveChanges} disabled={updateSettingsMutation.isPending}>
           {updateSettingsMutation.isPending ? <LoadingSpinner size="sm" className="mr-2" /> : <Save className="mr-2 h-4 w-4" />}
-          Save Changes
+          {updateSettingsMutation.isPending ? t('admin.settings.saving') : t('admin.settings.save')}
         </Button>
       </div>
 
-      <SettingsCard title="Guest User Permissions" description="Control what anonymous visitors can access and their usage limits.">
+      <SettingsCard title={t('admin.settings.guestTitle')} description={t('admin.settings.guestDescription')}>
         <FeatureAccessCard
-          title="Feature Access"
+          title={t('admin.settings.featureAccess')}
           permissions={allUserPermissions}
           enabledFeatures={settings.guest_permissions.features_enabled}
           onToggle={(p, e) => handleFeatureToggle('guest_permissions', p, e)}
         />
         <UsageLimitsCard
-          title="Usage Limits (per day)"
+          title={t('admin.settings.usageLimits')}
           limits={settings.guest_permissions.usage_limits}
           onLimitChange={(l, v) => handleLimitChange('guest_permissions', l, v)}
         />
       </SettingsCard>
 
-      <SettingsCard title="Registered User Permissions" description="Set the default access and limits for all signed-in users.">
+      <SettingsCard title={t('admin.settings.registeredTitle')} description={t('admin.settings.registeredDescription')}>
         <FeatureAccessCard
-          title="Feature Access"
+          title={t('admin.settings.featureAccess')}
           permissions={allUserPermissions}
           enabledFeatures={settings.registered_user_permissions.features_enabled}
           onToggle={(p, e) => handleFeatureToggle('registered_user_permissions', p, e)}
         />
         <UsageLimitsCard
-          title="Usage Limits (per day, -1 for unlimited)"
+          title={t('admin.settings.usageLimitsUnlimited')}
           limits={settings.registered_user_permissions.usage_limits}
           onLimitChange={(l, v) => handleLimitChange('registered_user_permissions', l, v)}
         />
       </SettingsCard>
 
-      <SettingsCard title="Default Admin Permissions" description="Set the default permissions for all administrators (Super Admins are unaffected).">
-        {/* --- MODIFICATION: Use the combined permissions list here --- */}
+      <SettingsCard title={t('admin.settings.adminTitle')} description={t('admin.settings.adminDescription')}>
         <FeatureAccessCard
-          title="Admin Panel Access"
+          title={t('admin.settings.adminPanelAccess')}
           permissions={allPermissionsForAdmin}
           enabledFeatures={settings.admin_permissions.features_enabled}
           onToggle={(p, e) => handleFeatureToggle('admin_permissions', p, e)}

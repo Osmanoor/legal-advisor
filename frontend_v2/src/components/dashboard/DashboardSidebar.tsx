@@ -1,9 +1,10 @@
 // src/components/dashboard/DashboardSidebar.tsx
+// Updated for i18n
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { MessageSquare, Calculator, Edit3, FileText, Settings, HelpCircle, LogOut, Search, Star   } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
+import { MessageSquare, Calculator, Edit3, FileText, Settings, HelpCircle, LogOut, Search, Star } from 'lucide-react';
 import NewLogoDark from '@/assets/logo-new-dash.svg';
 import { useUIStore } from '@/stores/uiStore';
 import { cn } from '@/lib/utils';
@@ -24,24 +25,23 @@ const iconMap: { [key: string]: React.ElementType } = {
 export const DashboardSidebar = () => {
   const { t } = useLanguage();
   const location = useLocation();
-  const { logout } = useAuthStore(); // Get the logout function from the store
+  const { logout } = useAuthStore();
   const { isSidebarOpen, setSidebarOpen } = useUIStore();
   const { isDesktop } = useBreakpoint();
   const { canAccess } = usePermission();
 
-  const mainNavItems: { path: string; textAr: string; iconName: string; permission: Permission }[] = [
-    { path: '/chat', textAr: 'المساعد الذكي', iconName: 'chat', permission: 'access_chat' },
-    { path: '/search', textAr: 'البحث المتقدم', iconName: 'search', permission: 'access_search_tool' },
-    { path: '/calculator', textAr: 'الالة الحاسبة', iconName: 'calculator', permission: 'access_calculator' },
-    { path: '/correction', textAr: 'معالج النصوص', iconName: 'correction', permission: 'access_text_corrector' },
-    { path: '/tender-mapping', textAr: 'نظام الطرح', iconName: 'templates', permission: 'access_report_generator' },
-    { path: '/feedback', textAr: 'قيمنا', iconName: 'feedback', permission: 'access_feedback' },
+  const mainNavItems: { path: string; tKey: string; iconName: string; permission: Permission }[] = [
+    { path: '/chat', tKey: 'landingPage.solutions.aiAssistant.title', iconName: 'chat', permission: 'access_chat' },
+    { path: '/search', tKey: 'landingPage.solutions.advancedSearch.title', iconName: 'search', permission: 'access_search_tool' },
+    { path: '/calculator', tKey: 'landingPage.solutions.calculator.title', iconName: 'calculator', permission: 'access_calculator' },
+    { path: '/correction', tKey: 'landingPage.solutions.textCorrection.title', iconName: 'correction', permission: 'access_text_corrector' },
+    { path: '/tender-mapping', tKey: 'landingPage.solutions.procurementSystem.title', iconName: 'templates', permission: 'access_report_generator' },
+    { path: '/feedback', tKey: 'navigation.feedback', iconName: 'feedback', permission: 'access_feedback' },
   ];
 
   const secondaryNavItems = [
-    { path: '/settings', labelKey: 'navigation.settings', textAr: 'الاعدادات', icon: Settings },
-    { path: '/help', labelKey: 'navigation.help', textAr: 'المساعدة', icon: HelpCircle },
-    { path: '/logout', labelKey: 'navigation.logout', textAr: 'تسجيل خروج', icon: LogOut },
+    { path: '/settings', tKey: 'dashboard.sidebar.settings', icon: Settings },
+    { path: '/help', tKey: 'dashboard.sidebar.help', icon: HelpCircle },
   ];
 
   const isActive = (path: string) => location.pathname.startsWith(path);
@@ -52,11 +52,9 @@ export const DashboardSidebar = () => {
     }
   };
   
-  // Handler for the logout action
   const handleLogout = async () => {
-    handleLinkClick(); // Close sidebar on mobile
+    handleLinkClick();
     await logout();
-    // The AppLayout's protected route logic will handle the redirect to /login
   };
 
   return (
@@ -68,22 +66,19 @@ export const DashboardSidebar = () => {
       )}
       style={{ direction: 'ltr' }}
     >
-      {/* Logo Area */}
       <div className="h-[86px] flex items-center justify-end px-6 border-b border-border-default shrink-0">
         <Link to="/" onClick={handleLinkClick}>
           <img src={NewLogoDark} alt={t('procurement.communityName')} className="h-[42.9px] w-auto" />
         </Link>
       </div>
 
-      {/* Navigation */}
       <nav className="flex-grow pt-8 px-6 flex flex-col">
-        {/* Main Navigation */}
         <ul className="space-y-4 mb-8">
           {mainNavItems.map(item => {
             const IconComponent = iconMap[item.iconName];
             const active = isActive(item.path);
             if (!canAccess(item.permission)) {
-                return null; // Don't render the link if user lacks permission
+                return null;
             }
             return (
               <li key={item.path} className="relative">
@@ -97,7 +92,7 @@ export const DashboardSidebar = () => {
                     className={`font-medium text-lg ${active ? 'font-semibold' : 'font-normal'} text-right`}
                     style={{ fontFamily: 'var(--font-primary-arabic)' }}
                   >
-                    {item.textAr}
+                    {t(item.tKey)}
                   </span>
                   {IconComponent && <IconComponent className={`w-5 h-5 ${active ? 'text-cta' : 'text-gray-400 group-hover:text-gray-500'}`} />}
                   {active && <div className="w-1 h-full bg-cta rounded-l-sm absolute right-0 top-0 bottom-0"></div>}
@@ -109,27 +104,9 @@ export const DashboardSidebar = () => {
 
         <hr className="border-gray-200 my-8" />
         
-        {/* Secondary Navigation (including Logout) */}
         <ul className="space-y-4">
           {secondaryNavItems.map(item => {
             const IconComponent = item.icon;
-            // If the item is the logout link, render a button instead
-            if (item.path === '/logout') {
-              return (
-                <li key={item.path}>
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center justify-end gap-3 p-3 h-[40px] w-full rounded-md text-gray-500 hover:bg-red-50 hover:text-red-600 group transition-colors"
-                  >
-                    <span className="font-normal text-lg text-right" style={{ fontFamily: 'var(--font-primary-arabic)' }}>
-                      {item.textAr}
-                    </span>
-                    <IconComponent className="w-5 h-5 text-gray-400 group-hover:text-red-500" />
-                  </button>
-                </li>
-              );
-            }
-            // Otherwise, render a normal Link
             return (
               <li key={item.path}>
                 <Link
@@ -138,13 +115,24 @@ export const DashboardSidebar = () => {
                   className="flex items-center justify-end gap-3 p-3 h-[40px] rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-700 group transition-colors"
                 >
                   <span className="font-normal text-lg text-right" style={{ fontFamily: 'var(--font-primary-arabic)' }}>
-                    {item.textAr}
+                    {t(item.tKey)}
                   </span>
                   <IconComponent className="w-5 h-5 text-gray-400 group-hover:text-gray-500" />
                 </Link>
               </li>
             );
           })}
+           <li>
+              <button
+                onClick={handleLogout}
+                className="flex items-center justify-end gap-3 p-3 h-[40px] w-full rounded-md text-gray-500 hover:bg-red-50 hover:text-red-600 group transition-colors"
+              >
+                <span className="font-normal text-lg text-right" style={{ fontFamily: 'var(--font-primary-arabic)' }}>
+                  {t('dashboard.sidebar.logout')}
+                </span>
+                <LogOut className="w-5 h-5 text-gray-400 group-hover:text-red-500" />
+              </button>
+            </li>
         </ul>
       </nav>
     </aside>

@@ -1,11 +1,11 @@
 // src/features/calculator/components/ResultsTable.tsx
+// Updated for i18n
 
 import React from 'react';
+import { useLanguage } from '@/hooks/useLanguage';
 import { Button } from '@/components/ui/button';
 import { CalculationResult } from '@/types/calculator';
 import { ArrowRight, RotateCcw } from 'lucide-react';
-//uselanguage
-import { useLanguage } from '@/hooks/useLanguage';
 
 interface ResultsTableProps {
   results: CalculationResult[];
@@ -17,23 +17,21 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, onBack, onR
   const { t, direction } = useLanguage();
   return (
     <div className="p-4 sm:p-6 bg-white border border-gray-200 rounded-2xl">
-      {/* Header with Back button */}
       <div className="flex justify-end mb-4">
         <Button variant="ghost" onClick={onBack} className="text-gray-500">
           <ArrowRight size={16} className="ml-2" />
-          العودة
+          {t('common.back')}
         </Button>
       </div>
 
-      {/* Results Card */}
       <div className="bg-[#ECFFEA] rounded-lg p-6 ">
         <div className="overflow-x-auto">
           <table className="w-full text-right" dir={direction}>
             <thead>
               <tr className="border-b border-black/20">
-                <th className="p-4 font-normal text-gray-600">الترتيب</th>
-                <th className="p-4 font-normal text-gray-600">أسم المنافس</th>
-                <th className="p-4 font-normal text-gray-600">النسبة الموزونة</th>
+                <th className="p-4 font-normal text-gray-600">{t('calculator.weighted.results.rank')}</th>
+                <th className="p-4 font-normal text-gray-600">{t('calculator.weighted.results.competitorName')}</th>
+                <th className="p-4 font-normal text-gray-600">{t('calculator.weighted.results.weightedScore')}</th>
               </tr>
             </thead>
             <tbody>
@@ -51,10 +49,9 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, onBack, onR
         </div>
       </div>
 
-      {/* Footer Button */}
       <div className="mt-6">
         <Button onClick={onReset} className="w-full h-12 bg-cta hover:bg-cta-hover text-base">
-          منافسة أخرى
+          {t('calculator.weighted.results.anotherCompetition')}
         </Button>
       </div>
     </div>

@@ -1,4 +1,5 @@
 // src/features/admin/components/AdminSidebar.tsx
+// Updated for i18n
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -17,31 +18,29 @@ const iconMap: { [key: string]: React.ElementType } = {
   users: Users,
   feedback: MessageSquare,
   contacts: Mail,
-  settings: Settings, // <-- ADD ICON FOR SETTINGS
+  settings: Settings,
 };
 
 export const AdminSidebar = () => {
   const { t } = useLanguage();
   const location = useLocation();
-  const { user, logout } = useAuthStore(); // Get user to check permissions
+  const { user, logout } = useAuthStore();
   const { isSidebarOpen, setSidebarOpen } = useUIStore();
   const { isDesktop } = useBreakpoint();
   const { canAccess } = usePermission();
   
-  // --- NEW: Check for super admin permission ---
   const canManageSettings = user?.permissions.includes('manage_global_settings');
 
-  const mainNavItems: { path: string; textAr: string; iconName: string; permission: Permission }[] = [
-    { path: '/admin/analytics', textAr: 'الأحصائيات', iconName: 'analytics', permission: 'view_analytics' },
-    { path: '/admin/users', textAr: 'إدارة المستخدمين', iconName: 'users', permission: 'manage_users' },
-    { path: '/admin/feedback', textAr: 'إدارة التقييم', iconName: 'feedback', permission: 'manage_feedback' },
-    { path: '/admin/contacts', textAr: 'رسائل التواصل', iconName: 'contacts', permission: 'manage_contacts' },
+  const mainNavItems: { path: string; tKey: string; iconName: string; permission: Permission }[] = [
+    { path: '/admin/analytics', tKey: 'admin.sidebar.analytics', iconName: 'analytics', permission: 'view_analytics' },
+    { path: '/admin/users', tKey: 'admin.sidebar.userManagement', iconName: 'users', permission: 'manage_users' },
+    { path: '/admin/feedback', tKey: 'admin.sidebar.feedbackManagement', iconName: 'feedback', permission: 'manage_feedback' },
+    { path: '/admin/contacts', tKey: 'admin.sidebar.contactMessages', iconName: 'contacts', permission: 'manage_contacts' },
   ];
   
-  // --- NEW: Add settings to secondary nav, conditionally ---
   const secondaryNavItems = [
-    { path: '/admin/settings', textAr: 'الإعدادات العامة', icon: Settings, permission: 'manage_global_settings' },
-    { path: '/help', textAr: 'المساعدة', icon: HelpCircle },
+    { path: '/admin/settings', tKey: 'admin.sidebar.generalSettings', icon: Settings, permission: 'manage_global_settings' },
+    { path: '/help', tKey: 'admin.sidebar.help', icon: HelpCircle },
   ];
 
   const isActive = (path: string) => location.pathname.startsWith(path);
@@ -76,7 +75,7 @@ export const AdminSidebar = () => {
           {mainNavItems.map(item => {
             const IconComponent = iconMap[item.iconName];
             const active = isActive(item.path);
-            if (!canAccess(item.permission)) return null; // Don't render the link if user lacks permission
+            if (!canAccess(item.permission)) return null;
             return (
               <li key={item.path} className="relative">
                 <Link
@@ -85,7 +84,7 @@ export const AdminSidebar = () => {
                   className={`flex items-center justify-end gap-3 p-3 h-[40px] font-bold rounded-md transition-colors group ${active ? 'bg-[#F5F8FE] text-cta' : 'text-gray-500 hover:bg-gray-100'}`}
                 >
                   <span className={`font-medium text-lg ${active ? 'font-semibold' : 'font-normal'} text-right`} style={{ fontFamily: 'var(--font-primary-arabic)' }}>
-                    {item.textAr}
+                    {t(item.tKey)}
                   </span>
                   {IconComponent && <IconComponent className={`w-5 h-5 ${active ? 'text-cta' : 'text-gray-400'}`} />}
                   {active && <div className="w-1 h-full bg-cta rounded-l-sm absolute right-0 top-0 bottom-0"></div>}
@@ -100,7 +99,7 @@ export const AdminSidebar = () => {
         <ul className="space-y-4">
           {secondaryNavItems.map(item => {
             const IconComponent = item.icon;
-            if (item.permission && !canAccess(item.permission as Permission)) return null; // Don't render if user lacks permission
+            if (item.permission && !canAccess(item.permission as Permission)) return null;
             return (
               <li key={item.path}>
                 <Link
@@ -109,7 +108,7 @@ export const AdminSidebar = () => {
                   className="flex items-center justify-end gap-3 p-3 h-[40px] rounded-md text-gray-500 hover:bg-gray-100 group"
                 >
                   <span className="font-normal text-lg text-right" style={{ fontFamily: 'var(--font-primary-arabic)' }}>
-                    {item.textAr}
+                    {t(item.tKey)}
                   </span>
                   {IconComponent && <IconComponent className="w-5 h-5 text-gray-400" />}
                 </Link>
@@ -124,7 +123,7 @@ export const AdminSidebar = () => {
                 className="flex items-center justify-end gap-3 p-3 h-[40px] w-full rounded-md text-gray-500 hover:bg-red-50 hover:text-red-600 group transition-colors"
             >
                 <span className="font-normal text-lg text-right" style={{ fontFamily: 'var(--font-primary-arabic)' }}>
-                  تسجيل الخروج
+                  {t('admin.sidebar.logout')}
                 </span>
                 <LogOut className="w-5 h-5 text-gray-400 group-hover:text-red-500" />
             </button>

@@ -1,4 +1,6 @@
 // src/pages/CalculatorPage.tsx
+// Updated for i18n
+
 import React, { useState } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -6,7 +8,6 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Percent, CalendarDays, FileText  } from 'lucide-react';
 
-// Import Sub-Calculator Components
 import { PercentageCalculator } from '@/features/calculator/components/PercentageCalculator';
 import { VatCalculator } from '@/features/calculator/components/VatCalculator';
 import { AmountPercentageCalculator } from '@/features/calculator/components/AmountPercentageCalculator';
@@ -26,7 +27,6 @@ export default function CalculatorPage() {
   const [selectedNumericalCalc, setSelectedNumericalCalc] = useState<NumericalCalcType>('percentage');
   const [selectedDateCalc, setSelectedDateCalc] = useState<DateCalcType>('conversion');
 
-  // Design config based on Figma CSS and new theme
   const designConfig = {
     fieldGroupClass: "space-y-2 text-right",
     labelClass: "block mb-2 text-[14px] font-normal text-inputTheme-text",
@@ -77,54 +77,44 @@ export default function CalculatorPage() {
   const tabsData = [
     { value: 'numericalValues', labelKey: 'calculator.tabs.numericalValues', Icon: Percent },
     { value: 'dates', labelKey: 'calculator.tabs.dates', Icon: CalendarDays },
-    { value: 'weightedPercentage', labelKey: 'النسبة الموزونة', Icon: FileText },
+    { value: 'weightedPercentage', labelKey: 'calculator.tabs.weightedPercentage', Icon: FileText },
   ];
 
   return (
-    // Overall page padding and direction
     <div className="p-4 md:p-6 lg:p-8" dir={direction}>
-      {/* Top Wrapper for Title and Subtitle */}
-      {/* CSS: top: 141px from dashboard top, left: 1095px (transformed to be right aligned) */}
-      {/* This implies it's aligned with the start of the content area, not full width of page */}
       <div className={`mb-6 md:mb-8 ${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
         <h1 
-            // CSS: Title - width: 291px; height: 29px; font-family: 'Montserrat-Arabic'; font-weight: 500; font-size: 22px; line-height: 130%; color: #000000;
-            className="text-design-22 font-medium text-text-on-light-strong" // text-design-22 for 22px font
+            className="text-design-22 font-medium text-text-on-light-strong"
             style={{fontFamily: 'var(--font-primary-arabic)', fontWeight: 500, lineHeight: '130%'}}
         >
             {t('calculator.mainTitle')}
         </h1>
         <p 
-            // CSS: Paragraph - width: 386px; height: 21px; font-family: 'Inter'; font-weight: 400; font-size: 14px; line-height: 150%; color: #666F8D;
-            className="text-[14px] text-text-on-light-faint mt-1" // text-text-on-light-faint for #666F8D
+            className="text-[14px] text-text-on-light-faint mt-1"
             style={{fontFamily: 'var(--font-primary-latin)', fontWeight: 400, lineHeight: '150%'}}
         >
             {t('calculator.mainSubtitle')}
         </p>
       </div>
 
-      {/* Calculator Content Area - Max width from design for TabsList and "Main" content card */}
       <div className="w-full max-w-[854px] mx-auto">
         <Tabs defaultValue="numericalValues" value={activeMainTab} onValueChange={(v) => setActiveMainTab(v as MainCalcTab)} className="w-full">
-          {/* TabsList to span full width of its 854px container */}
           <TabsList className={`w-full flex mb-6 ${direction === 'rtl' ? 'md:flex-row-reverse' : ''}`}>
             {tabsData.map(tab => (
               <TabsTrigger 
                 key={tab.value} 
                 value={tab.value} 
-                className="flex-1 flex flex-row items-center justify-center" // flex-1 makes triggers share width
+                className="flex-1 flex flex-row items-center justify-center"
               >
                 <div className={`flex items-center gap-2 ${direction === 'rtl' ? 'flex-row-reverse' : ''}`}>
-                    <tab.Icon className={`w-5 h-5`} /> {/* Icon color inherited */}
+                    <tab.Icon className={`w-5 h-5`} />
                     <span>{t(tab.labelKey)}</span>
                 </div>
               </TabsTrigger>
             ))}
           </TabsList>
 
-          {/* Content for "القيم الحسابية" Tab */}
           <TabsContent value="numericalValues">
-            {/* Dropdown for selecting numerical calculator type */}
             <div className={`mb-6 md:w-[370px] ${direction === 'rtl' ? 'ml-auto text-right' : 'mr-auto text-left'}`}>
               <Label 
                 htmlFor="numerical-calc-type" 
@@ -156,7 +146,6 @@ export default function CalculatorPage() {
             {renderNumericalCalculator()}
           </TabsContent>
 
-          {/* Content for "التواريخ" Tab */}
           <TabsContent value="dates">
              <div className={`mb-6 md:w-[370px] ${direction === 'rtl' ? 'ml-auto text-right' : 'mr-auto text-left'}`}>
               <Label 

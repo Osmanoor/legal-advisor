@@ -1,4 +1,5 @@
 // src/features/auth/components/LoginForm.tsx
+// Updated for i18n
 
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -26,18 +27,17 @@ export function LoginForm({ onSwitchToSignup }: LoginFormProps) {
   const [loginIdentifier, setLoginIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // Local loading state
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      // Pass the rememberMe state to the login function
       await login({ loginIdentifier, password, rememberMe });
       navigate('/chat');
     } catch (error) {
       const axiosError = error as AxiosError<{ error?: string }>;
-      const errorMessage = axiosError.response?.data?.error || 'Invalid credentials.';
+      const errorMessage = axiosError.response?.data?.error || t('auth.errorInvalidCredentials');
       showToast(errorMessage, 'error');
     } finally {
       setIsLoading(false);
@@ -52,11 +52,11 @@ export function LoginForm({ onSwitchToSignup }: LoginFormProps) {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <Label htmlFor="loginIdentifier">البريد الألكتروني او رقم الهاتف</Label>
+          <Label htmlFor="loginIdentifier">{t('auth.emailOrPhone')}</Label>
           <Input id="loginIdentifier" value={loginIdentifier} onChange={(e) => setLoginIdentifier(e.target.value)} required />
         </div>
         <div>
-          <Label htmlFor="password">كلمة السر</Label>
+          <Label htmlFor="password">{t('auth.password')}</Label>
           <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
         </div>
         
@@ -68,16 +68,16 @@ export function LoginForm({ onSwitchToSignup }: LoginFormProps) {
               onCheckedChange={(checked) => setRememberMe(!!checked)}
             />
             <Label htmlFor="remember-me" className="font-normal text-sm text-gray-600">
-              تذكرني
+              {t('auth.rememberMe')}
             </Label>
           </div>
           <Link to="/password-reset" className="text-sm font-medium text-cta hover:underline">
-            نسيت كلمة السر ؟
+            {t('auth.forgotPassword')}
           </Link>
         </div>
 
         <Button type="submit" className="w-full bg-cta hover:bg-cta-hover h-11" disabled={isLoading}>
-          {isLoading ? <LoadingSpinner size="sm" /> : "تسجيل دخول"}
+          {isLoading ? <LoadingSpinner size="sm" /> : t('auth.login')}
         </Button>
       </form>
 

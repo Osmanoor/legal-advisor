@@ -1,0 +1,56 @@
+steps:
+  # 1. Build the production Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/my-project-2024-441219/gpn-repo/gpn-service:latest'
+      - '.'
+
+  # 2. Push the image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'us-central1-docker.pkg.dev/my-project-2024-441219/gpn-repo/gpn-service:latest'
+
+  # 3. Apply database migrations
+  - name: 'us-central1-docker.pkg.dev/my-project-2024-441219/gpn-repo/gpn-service:latest'
+    entrypoint: 'flask'
+    args: ['db', 'upgrade']
+    secretEnv: ['DATABASE_URL']
+
+  # 4. Seed the initial data (Super Admin, etc.)
+  - name: 'us-central1-docker.pkg.dev/my-project-2024-441219/gpn-repo/gpn-service:latest'
+    entrypoint: 'flask'
+    args: ['seed-data']
+    secretEnv: ['DATABASE_URL', 'SUPER_ADMIN_IDENTIFIER', 'SUPER_ADMIN_PASSWORD']
+
+  # 5. Deploy the service to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'gpn-service' # This will be the name of your service
+      - '--image'
+      - 'us-central1-docker.pkg.dev/my-project-2024-441219/gpn-repo/gpn-service:latest'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--port=8080'
+      - '--add-cloudsql-instances=my-project-2024-441219:us-central1:gpn-db'
+      - '--update-secrets=DATABASE_URL=DATABASE_URL:latest,JWT_SECRET_KEY=JWT_SECRET_KEY:latest,OPENAI_API_KEY=OPENAI_API_KEY:latest,GEMINI_API_KEY=GEMINI_API_KEY:latest,LINKEDIN_CLIENT_ID=LINKEDIN_CLIENT_ID:latest,LINKEDIN_CLIENT_SECRET=LINKEDIN_CLIENT_SECRET:latest,LINKEDIN_REDIRECT_URI=LINKEDIN_REDIRECT_URI:latest,SENDGRID_API_KEY=SENDGRID_API_KEY:latest,SENDER_EMAIL=SENDER_EMAIL:latest,TWILIO_ACCOUNT_SID=TWILIO_ACCOUNT_SID:latest,TWILIO_AUTH_TOKEN=TWILIO_AUTH_TOKEN:latest,TWILIO_PHONE_NUMBER=TWILIO_PHONE_NUMBER:latest,GCS_BUCKET_NAME=GCS_BUCKET_NAME:latest,SUPER_ADMIN_IDENTIFIER=SUPER_ADMIN_IDENTIFIER:latest,SUPER_ADMIN_PASSWORD=SUPER_ADMIN_PASSWORD:latest'
+
+# Define which secrets from Secret Manager are available to this build
+availableSecrets:
+  secretManager:
+    - versionName: projects/my-project-2024-441219/secrets/DATABASE_URL/versions/latest
+      env: 'DATABASE_URL'
+    - versionName: projects/my-project-2024-441219/secrets/JWT_SECRET_KEY/versions/latest
+      env: 'JWT_SECRET_KEY'
+    - versionName: projects/my-project-2024-441219/secrets/SUPER_ADMIN_IDENTIFIER/versions/latest
+      env: 'SUPER_ADMIN_IDENTIFIER'
+    - versionName: projects/my-project-2024-441219/secrets/SUPER_ADMIN_PASSWORD/versions/latest
+      env: 'SUPER_ADMIN_PASSWORD'

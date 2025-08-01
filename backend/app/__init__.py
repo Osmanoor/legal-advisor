@@ -11,7 +11,7 @@ from app.extensions import db, migrate, bcrypt, jwt, cors
 
 def create_app(config_class=Config):
     """Create and configure the Flask application"""
-    app = Flask(__name__, static_folder='../static', static_url_path='')
+    app = Flask(__name__, static_folder='static', static_url_path='')
     app.config.from_object(config_class)
     
     # Initialize Flask extensions
@@ -19,7 +19,17 @@ def create_app(config_class=Config):
     migrate.init_app(app, db)
     bcrypt.init_app(app)
     jwt.init_app(app)
-    cors.init_app(app, resources={r"/api/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
+    
+    # --- MODIFICATION START: Conditional CORS Configuration ---
+    frontend_url = app.config.get('FRONTEND_URL')
+    if frontend_url:
+        # Development mode: Allow requests from the Vite dev server
+        cors.init_app(app, resources={r"/api/*": {"origins": frontend_url}}, supports_credentials=True)
+    else:
+        # Production mode (or local test): Standard CORS for same-origin and credentials
+        cors.init_app(app, supports_credentials=True)
+    # --- MODIFICATION END ---
+
 
     # Import models here so that Alembic can see them
     from app import models

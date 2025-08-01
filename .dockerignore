@@ -1,0 +1,27 @@
+# Git
+.git
+.gitignore
+
+# Environments
+.env
+.env.*
+backend/venv/
+backend/.venv/
+frontend_v2/node_modules/
+
+# Python cache
+backend/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Frontend build artifacts (we build inside Docker)
+frontend_v2/dist/
+frontend_v2/build/
+
+# Test files
+backend/tests/
+frontend_v2/tests/
+
+# Other
+.DS_Store

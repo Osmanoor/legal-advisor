@@ -2,8 +2,7 @@
 .git
 .gitignore
 
-# Environments
-.env
+# Environments - We DO NOT ignore the backend/.env file
 .env.*
 backend/venv/
 backend/.venv/
@@ -15,7 +14,8 @@ backend/__pycache__/
 *.pyo
 *.pyd
 
-# Frontend build artifacts (we build inside Docker)
+# Frontend build artifacts - these are not needed in the build context
+# since you are manually copying them to backend/app/static
 frontend_v2/dist/
 frontend_v2/build/
 

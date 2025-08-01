@@ -13,7 +13,7 @@ steps:
       - 'push'
       - 'us-central1-docker.pkg.dev/my-project-2024-441219/gpn-repo/gpn-service:latest'
 
-  # 3. Apply database migrations
+  # 3. Apply database migration
   - name: 'us-central1-docker.pkg.dev/my-project-2024-441219/gpn-repo/gpn-service:latest'
     entrypoint: 'flask'
     args: ['db', 'upgrade']

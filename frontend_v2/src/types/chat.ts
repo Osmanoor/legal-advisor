@@ -1,6 +1,5 @@
 // src/types/chat.ts
 
-// This is your existing, correct Resource interface. It will be preserved.
 export interface Resource {
   content: string;
   metadata: {
@@ -14,31 +13,33 @@ export interface Resource {
   };
 }
 
-// This is your existing, correct ChatMessage interface.
 export interface ChatMessage {
-  id: string; // Will now be a UUID from the database
+  id: string; 
   role: 'user' | 'assistant';
   content: string;
   resources?: Resource[];
-  timestamp: string; // Will be `created_at` from the database
+  timestamp: string;
 }
 
-// --- NEW AND UPDATED TYPES FOR PERSISTENT CHAT ---
-
-// Updated to match the backend response for a session list item
 export interface ChatSession {
-  id: string; // UUID from the database
+  id: string; 
   title: string;
-  updated_at: string; // ISO string from the database
-  questionCount: number; // The number of user questions in the session
+  updated_at: string;
+  questionCount: number; 
 }
 
-// The data returned when starting a new chat session
-export interface NewChatSessionResponse extends ChatSession {
+// --- MODIFICATION START: Update response type ---
+// This interface now represents the response for BOTH guests and users.
+// For guests, the top-level properties (id, title, etc.) will be undefined.
+export interface NewChatSessionResponse {
+    id?: string;
+    title?: string;
+    updated_at?: string;
+    questionCount?: number;
     messages: ChatMessage[];
 }
+// --- MODIFICATION END ---
 
-// Options sent with a message to the backend
 export interface ChatOptions {
   language?: 'ar' | 'en' | 'sa';
   reasoning?: boolean;

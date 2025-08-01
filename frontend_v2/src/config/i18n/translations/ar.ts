@@ -87,7 +87,7 @@ export const ar = {
     // --- Stepper ---
     steps: {
       basicInfo: 'المعلومات الأساسية',
-      verification: 'التحقق',
+      verification: "ارسال كود التحقق",
       additionalInfo: 'المعلومات الإضافية'
     },
 
@@ -104,6 +104,8 @@ export const ar = {
     verificationSuccess: 'تم التحقق بنجاح!',
     codeVerifiedSuccess: 'تم التحقق من الرمز بنجاح!',
     profileSavedSuccess: 'تم حفظ معلومات الملف الشخصي!',
+    linkedinAuthFailed: 'فشل المصادقة مع لينكدإن. يرجى المحاولة مرة أخرى.',
+    linkedinProcessFailed: 'فشل معالجة تسجيل الدخول عبر لينكدإن. يرجى المحاولة مرة أخرى.',
   },
   navigation: {
     home: 'الرئيسية',
@@ -931,7 +933,7 @@ export const ar = {
       regulation: 'اللائحة',
       
       // General
-      noResult: 'لم يتم الع"ور على نوع منافسة مطابق',
+      noResult: 'لم يتم العثور على نوع منافسة مطابق',
       tryAgain: 'يرجى تجربة خيارات مختلفة'
     },
     
@@ -955,7 +957,9 @@ export const ar = {
       profile: 'الملف الشخصي',
       adminDashboard: 'لوحة التحكم للمشرف',
       logout: 'تسجيل الخروج',
-      login: 'تسجيل الدخول'
+      login: 'تسجيل الدخول',
+      switchToAdmin: 'لوحة تحكم المشرف',
+      switchToUser: 'لوحة تحكم المستخدم',
     },
     sidebar: {
       settings: 'الاعدادات',
@@ -1021,4 +1025,18 @@ export const ar = {
       error: 'فشل إرسال التقييم.'
     }
   },
+  searchKeywords: {
+    chat: 'مساعد ذكي دردشة سؤال جواب ai',
+    search: 'بحث متقدم مواد نظام لائحة',
+    calculator: 'حاسبة نسبة مئوية ضريبة قيمة مضافة تاريخ هجري ميلادي',
+    correction: 'تصحيح لغوي إملائي نحوي تفقيط أرقام كلمات',
+    tenderMapping: 'نظام الطرح منافسة تقرير جدول زمني',
+    feedback: 'تقييم ملاحظات رأي',
+    settings: 'إعدادات ملف شخصي كلمة سر حساب',
+    adminAnalytics: 'إحصائيات تحليلات زيارات مستخدمين لوحة تحكم',
+    adminUsers: 'إدارة مستخدمين صلاحيات أدوار حذف إضافة',
+    adminFeedback: 'إدارة تقييمات مراجعات موافقة أرشفة',
+    adminContacts: 'رسائل تواصل استفسارات',
+    adminSettings: 'إعدادات عامة صلاحيات حدود استخدام',
+  }   
 };

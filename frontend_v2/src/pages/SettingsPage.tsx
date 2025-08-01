@@ -182,7 +182,7 @@ export default function SettingsPage() {
               <div className="space-y-1.5 text-right"><Label htmlFor="workplace">{t('settings.workplace')}</Label><Input id="workplace" name="workplace" value={formData.workplace} onChange={handleChange} /></div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
                 <div className="space-y-1.5 text-right"><Label htmlFor="jobTitle">{t('settings.jobTitle')}</Label><Input id="jobTitle" name="jobTitle" value={formData.jobTitle} onChange={handleChange} /></div>
-                <div className="space-y-1.5 text-right"><Label htmlFor="linkedin">{t('settings.linkedin')}</Label><Input id="linkedin" name="linkedin" value={formData.linkedin} onChange={handleChange} /></div>
+                <div className="space-y-1.5 text-right"><Label htmlFor="linkedin">{t('settings.linkedin')}</Label><Input id="linkedin" name="linkedin" value={formData.linkedin} onChange={handleChange} disabled className='bg-gray-100 cursor-not-allowed' /></div>
               </div>
             </div>
             <div className="mt-8 flex w-full"><Button type="submit" className="w-full bg-cta hover:bg-cta-hover" disabled={updateUserProfileMutation.isPending}>{updateUserProfileMutation.isPending ? <LoadingSpinner size="sm" /> : t('settings.save')}</Button></div>

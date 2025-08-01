@@ -1,43 +1,34 @@
 # app/services/usage_service.py
 
-import json
 from datetime import date
 from sqlalchemy import and_
 from app.extensions import db
 from app.models import UserUsageLog, User
-from app.config import Config
-
+from app.services.settings_service import SettingsService
 
 class UsageService:
-    def __init__(self):
-        try:
-            with open(Config.SETTINGS_FILE_PATH, 'r') as f:
-                self.settings = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
-            # In a real app, you might fall back to defaults or raise an error
-            self.settings = {}
 
     def _get_limit_for_feature(self, user: User | None, guest_identifier: str | None, feature: str) -> int:
         """Determines the usage limit for a given user/guest and feature."""
+        # --- MODIFICATION: Get the latest settings on every check ---
+        settings = SettingsService.get_settings()
+        
         if user:
             role_name = user.roles[0].name if user.roles else 'Registered User'
             if role_name == 'Admin':
-                return self.settings.get("admin_permissions", {}).get("usage_limits", {}).get(feature, 0)
+                return settings.get("admin_permissions", {}).get("usage_limits", {}).get(feature, 0)
             else: # Registered User
-                return self.settings.get("registered_user_permissions", {}).get("usage_limits", {}).get(feature, 0)
+                return settings.get("registered_user_permissions", {}).get("usage_limits", {}).get(feature, 0)
         elif guest_identifier: # Guest user
-            return self.settings.get("guest_permissions", {}).get("usage_limits", {}).get(feature, 0)
+            return settings.get("guest_permissions", {}).get("usage_limits", {}).get(feature, 0)
         return 0
 
     def check_usage(self, user: User | None, guest_identifier: str | None, feature: str) -> bool:
         """Checks if a user or guest is within their usage limit for a feature."""
         limit = self._get_limit_for_feature(user, guest_identifier, feature)
         
-        # -1 means unlimited usage
-        if limit == -1:
-            return True
-        if limit == 0:
-            return False
+        if limit == -1: return True
+        if limit == 0: return False
 
         today = date.today()
         
@@ -51,10 +42,9 @@ class UsageService:
         elif guest_identifier:
             query_filter.append(UserUsageLog.guest_identifier == guest_identifier)
         else:
-            return False # Cannot check usage for unidentified request
+            return False
 
         usage_log = UserUsageLog.query.filter(and_(*query_filter)).first()
-
         current_usage = usage_log.count if usage_log else 0
         
         return current_usage < limit
@@ -62,7 +52,7 @@ class UsageService:
     def log_usage(self, user_id: str | None, guest_identifier: str | None, feature: str):
         """Logs one usage instance for a user or guest for a specific feature."""
         if not user_id and not guest_identifier:
-            return # Cannot log usage for unidentified request
+            return
 
         today = date.today()
         

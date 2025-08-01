@@ -26,12 +26,12 @@
       "access_calculator": true,
       "access_chat": true,
       "access_feedback": true,
-      "access_report_generator": true,
-      "access_search_tool": true,
-      "access_text_corrector": true
+      "access_report_generator": false,
+      "access_search_tool": false,
+      "access_text_corrector": false
     },
     "usage_limits": {
-      "ai_assistant_queries_per_day": 5,
+      "ai_assistant_queries_per_day": 3,
       "report_generations_per_day": 1,
       "text_corrections_per_day": 10
     }
@@ -49,7 +49,7 @@
       "access_text_corrector": true
     },
     "usage_limits": {
-      "ai_assistant_queries_per_day": 50,
+      "ai_assistant_queries_per_day": 10,
       "report_generations_per_day": 10,
       "text_corrections_per_day": 100
     }

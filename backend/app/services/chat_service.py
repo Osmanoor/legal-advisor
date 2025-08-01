@@ -4,6 +4,7 @@ import uuid
 import sys
 import os
 from flask import jsonify
+from datetime import datetime
 from app.extensions import db
 from app.models import ChatSession, ChatMessage, MessageResource
 
@@ -92,40 +93,64 @@ class ChatService:
         db.session.commit()
         return assistant_message, None
 
-    def start_new_session(self, user_id: str, first_message_content: str, options: dict):
-        """Starts a new session, gets the first response, and saves everything to the DB."""
-        user_uuid = uuid.UUID(user_id)
-        
-        new_session = ChatSession(
-            user_id=user_uuid,
-            title=first_message_content[:120]
-        )
-        db.session.add(new_session)
-        
-        user_message = ChatMessage(session=new_session, role='user', content=first_message_content)
-        db.session.add(user_message)
+    def start_new_session(self, user_id: str | None, first_message_content: str, options: dict, history: list | None = None):
+        """Starts a new session for users, or handles a sessionless query for guests."""
         
         rag_system = self.get_rag_system(
             language=options.get('language', 'ar'),
             reasoning=options.get('reasoning', False)
         )
-        response_data = rag_system.query(first_message_content, [])
-        
-        assistant_message = ChatMessage(session=new_session, role='assistant', content=response_data['answer'])
-        db.session.add(assistant_message)
-        db.session.flush()
 
-        for doc in response_data.get("source_documents", []):
-            resource = MessageResource(
-                message_id=assistant_message.id,
-                content=doc.page_content,
-                resource_metadata=doc.metadata
-            )
-            db.session.add(resource)
+        # --- MODIFICATION START: Handle authenticated vs. guest users ---
+        if user_id:
+            # Authenticated user: Create persistent session and messages
+            user_uuid = uuid.UUID(user_id)
             
-        db.session.commit()
-        # --- FIX: Return the individual message objects to guarantee order ---
-        return new_session, user_message, assistant_message, None
+            new_session = ChatSession(
+                user_id=user_uuid,
+                title=first_message_content[:120]
+            )
+            db.session.add(new_session)
+            
+            user_message = ChatMessage(session=new_session, role='user', content=first_message_content)
+            db.session.add(user_message)
+            
+            response_data = rag_system.query(first_message_content, [])
+            
+            assistant_message = ChatMessage(session=new_session, role='assistant', content=response_data['answer'])
+            db.session.add(assistant_message)
+            db.session.flush()
+
+            for doc in response_data.get("source_documents", []):
+                resource = MessageResource(
+                    message_id=assistant_message.id,
+                    content=doc.page_content,
+                    resource_metadata=doc.metadata
+                )
+                db.session.add(resource)
+            
+            db.session.commit()
+            return new_session, user_message, assistant_message, None
+        else:
+            # Guest user: Perform RAG query without saving to DB
+            chat_history_for_rag = history or []
+            
+            response_data = rag_system.query(first_message_content, chat_history_for_rag)
+
+            # Create transient (non-DB) message objects to return
+            user_message = ChatMessage(role='user', content=first_message_content, id=uuid.uuid4(), created_at=datetime.utcnow(), resources=[])
+            assistant_message = ChatMessage(role='assistant', content=response_data['answer'], id=uuid.uuid4(), created_at=datetime.utcnow())
+            
+            # Populate resources for the assistant message
+            transient_resources = []
+            for doc in response_data.get("source_documents", []):
+                resource = MessageResource(content=doc.page_content, resource_metadata=doc.metadata)
+                transient_resources.append(resource)
+            assistant_message.resources = transient_resources
+
+            return None, user_message, assistant_message, None
+        # --- MODIFICATION END ---
+
 
 # --- SERIALIZATION HELPERS ---
 def serialize_session_list_item(session):

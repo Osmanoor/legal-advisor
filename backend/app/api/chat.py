@@ -13,6 +13,12 @@ chat_service = ChatService()
 @permission_required('access_chat')
 def get_sessions():
     user_id = get_jwt_identity()
+    # --- MODIFICATION START: Handle guest users ---
+    # If there is no user_id (i.e., a guest), return an empty list immediately.
+    if not user_id:
+        return jsonify([]), 200
+    # --- MODIFICATION END ---
+    
     sessions = chat_service.get_sessions_for_user(user_id)
     return jsonify([serialize_session_list_item(s) for s in sessions]), 200
 
@@ -20,6 +26,10 @@ def get_sessions():
 @permission_required('access_chat')
 def get_session_messages(session_id):
     user_id = get_jwt_identity()
+    # Guests will not have a user_id, so this will correctly deny access.
+    if not user_id:
+        return jsonify({"error": "Authentication required"}), 401
+    
     session = chat_service.get_session_by_id(session_id, user_id)
     if not session:
         return jsonify({"error": "Session not found or access denied"}), 404
@@ -29,6 +39,9 @@ def get_session_messages(session_id):
 @permission_required('access_chat')
 def delete_session(session_id):
     user_id = get_jwt_identity()
+    if not user_id:
+        return jsonify({"error": "Authentication required"}), 401
+        
     if chat_service.delete_session_by_id(session_id, user_id):
         return jsonify({"message": "Session deleted successfully"}), 200
     return jsonify({"error": "Session not found or access denied"}), 404
@@ -38,6 +51,9 @@ def delete_session(session_id):
 @usage_limited('ai_assistant_queries_per_day')
 def add_message(session_id):
     user_id = get_jwt_identity()
+    if not user_id:
+        return jsonify({"error": "Authentication required"}), 401
+        
     data = request.get_json()
     user_message = data.get('message')
     options = data.get('options', {})
@@ -56,22 +72,33 @@ def start_new_chat():
     data = request.get_json()
     first_message = data.get('message')
     options = data.get('options', {})
+    
+    # --- MODIFICATION START: Handle guest chat history ---
+    # Only consider history if the user is a guest (no user_id).
+    history = data.get('history') if not user_id else None
+    # --- MODIFICATION END ---
+    
     if not first_message:
         return jsonify({"error": "Initial message content is required"}), 400
     
-    # --- FIX: Capture the explicit message objects returned from the service ---
-    session, user_message, assistant_message, error = chat_service.start_new_session(user_id, first_message, options)
+    session, user_message, assistant_message, error = chat_service.start_new_session(user_id, first_message, options, history)
     
     if error:
         return jsonify({"error": error}), 500
         
-    # --- FIX: Construct the messages array in the correct, guaranteed order ---
     messages_payload = [serialize_message(user_message), serialize_message(assistant_message)]
     
-    return jsonify({
-        'id': str(session.id), 
-        'title': session.title,
-        'updated_at': session.updated_at.isoformat() + 'Z',
-        'questionCount': 1, # A new session always starts with one question
-        'messages': messages_payload
-    }), 201
+    # --- MODIFICATION START: Differentiate response for guests vs. users ---
+    if session: # Authenticated user response
+        return jsonify({
+            'id': str(session.id), 
+            'title': session.title,
+            'updated_at': session.updated_at.isoformat() + 'Z',
+            'questionCount': 1,
+            'messages': messages_payload
+        }), 201
+    else: # Guest user response (no session created)
+        return jsonify({
+            'messages': messages_payload
+        }), 200
+    # --- MODIFICATION END ---

@@ -1,7 +1,7 @@
 # app/api/auth.py
 
 import os
-from flask import Blueprint, request, jsonify, redirect
+from flask import Blueprint, request, jsonify, redirect, current_app
 from flask_jwt_extended import set_access_cookies, unset_jwt_cookies, jwt_required, get_jwt_identity
 from app.services.auth_service import AuthService
 from app.utils.auth_decorators import permission_required
@@ -181,19 +181,27 @@ def linkedin_login():
 def linkedin_callback():
     """Handles the callback from LinkedIn after authorization."""
     code = request.args.get('code')
+
+    # --- MODIFICATION START: Environment-aware redirect URLs ---
+    frontend_url = current_app.config.get('FRONTEND_URL')
+    # Use absolute URL in development if FRONTEND_URL is set, otherwise use relative path for production.
+    base_url = frontend_url if frontend_url else ''
+    
     if not code:
-        return redirect('/login?error=linkedin_auth_failed') # Redirect to frontend login
+        # Redirect to frontend login page with an error
+        return redirect(f"{base_url}/login?error=linkedin_auth_failed")
 
     result, status_code = auth_service.handle_linkedin_callback(code)
 
     if status_code == 200:
-        # On success, set our own app's cookie and redirect to the frontend dashboard
-        # The frontend will need to handle this redirect and store the user info.
-        response = redirect('/dashboard') # Redirect to the main app dashboard
+        # On success, set our app's cookie and redirect to the frontend dashboard
+        response = redirect(f"{base_url}/chat") # Use base_url for the redirect
         set_access_cookies(response, result["token"])
         return response
 
-    return redirect('/login?error=linkedin_process_failed')
+    # On failure, redirect back to the frontend login page with a different error
+    return redirect(f"{base_url}/login?error=linkedin_process_failed")
+    # --- MODIFICATION END ---
 
 
 # ... (register, login, logout endpoints remain here) ...

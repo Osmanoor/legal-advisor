@@ -95,7 +95,7 @@ export const Step1_RegisterForm: React.FC<Step1_RegisterFormProps> = ({ onSucces
             defaultCountry="SA"
             value={phoneNumber}
             onChange={setPhoneNumber}
-            className="phone-input-container"
+            className="phone-input-container bg-white theme-light"
             dir="ltr"
           />
         </div>

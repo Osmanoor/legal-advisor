@@ -19,6 +19,7 @@ from app.models import Permission
 import uuid
 from google.cloud import storage
 from werkzeug.utils import secure_filename
+from io import BytesIO
 
 import sqlalchemy as sa
 
@@ -85,6 +86,34 @@ class AuthService:
             db.session.rollback()
             print(f"GCS Upload Error: {e}")
             return {"error": "Failed to upload file."}, 500
+    
+    def _upload_avatar_from_url(self, user: User, image_url: str):
+        """Downloads an image from a URL and uploads it to GCS for a user."""
+        if not self.bucket:
+            print("GCS not configured, skipping avatar upload from URL.")
+            return None
+
+        try:
+            response = requests.get(image_url, stream=True)
+            if response.status_code != 200:
+                print(f"Failed to download avatar from URL: {image_url}. Status: {response.status_code}")
+                return None
+
+            content_type = response.headers.get('Content-Type', 'image/jpeg')
+            extension = content_type.split('/')[-1] if '/' in content_type else 'jpg'
+            unique_filename = f"avatars/{user.id}/{uuid.uuid4()}.{extension}"
+
+            blob = self.bucket.blob(unique_filename)
+            blob.upload_from_file(BytesIO(response.content), content_type=content_type)
+            
+            public_url = blob.public_url
+            user.profile_picture_url = public_url
+            # The final commit will be handled by the calling function `handle_linkedin_callback`
+            return public_url
+
+        except Exception as e:
+            print(f"Error uploading avatar from URL: {e}")
+            return None
 
     def get_user_permissions(self, user: User) -> list:
         """Calculates and returns a list of all final permissions for a user."""
@@ -131,11 +160,11 @@ class AuthService:
             return True, None # Pretend success for development
         
         try:
-            # message = self.twilio_client.messages.create(
-            #     body=body,
-            #     from_=os.environ['TWILIO_PHONE_NUMBER'],
-            #     to=to_phone_number # Assumes international format, e.g., +966...
-            # )
+            message = self.twilio_client.messages.create(
+                body=body,
+                from_=os.environ['TWILIO_PHONE_NUMBER'],
+                to=to_phone_number # Assumes international format, e.g., +966...
+            )
             print(f"SMS sent to {to_phone_number}, body: {body}")
             return True, None
         except Exception as e:
@@ -269,21 +298,26 @@ class AuthService:
         if not access_token:
             return {"error": "Failed to retrieve LinkedIn access token"}, 500
 
-        # 2. Get user profile and email from LinkedIn
+        # 2. Get user profile and email from LinkedIn's userinfo endpoint
         user_profile = self._get_linkedin_user_profile(access_token)
-        user_email_data = self._get_linkedin_user_email(access_token)
-        if not user_profile or not user_email_data:
+        if not user_profile:
             return {"error": "Failed to retrieve LinkedIn user details"}, 500
 
-        linkedin_id = user_profile.get('id')
-        email = user_email_data.get('email')
-        full_name = f"{user_profile.get('localizedFirstName')} {user_profile.get('localizedLastName')}"
+        linkedin_id = user_profile.get('sub')
+        email = user_profile.get('email')
+        full_name = user_profile.get('name')
+        is_email_verified = user_profile.get('email_verified')
+        picture_url = user_profile.get('picture')
+        
+        if not linkedin_id or not email or not full_name:
+            return {"error": "Incomplete profile data from LinkedIn"}, 500
+
 
         # 3. Find or create user in our database
         user = User.query.filter_by(linkedin_id=linkedin_id).first()
         if not user:
-            # If no user with that linkedin_id, check by email
-            user = User.query.filter_by(email=email).first()
+            # If no user with that linkedin_id, check by verified email
+            user = User.query.filter(User.email == email, User.email_verified_at.isnot(None)).first()
             if user:
                 # User exists, link their LinkedIn account
                 user.linkedin_id = linkedin_id
@@ -294,14 +328,21 @@ class AuthService:
                     full_name=full_name,
                     email=email,
                     linkedin_id=linkedin_id,
-                    # We need to ask for a phone number and create a random password
-                    # This is a complex flow; for now, we'll create a placeholder
-                    phone_number=f"linkedin_{linkedin_id}", # Placeholder!
+                    phone_number=None, # Set phone number to None for social logins
                 )
                 user.set_password(os.urandom(16)) # Secure random password
-                user.roles.append(default_role)
+                if default_role:
+                    user.roles.append(default_role)
                 db.session.add(user)
         
+        # Set email verification status for both new and existing users
+        if is_email_verified and not user.email_verified_at:
+            user.email_verified_at = datetime.utcnow()
+        
+        # Upload avatar if picture URL is available and user doesn't have one
+        if picture_url and not user.profile_picture_url:
+             self._upload_avatar_from_url(user, picture_url)
+
         db.session.commit()
 
         # 4. Create our own JWT for the user
@@ -327,22 +368,13 @@ class AuthService:
         return None
 
     def _get_linkedin_user_profile(self, access_token):
-        """Gets user's basic profile from LinkedIn."""
-        url = 'https://api.linkedin.com/v2/me'
+        """Gets user's profile info from LinkedIn's OIDC userinfo endpoint."""
+        url = 'https://api.linkedin.com/v2/userinfo'
         headers = {'Authorization': f'Bearer {access_token}'}
         response = requests.get(url, headers=headers)
         if response.status_code == 200:
             return response.json()
-        return None
-        
-    def _get_linkedin_user_email(self, access_token):
-        """Gets user's primary email from LinkedIn."""
-        url = 'https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))'
-        headers = {'Authorization': f'Bearer {access_token}'}
-        response = requests.get(url, headers=headers)
-        if response.status_code == 200:
-            data = response.json()
-            return {"email": data['elements'][0]['handle~']['emailAddress']}
+        print(f"LinkedIn UserInfo Error: {response.text}")
         return None
 
     # ... (register, login, logout methods remain here) ...

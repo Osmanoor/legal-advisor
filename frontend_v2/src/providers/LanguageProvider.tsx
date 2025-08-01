@@ -21,10 +21,12 @@ export const LanguageContext = createContext<LanguageContextType | null>(null);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<Language>(() => {
-    return (localStorage.getItem('language') as Language) || 'ar';
+    // return (localStorage.getItem('language') as Language) || 'ar';
+    return  'ar';
   });
 
-  const direction: Direction = language === 'ar' ? 'rtl' : 'ltr';
+  // const direction: Direction = language === 'ar' ? 'rtl' : 'ltr';
+  const direction: Direction = 'rtl' ;
 
   const translations = {
     en,
@@ -32,7 +34,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   };
 
   const setLanguage = (newLanguage: Language) => {
-    setLanguageState(newLanguage);
+    // setLanguageState(newLanguage);
     localStorage.setItem('language', newLanguage);
     document.documentElement.dir = newLanguage === 'ar' ? 'rtl' : 'ltr';
     document.documentElement.lang = newLanguage;

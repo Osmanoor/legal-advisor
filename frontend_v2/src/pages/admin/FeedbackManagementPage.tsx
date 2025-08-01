@@ -118,7 +118,7 @@ export default function FeedbackManagementPage() {
       </div>
       
       <div className="border-b-2 border-gray-200">
-        <div className="flex justify-end">
+        <div className="flex justify-start">
             {(Object.keys(tabLabels) as Array<keyof typeof tabLabels>).map(filterKey => (
                 <button 
                   key={filterKey}

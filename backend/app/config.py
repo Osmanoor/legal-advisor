@@ -13,6 +13,11 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    # --- NEW: Frontend URL for Development ---
+    # This is used to construct absolute URLs for redirects during development.
+    # In production, this will be None, and relative paths will be used.
+    FRONTEND_URL = os.environ.get('FRONTEND_URL') # e.g., 'http://localhost:5173'
+
     # --- Security & JWT Configurations ---
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or 'a-default-fallback-secret-key'
     

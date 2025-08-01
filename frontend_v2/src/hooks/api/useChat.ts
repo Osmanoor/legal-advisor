@@ -5,7 +5,14 @@ import { api } from '@/lib/axios';
 import { ChatMessage, ChatSession, ChatOptions, NewChatSessionResponse } from '@/types/chat';
 import { trackEvent } from '@/lib/analytics';
 
-// --- API Functions ---
+// --- MODIFICATION START: Define payload for starting a chat ---
+interface StartChatPayload {
+    message: string;
+    options: ChatOptions;
+    history?: { role: 'user' | 'assistant', content: string }[];
+}
+// --- MODIFICATION END ---
+
 const fetchChatSessions = async (): Promise<ChatSession[]> => {
   const response = await api.get('/chat/sessions');
   return response.data;
@@ -16,10 +23,12 @@ const fetchChatMessages = async (sessionId: string): Promise<ChatMessage[]> => {
   return response.data;
 };
 
-const startNewChat = async (variables: { message: string; options: ChatOptions }): Promise<NewChatSessionResponse> => {
+// --- MODIFICATION START: Update function signature ---
+const startNewChat = async (variables: StartChatPayload): Promise<NewChatSessionResponse> => {
     const response = await api.post('/chat/sessions/new', variables);
     return response.data;
 };
+// --- MODIFICATION END ---
 
 const sendMessage = async (variables: { sessionId: string; message: string; options: ChatOptions }): Promise<ChatMessage> => {
     const { sessionId, ...payload } = variables;
@@ -33,7 +42,6 @@ const deleteSession = async (sessionId: string): Promise<{ message: string }> =>
 };
 
 
-// --- The Main Hook ---
 export function useChat() {
   const queryClient = useQueryClient();
 
@@ -52,20 +60,23 @@ export function useChat() {
     mutationFn: startNewChat,
     onSuccess: (newSessionData) => {
       trackEvent({ event: 'feature_used', feature_name: 'ai_assistant' });
-      // --- FIX: Use the new structured response to populate the cache ---
-      // This places the guaranteed-order messages into the cache for the new session ID.
-      queryClient.setQueryData(['chat', 'messages', newSessionData.id], newSessionData.messages);
       
-      // Add the new session to the session list without a full refetch for a faster UI update.
-      queryClient.setQueryData<ChatSession[]>(['chat', 'sessions'], (oldSessions) => {
-        const newSessionEntry = {
-          id: newSessionData.id,
-          title: newSessionData.title,
-          updated_at: newSessionData.updated_at,
-          questionCount: newSessionData.questionCount,
-        };
-        return oldSessions ? [newSessionEntry, ...oldSessions] : [newSessionEntry];
-      });
+      // --- MODIFICATION START: Handle both guest and user responses ---
+      if (newSessionData.id) { // This is a logged-in user with a new session
+        queryClient.setQueryData(['chat', 'messages', newSessionData.id], newSessionData.messages);
+        
+        queryClient.setQueryData<ChatSession[]>(['chat', 'sessions'], (oldSessions) => {
+          const newSessionEntry = {
+            id: newSessionData.id!,
+            title: newSessionData.title!,
+            updated_at: newSessionData.updated_at!,
+            questionCount: newSessionData.questionCount!,
+          };
+          return oldSessions ? [newSessionEntry, ...oldSessions] : [newSessionEntry];
+        });
+      }
+      // For guests, we don't need to touch the query cache. The component will handle the state locally.
+      // --- MODIFICATION END ---
     },
   });
 

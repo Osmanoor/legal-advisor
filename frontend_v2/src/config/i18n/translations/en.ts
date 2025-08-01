@@ -21,6 +21,8 @@ export const en = {
     logout: 'Logout',
     email: 'Email',
     password: 'Password',
+    linkedinAuthFailed: 'LinkedIn authentication failed. Please try again.',
+    linkedinProcessFailed: 'Failed to process LinkedIn login. Please try again.',
   },
   navigation: {
     home: 'Home',

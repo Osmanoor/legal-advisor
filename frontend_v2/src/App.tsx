@@ -30,6 +30,7 @@ import LoginPage from './pages/LoginPage';
 import SettingsPage from './pages/SettingsPage';
 import FeedbackPage from './pages/FeedbackPage';
 import PasswordResetPage from './pages/PasswordResetPage';
+import HelpPage from './pages/HelpPage'; // <-- Import the new page
 
 // Admin Pages
 import AnalyticsPage from './pages/admin/AnalyticsPage';
@@ -122,6 +123,9 @@ function App() {
                 {/* Settings page is always available but ONLY to logged-in users */}
                 <Route element={<AuthenticatedRoute />}>
                   <Route path="/settings" element={<SettingsPage />} />
+                  {/* --- MODIFICATION START: Add Help Page Route --- */}
+                  <Route path="/help" element={<HelpPage />} />
+                  {/* --- MODIFICATION END --- */}
                 </Route>
 
                 {/* Redirect from dashboard root to chat page */}

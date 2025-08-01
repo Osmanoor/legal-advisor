@@ -5,6 +5,7 @@ import json
 from app.models import Role, Permission, ContactSubmission
 from app.extensions import db 
 from app.config import Config
+from app.services.settings_service import SettingsService # <-- Import new service
 
 SETTINGS_FILE_PATH = Config.SETTINGS_FILE_PATH
 
@@ -48,15 +49,12 @@ class AdminService:
             },
             "admin_permissions": {
                 "features_enabled": {
-                    # --- MODIFICATION START ---
-                    # User-facing features (defaults for admins)
                     "access_chat": True,
                     "access_search_tool": True,
                     "access_calculator": True,
                     "access_text_corrector": True,
                     "access_report_generator": True,
                     "access_feedback": True,
-                    # Admin-facing features (defaults for admins)
                     "view_analytics": True,
                     "manage_users": True,
                     "update_user": True,
@@ -65,8 +63,6 @@ class AdminService:
                     "manage_contacts": True,
                     "update_admin": False,
                     "manage_global_settings": False,
-                    
-                    # --- MODIFICATION END ---
                 },
                 "usage_limits": {
                     "ai_assistant_queries_per_day": -1,
@@ -81,14 +77,14 @@ class AdminService:
         Retrieves global settings from JSON, all roles, and all categorized permissions.
         """
         try:
+            # --- MODIFICATION: Use the service to get settings ---
+            global_settings = SettingsService.get_settings()
+            # If the settings file did not exist, the service would have created a default one
+            # if it was called before, but here we ensure it exists if it's the first call.
             if not os.path.exists(SETTINGS_FILE_PATH):
-                global_settings = self._get_default_settings()
                 with open(SETTINGS_FILE_PATH, 'w') as f:
                     json.dump(global_settings, f, indent=2)
-            else:
-                with open(SETTINGS_FILE_PATH, 'r') as f:
-                    global_settings = json.load(f)
-        
+
         except (IOError, json.JSONDecodeError) as e:
             print(f"Error handling settings file: {e}")
             return {"error": "Could not read or create settings file."}, 500
@@ -114,12 +110,14 @@ class AdminService:
 
     def update_all_settings(self, data):
         """
-        Updates the global_settings.json file.
+        Updates the global_settings.json file and forces the cache to reload.
         """
         try:
-            # We now expect the full settings object, not a wrapped one
             with open(SETTINGS_FILE_PATH, 'w') as f:
                 json.dump(data, f, indent=2)
+            
+            # --- MODIFICATION: Force the settings service to reload its cache ---
+            SettingsService.force_reload()
             
             return {"message": "Settings updated successfully"}, 200
 
@@ -135,19 +133,15 @@ class AdminService:
         return dummy_stats, 200
 
     def get_contact_submissions(self, page=1, per_page=20, filter_by='new'):
-        # --- THIS IS THE CHANGE ---
         query = ContactSubmission.query
 
-        # Apply filter based on the status
         if filter_by in ['new', 'read', 'archived']:
             query = query.filter(ContactSubmission.status == filter_by)
-        # If filter_by is 'all' or an unknown value, we don't apply a status filter
 
         paginated_submissions = query.order_by(ContactSubmission.submitted_at.desc()).paginate(
             page=page, per_page=per_page, error_out=False
         )
-        # --- END OF CHANGE ---
-
+        
         submissions_data = [
             {
                 "id": s.id, "name": s.name, "email": s.email, "message": s.message,

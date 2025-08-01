@@ -1,10 +1,8 @@
 // src/components/dashboard/DashboardHeader.tsx
-// Updated for i18n
 
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Search, ChevronDown, Menu, X, User as UserIcon, LogOut, Shield, LogIn } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Search, ChevronDown, Menu, X, User as UserIcon, LogOut, Shield, LogIn, Repeat } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
 import UserAvatar from '/public/images/avatars/avatar1.png';
 import { useUIStore } from '@/stores/uiStore';
@@ -14,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/authStore';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Permission } from '@/types/user';
+import { HeaderSearch } from '@/features/search/components/HeaderSearch';
 
 const ADMIN_PAGE_PERMISSIONS: Permission[] = [
   'view_analytics',
@@ -29,6 +28,8 @@ export const DashboardHeader = () => {
   const { toggleSidebar } = useUIStore();
   const { isDesktop } = useBreakpoint();
   const [isMobileSearchVisible, setMobileSearchVisible] = useState(false);
+  const location = useLocation();
+  const isAdminPage = location.pathname.startsWith('/admin');
 
   const { user, logout, isAuthenticated } = useAuthStore();
   
@@ -63,10 +64,17 @@ export const DashboardHeader = () => {
             </Link>
             
             {canAccessAdmin && (
-              <Link to="/admin" className="flex items-center gap-2 w-full p-2 rounded-md text-sm hover:bg-gray-100 text-cta font-medium">
-                <Shield className="w-4 h-4" />
-                <span>{t('dashboard.header.adminDashboard')}</span>
-              </Link>
+              isAdminPage ? (
+                <Link to="/chat" className="flex items-center gap-2 w-full p-2 rounded-md text-sm hover:bg-gray-100 text-cta font-medium">
+                  <Repeat className="w-4 h-4" />
+                  <span>{t('dashboard.header.switchToUser')}</span>
+                </Link>
+              ) : (
+                <Link to="/admin" className="flex items-center gap-2 w-full p-2 rounded-md text-sm hover:bg-gray-100 text-cta font-medium">
+                  <Shield className="w-4 h-4" />
+                  <span>{t('dashboard.header.switchToAdmin')}</span>
+                </Link>
+              )
             )}
 
             <button onClick={handleLogout} className="flex items-center gap-2 w-full p-2 rounded-md text-sm hover:bg-red-50 text-red-600">
@@ -82,7 +90,7 @@ export const DashboardHeader = () => {
   const GuestActions = () => (
     <Button asChild>
       <Link to="/login">
-        <LogIn className="mr-2 h-4 w-4" />
+        {/* <LogIn className="mr-2 h-4 w-8" /> */}
         {t('dashboard.header.login')}
       </Link>
     </Button>
@@ -103,14 +111,7 @@ export const DashboardHeader = () => {
             <Button variant="ghost" size="icon" onClick={() => setMobileSearchVisible(false)}>
               <X className="w-5 h-5 text-gray-600" />
             </Button>
-            <Input
-              type="text"
-              placeholder={`${t('common.search')}...`}
-              className="h-[34px] flex-grow bg-gray-100 border-gray-300 focus:ring-1 focus:ring-cta"
-              dir={direction}
-              style={{ fontFamily: 'var(--font-primary-latin)' }}
-              autoFocus
-            />
+            <HeaderSearch className="flex-grow" />
           </div>
         )}
 
@@ -120,16 +121,7 @@ export const DashboardHeader = () => {
           {isDesktop && (
             <div className={`flex items-center gap-3 ${direction === 'rtl' ? 'flex-row-reverse' : ''}`}>
               {isAuthenticated ? <UserProfileDropdown /> : <GuestActions />}
-              <div className={`flex items-center border border-gray-300 rounded-md px-3 h-[34px] w-[240px]`}>
-                <Search className={`w-5 h-5 text-gray-500 ${direction === 'rtl' ? 'ml-3' : 'mr-3'}`} />
-                <Input
-                  type="text"
-                  placeholder={`${t('common.search')}...`}
-                  className="border-none focus:ring-0 h-full p-0 text-sm placeholder-gray-400 flex-grow bg-transparent"
-                  dir={direction}
-                  style={{ fontFamily: 'var(--font-primary-latin)' }}
-                />
-              </div>
+              <HeaderSearch />
             </div>
           )}
 

@@ -4,7 +4,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/hooks/useLanguage';
-import { MessageSquare, Calculator, Edit3, FileText, Settings, HelpCircle, LogOut, Search, Star } from 'lucide-react';
+import { Settings, HelpCircle, LogOut, Star } from 'lucide-react';
 import NewLogoDark from '@/assets/logo-new-dash.svg';
 import { useUIStore } from '@/stores/uiStore';
 import { cn } from '@/lib/utils';
@@ -13,14 +13,24 @@ import { useAuthStore } from '@/stores/authStore';
 import { usePermission } from '@/hooks/usePermission'; 
 import { Permission } from '@/types/user'; 
 
+// --- MODIFICATION START: Import custom SVG icons ---
+import UserRobotIcon from '@/assets/icons/user-robot.svg?react';
+import UserCalculatorIcon from '@/assets/icons/user-calculator.svg?react';
+import UserEditMessageIcon from '@/assets/icons/user-edit-message.svg?react';
+import UserPanIcon from '@/assets/icons/user-pan_.svg?react';
+import UserTenderIcon from '@/assets/icons/user-tender.svg?react';
+// --- MODIFICATION END ---
+
+// --- MODIFICATION START: Update the icon map ---
 const iconMap: { [key: string]: React.ElementType } = {
-  chat: MessageSquare,
-  search: Search,
-  calculator: Calculator,
-  correction: Edit3,
-  templates: FileText,
-  feedback: Star,
+  chat: UserRobotIcon,
+  search: UserPanIcon,
+  calculator: UserCalculatorIcon,
+  correction: UserEditMessageIcon,
+  tenderMapping: UserTenderIcon, // Correct key for Tender Mapping
+  feedback: Star, // Keep Star icon for feedback as it was not in the request
 };
+// --- MODIFICATION END ---
 
 export const DashboardSidebar = () => {
   const { t } = useLanguage();
@@ -35,7 +45,7 @@ export const DashboardSidebar = () => {
     { path: '/search', tKey: 'landingPage.solutions.advancedSearch.title', iconName: 'search', permission: 'access_search_tool' },
     { path: '/calculator', tKey: 'landingPage.solutions.calculator.title', iconName: 'calculator', permission: 'access_calculator' },
     { path: '/correction', tKey: 'landingPage.solutions.textCorrection.title', iconName: 'correction', permission: 'access_text_corrector' },
-    { path: '/tender-mapping', tKey: 'landingPage.solutions.procurementSystem.title', iconName: 'templates', permission: 'access_report_generator' },
+    { path: '/tender-mapping', tKey: 'landingPage.solutions.procurementSystem.title', iconName: 'tenderMapping', permission: 'access_report_generator' },
     { path: '/feedback', tKey: 'navigation.feedback', iconName: 'feedback', permission: 'access_feedback' },
   ];
 

@@ -4,7 +4,6 @@ import os
 from dotenv import load_dotenv
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-load_dotenv(os.path.join(basedir, '..', '.env'))
 
 class Config:
     """Application configuration"""
@@ -64,7 +63,7 @@ class Config:
         'min_query_length': 2,
         'valid_doc_types': ['System', 'Regulation', 'Both']
     }
-    LIBRARY_ROOT_FOLDER = "backend/library"
+    LIBRARY_ROOT_FOLDER = "library"
     LIBRARY_CONFIG = {
         'allowed_file_types': ['pdf', 'doc', 'docx', 'txt'],
         'max_file_size': 50 * 1024 * 1024,
@@ -76,15 +75,15 @@ class Config:
         'max_message_length': 1000,
         'required_fields': ['name', 'email', 'message']
     }
-    TEMPLATES_DIR = 'backend/app/templates/docs'
+    TEMPLATES_DIR = 'app/templates/docs'
     SMTP_CONFIG = {
         'server': 'smtp.gmail.com',
         'port': 587,
         'username': 'osmanoor2018@gmail.com',
         'password': 'kjpq qqgc moju mqhe'
     }
-    Journey_DIR = os.path.join('backend','data', 'journey')
-    TENDER_MAPPING_DIR = os.path.join('backend','data', 'tender_mapping')
+    Journey_DIR = os.path.join('data', 'journey')
+    TENDER_MAPPING_DIR = os.path.join('data', 'tender_mapping')
 
     # --- Global Settings File Path ---
     SETTINGS_FILE_PATH = os.path.join(basedir, 'global_settings.json')

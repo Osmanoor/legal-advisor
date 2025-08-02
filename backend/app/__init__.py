@@ -2,9 +2,15 @@
 
 import os
 import click
-from flask import Flask, send_from_directory
+from dotenv import load_dotenv
+from flask import Flask, send_from_directory, jsonify, request
 from flask.cli import with_appcontext
 from datetime import datetime, timedelta
+
+# Failsafe .env loading with explicit path
+basedir = os.path.abspath(os.path.dirname(__file__))
+dotenv_path = os.path.join(basedir, '..', '.env')
+load_dotenv(dotenv_path=dotenv_path)
 
 from app.config import Config
 from app.extensions import db, migrate, bcrypt, jwt, cors
@@ -14,24 +20,17 @@ def create_app(config_class=Config):
     app = Flask(__name__, static_folder='static', static_url_path='')
     app.config.from_object(config_class)
     
-    # Initialize Flask extensions
     db.init_app(app)
     migrate.init_app(app, db)
     bcrypt.init_app(app)
     jwt.init_app(app)
     
-    # --- MODIFICATION START: Conditional CORS Configuration ---
     frontend_url = app.config.get('FRONTEND_URL')
     if frontend_url:
-        # Development mode: Allow requests from the Vite dev server
         cors.init_app(app, resources={r"/api/*": {"origins": frontend_url}}, supports_credentials=True)
     else:
-        # Production mode (or local test): Standard CORS for same-origin and credentials
         cors.init_app(app, supports_credentials=True)
-    # --- MODIFICATION END ---
 
-
-    # Import models here so that Alembic can see them
     from app import models
 
     @jwt.token_in_blocklist_loader
@@ -40,7 +39,6 @@ def create_app(config_class=Config):
         token = db.session.query(models.TokenBlocklist.id).filter_by(jti=jti).scalar()
         return token is not None
 
-    # --- Register Blueprints (Unchanged) ---
     from app.api.auth import auth_bp
     from app.api.admin import admin_bp
     from app.api.reviews_admin import reviews_admin_bp
@@ -73,20 +71,23 @@ def create_app(config_class=Config):
     app.register_blueprint(settings_bp, url_prefix='/api/settings')
     app.register_blueprint(calculator_bp, url_prefix='/api/calculator')
     
-    # Register custom CLI commands
     app.cli.add_command(seed_data_command)
 
-    # --- Static file serving (Unchanged) ---
+    # This route serves the main index.html for the root URL
     @app.route('/')
-    def serve():
+    def serve_index():
         return send_from_directory(app.static_folder, 'index.html')
 
-    @app.route('/<path:path>')
-    def serve_path(path):
-        if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
-            return send_from_directory(app.static_folder, path)
-        else:
-            return send_from_directory(app.static_folder, 'index.html')
+    # This error handler catches any request that doesn't match an API route
+    # or a static file, and serves the index.html. This is the key to
+    # making React Router work on reloads.
+    @app.errorhandler(404)
+    def not_found(e):
+        # If the request path starts with /api, it's a genuine API 404
+        if request.path.startswith('/api/'):
+            return jsonify({"error": "Not Found"}), 404
+        # Otherwise, it's a frontend route, so serve the main app
+        return send_from_directory(app.static_folder, 'index.html')
 
     return app
 

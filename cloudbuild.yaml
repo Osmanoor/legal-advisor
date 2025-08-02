@@ -1,6 +1,5 @@
 steps:
   # 1. Build the production Docker image.
-  # This image will contain your backend, the pre-built frontend, and the .env file.
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
@@ -15,13 +14,12 @@ steps:
       - 'us-central1-docker.pkg.dev/my-project-2024-441219/gpn-repo/gpn-service:latest'
 
   # 3. Deploy the new image to Cloud Run.
-  # This step is much simpler now as it doesn't handle secrets.
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args:
       - 'run'
       - 'deploy'
-      - 'gpn-service' # This is the name of your service
+      - 'gpn-service'
       - '--image'
       - 'us-central1-docker.pkg.dev/my-project-2024-441219/gpn-repo/gpn-service:latest'
       - '--region'
@@ -30,5 +28,4 @@ steps:
       - 'managed'
       - '--allow-unauthenticated'
       - '--port=8080'
-      # This flag tells Cloud Run how to connect to your database instance.
       - '--add-cloudsql-instances=my-project-2024-441219:us-central1:gpn-db'

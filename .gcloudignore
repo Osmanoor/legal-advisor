@@ -1,0 +1,20 @@
+# This file tells gcloud what NOT to upload to Cloud Build.
+# By default, gcloud ignores all dotfiles like .env. We override that.
+
+# Start with the default ignore list. It's good practice.
+.gcloudignore
+.git
+.gitignore
+node_modules
+dist
+build
+
+#
+# Now, UN-ignore the specific file we NEED.
+# The "!" at the beginning means "DO NOT IGNORE THIS FILE".
+#
+!backend/.env
+
+# Re-ignore other dotfiles you don't want.
+.env.*
+.vscode
